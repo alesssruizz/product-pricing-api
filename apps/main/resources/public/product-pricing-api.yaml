@@ -1,0 +1,155 @@
+openapi: 3.0.3
+info:
+  title: Price Query API
+  description: >
+    API para consultar la tarifa y precio final aplicable a un producto de una
+    cadena en una fecha determinada. Resuelve conflictos de solapamiento de
+    rangos de vigencia mediante el campo PRIORITY.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local dev
+
+tags:
+  - name: Prices
+    description: Consulta de precios aplicables
+
+paths:
+  /api/v1/prices:
+    get:
+      tags:
+        - Prices
+      operationId: getApplicablePrice
+      summary: Obtiene el precio aplicable para un producto, cadena y fecha dados
+      description: >
+        Dado un instante de aplicación, un producto y una cadena, devuelve
+        la tarifa (price list) con mayor prioridad vigente en ese instante,
+        junto con el precio final.
+      parameters:
+        - $ref: '#/components/parameters/ApplicationDate'
+        - $ref: '#/components/parameters/ProductId'
+        - $ref: '#/components/parameters/BrandId'
+      responses:
+        '200':
+          description: Precio aplicable encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PriceResponse'
+              example:
+                productId: 35455
+                brandId: 1
+                priceList: 1
+                startDate: "2020-06-14T00:00:00Z"
+                endDate: "2020-12-31T23:59:59Z"
+                price: 35.50
+                currency: "EUR"
+        '400':
+          description: Parámetros de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+        '404':
+          description: No existe tarifa vigente para los criterios indicados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetail'
+
+components:
+  parameters:
+    ApplicationDate:
+      name: applicationDate
+      in: query
+      required: true
+      description: Fecha y hora de aplicación (ISO-8601, sin zona horaria)
+      schema:
+        type: string
+        format: date-time
+        example: "2020-06-14T16:00:00Z"
+
+    ProductId:
+      name: productId
+      in: query
+      required: true
+      description: Identificador del producto
+      schema:
+        type: integer
+        format: int64
+        example: 35455
+
+    BrandId:
+      name: brandId
+      in: query
+      required: true
+      description: Identificador de la cadena (1 = ZARA)
+      schema:
+        type: integer
+        format: int64
+        example: 1
+
+  schemas:
+    PriceResponse:
+      type: object
+      description: Precio final aplicable con la tarifa que lo origina
+      required:
+        - productId
+        - brandId
+        - priceList
+        - startDate
+        - endDate
+        - price
+        - currency
+      properties:
+        productId:
+          type: integer
+          format: int64
+          example: 35455
+        brandId:
+          type: integer
+          format: int64
+          example: 1
+        priceList:
+          type: integer
+          format: int32
+          description: Identificador de la tarifa (price_list) aplicada
+          example: 1
+        startDate:
+          type: string
+          format: date-time
+          description: Inicio de vigencia de la tarifa aplicada
+        endDate:
+          type: string
+          format: date-time
+          description: Fin de vigencia de la tarifa aplicada
+        price:
+          type: number
+          format: double
+          example: 35.50
+        currency:
+          type: string
+          minLength: 3
+          maxLength: 3
+          example: "EUR"
+
+    ProblemDetail:
+      type: object
+      description: Estructura de error (RFC 7807 simplificado)
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        status:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: "price_not_found"
+        message:
+          type: string
+          example: "No existe tarifa vigente para productId=35455, brandId=1 en la fecha indicada"
+        path:
+          type: string
+          example: "/api/v1/prices"
