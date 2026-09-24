@@ -1,7 +1,7 @@
-.PONY: all build test
+.PONY: all test
 
 all:
-	@./gradlew clean build --warning-mode all
+	@./gradlew spotlessApply clean build --warning-mode all
 
 test:
 	@./gradlew test --warning-mode all
