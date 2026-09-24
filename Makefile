@@ -1,6 +1,6 @@
-.PONY: build test
+.PONY: all test
 
-build:
+all:
 	@./gradlew spotlessApply clean build --warning-mode all
 
 test:
