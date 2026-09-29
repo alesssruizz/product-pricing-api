@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface SpringDataPriceRepository extends JpaRepository<PriceJpaEntity, Long> {
-
-	// Utilizo mejor query ya que pienso que es mucho mas declarativo que el metodo verboso de Jpa
+    // Utilizo mejor query ya que pienso que es mucho mas declarativo que el metodo verboso de Jpa
     @Query(
         value = """
         SELECT p
@@ -25,7 +24,6 @@ public interface SpringDataPriceRepository extends JpaRepository<PriceJpaEntity,
         Long productId,
         LocalDateTime applicationDate
     );
-
     /*
      * Equivalente a la query anterior, pero usando el metodo de Spring Data JPA derivado del nombre del metodo.
      *
