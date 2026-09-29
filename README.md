@@ -1,7 +1,8 @@
 ## ✍️ Notas del autor
 
-_(Espacio para que añada mi propia explicación del proyecto, decisiones tomadas y cualquier comentario adicional para quien evalúe la prueba.)_
+Estare atento al repo estos dias por si teneis cualquier incidencia o duda, me podeis crear una issue y la intento contestar lo antes posible.
 
+Y por supuesto, encantado de recibir cualquier PR para mejorar el codigo y asi poder tener feedback directo vuestro.
 
 # 💰 Product Pricing API
 
