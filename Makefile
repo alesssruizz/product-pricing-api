@@ -1,4 +1,4 @@
-.PONY: all test
+.PHONY: all test lint fix-lint run
 
 all:
 	@./gradlew spotlessApply clean build --warning-mode all
