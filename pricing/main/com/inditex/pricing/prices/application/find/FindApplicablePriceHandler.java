@@ -5,12 +5,12 @@ import com.inditex.pricing.shared.domain.Service;
 import com.inditex.pricing.shared.domain.bus.query.QueryHandler;
 
 @Service
-public class FindApplicationPriceQueryHandler
+public class FindApplicablePriceHandler
     implements QueryHandler<FindApplicablePriceQuery, PriceResponse> {
 
     private final PriceFinder finder;
 
-    public FindApplicationPriceQueryHandler(PriceFinder finder) {
+    public FindApplicablePriceHandler(PriceFinder finder) {
         this.finder = finder;
     }
 
