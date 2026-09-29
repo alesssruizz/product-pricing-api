@@ -13,6 +13,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     private static final String HEALTH_CHECK_PACKAGE =
         "com.inditex.apps.pricing.controller.health_check";
+    private static final String SPRINGDOC_PACKAGE = "org.springdoc";
 
     @Override
     public void configureApiVersioning(ApiVersionConfigurer configurer) {
@@ -31,6 +32,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
             HandlerTypePredicate
                 .forAnnotation(RestController.class)
                 .and(HandlerTypePredicate.forBasePackage(HEALTH_CHECK_PACKAGE).negate())
+                .and(HandlerTypePredicate.forBasePackage(SPRINGDOC_PACKAGE).negate())
         );
     }
 }
