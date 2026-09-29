@@ -15,7 +15,7 @@ import com.inditex.pricing.prices.domain.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.InvalidDateFormat;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
-import com.inditex.pricing.shared.infraestructure.spring.ApiController;
+import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
 @RestController
 @RequestMapping("/{version}")

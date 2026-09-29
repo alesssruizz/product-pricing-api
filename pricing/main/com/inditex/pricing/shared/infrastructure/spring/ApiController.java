@@ -1,4 +1,4 @@
-package com.inditex.pricing.shared.infraestructure.spring;
+package com.inditex.pricing.shared.infrastructure.spring;
 
 import java.util.HashMap;
 

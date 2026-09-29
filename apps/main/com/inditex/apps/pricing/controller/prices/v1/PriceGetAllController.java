@@ -12,7 +12,7 @@ import com.inditex.pricing.prices.application.PricesResponse;
 import com.inditex.pricing.prices.application.search_all.PriceSearchAllQuery;
 import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
-import com.inditex.pricing.shared.infraestructure.spring.ApiController;
+import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
 @RestController
 @RequestMapping("/{version}")

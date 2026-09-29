@@ -13,7 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.Utils;
 import com.inditex.pricing.shared.domain.bus.query.QueryHandlerExecutionError;
-import com.inditex.pricing.shared.infraestructure.spring.ApiController;
+import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
 @RestControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {

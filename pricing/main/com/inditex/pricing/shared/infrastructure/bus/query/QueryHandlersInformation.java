@@ -1,4 +1,4 @@
-package com.inditex.pricing.shared.infraestructure.bus.query;
+package com.inditex.pricing.shared.infrastructure.bus.query;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
