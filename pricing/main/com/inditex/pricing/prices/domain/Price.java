@@ -1,6 +1,9 @@
 package com.inditex.pricing.prices.domain;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public record Price(
     PriceBrandId brandId,
@@ -12,6 +15,14 @@ public record Price(
     PriceQuantity priceQuantity,
     PriceCurrency currency
 ) {
+    private static final Comparator<Price> APPLICABILITY_ORDER = Comparator
+        .comparing((Price price) -> price.priority().value())
+        .thenComparing(price -> price.startDate().value());
+
+    public static Optional<Price> mostApplicable(List<Price> candidates) {
+        return candidates.stream().max(APPLICABILITY_ORDER);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

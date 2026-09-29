@@ -33,9 +33,13 @@ public class JpaPriceRepository implements PriceRepository {
         PriceProductId productId,
         PriceDate applicationDate
     ) {
-        return jpaRepository
+        List<Price> candidates = jpaRepository
             .findApplicablePrice(brandId.value(), productId.value(), applicationDate.value())
-            .map(this::toDomain);
+            .stream()
+            .map(this::toDomain)
+            .collect(Collectors.toList());
+
+        return Price.mostApplicable(candidates);
     }
 
     @Override
