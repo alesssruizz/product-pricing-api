@@ -10,4 +10,4 @@ lint:
 	@./gradlew spotlessCheck
 
 fix-lint:
-	@./gradlew spotlessApply
+	@./gradlew spotlessApply --info
