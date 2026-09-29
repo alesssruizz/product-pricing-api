@@ -1,8 +1,13 @@
-# Product Pricing API
+## ✍️ Notas del autor
+
+_(Espacio para que añada mi propia explicación del proyecto, decisiones tomadas y cualquier comentario adicional para quien evalúe la prueba.)_
+
+
+# 💰 Product Pricing API
 
 Servicio REST que resuelve la tarifa y el precio final aplicable a un producto de una cadena en una fecha determinada, cuando existen varias tarifas con rangos de vigencia solapados.
 
-## Stack
+## 📦 Stack
 
 - Java 21
 - Spring Boot 4.1.1 (Web MVC, Data JPA)
@@ -10,7 +15,7 @@ Servicio REST que resuelve la tarifa y el precio final aplicable a un producto d
 - Gradle
 - JUnit 5 + Mockito + AssertJ
 
-## Arquitectura
+## 🏗️ Arquitectura
 
 Arquitectura Hexagonal (Ports & Adapters) + CQRS ligero, organizada en dos módulos Gradle:
 
@@ -20,17 +25,35 @@ Arquitectura Hexagonal (Ports & Adapters) + CQRS ligero, organizada en dos módu
   - `application`: casos de uso (queries + handlers), orquestan el dominio.
   - `infrastructure`: adaptadores concretos (JPA, Spring MVC).
 
-La regla de negocio central —qué tarifa aplica cuando dos se solapan— vive en `Price.mostApplicable(List<Price>)`, en el dominio, testeada sin Spring ni base de datos.
+La regla de negocio central —qué tarifa aplica cuando dos se solapan— vive en `Price.mostApplicable(List<Price>)`, en el dominio.
 
-## Cómo levantar el proyecto
+## ▶️ Cómo levantar el proyecto
+
+Con `make` (recomendado, usa el `Makefile` del repo):
 
 ```bash
+make all
+make run
+```
+
+Sin `make`, directamente con el wrapper de Gradle:
+
+```bash
+./gradlew clean build
 ./gradlew bootRun
 ```
 
 La aplicación arranca en `http://localhost:8080` e inicializa H2 con los datos de ejemplo del enunciado (`pricing/main/resources/database/data.sql`) en cada arranque.
 
-## Cómo correr los tests
+## ✅ Cómo correr los tests
+
+Con `make`:
+
+```bash
+make test
+```
+
+Sin `make`:
 
 ```bash
 ./gradlew test
@@ -38,7 +61,23 @@ La aplicación arranca en `http://localhost:8080` e inicializa H2 con los datos 
 
 Incluye tests de aceptación (HTTP + H2 real) y unitarios (dominio y aplicación, sin Spring).
 
-## Endpoint principal
+## 🧹 Lint y formato
+
+El proyecto usa Spotless (Prettier para Java). Con `make`:
+
+```bash
+make lint       # comprueba el formato, sin modificar nada
+make fix-lint   # aplica el formato automáticamente
+```
+
+Sin `make`:
+
+```bash
+./gradlew spotlessCheck
+./gradlew spotlessApply
+```
+
+## 🔌 Endpoint principal
 
 ### `GET /api/v1/price`
 
@@ -83,7 +122,7 @@ GET /api/v1/price?applicationDate=2020-06-14T16:00:00&productId=35455&brandId=1
 
 Devuelve el listado completo de tarifas cargadas (utilidad de consulta, sin lógica de negocio).
 
-## Datos de ejemplo (H2)
+## 🌱 Datos de ejemplo (H2)
 
 | BRAND_ID | START_DATE | END_DATE | PRICE_LIST | PRODUCT_ID | PRIORITY | PRICE | CURR |
 |---|---|---|---|---|---|---|---|
@@ -94,7 +133,7 @@ Devuelve el listado completo de tarifas cargadas (utilidad de consulta, sin lóg
 
 `PRIORITY` desambigua qué tarifa aplica cuando dos rangos se solapan: gana la de mayor prioridad.
 
-## Documentación interactiva (OpenAPI)
+## 📖 Documentación interactiva (OpenAPI)
 
 Con la aplicación levantada:
 
@@ -103,6 +142,10 @@ Con la aplicación levantada:
 
 Generada automáticamente por `springdoc-openapi` a partir del código — no hay un YAML mantenido a mano.
 
-## Consola H2
+## 🗄️ Consola H2
 
 `http://localhost:8080/h2-console` — JDBC URL: `jdbc:h2:mem:pricingdb`, usuario `sa`, sin contraseña.
+
+## 🤖 Sobre el desarrollo
+
+Parte de este proyecto se construyó con ayuda de Claude Code, siguiendo un flujo de Spec-Driven Development (propuesta → spec → tareas → implementación → verificación) apoyado en sub-agentes para algunas fases de implementación y testing. Todas las decisiones de arquitectura, los criterios de diseño y la revisión final fueron revisados por mí.
