@@ -11,3 +11,6 @@ lint:
 
 fix-lint:
 	@./gradlew spotlessApply --info
+
+run:
+	@./gradlew bootRun
