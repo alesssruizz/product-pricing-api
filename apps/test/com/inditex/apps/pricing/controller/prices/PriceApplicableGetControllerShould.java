@@ -114,7 +114,7 @@ public class PriceApplicableGetControllerShould extends ProductPricingApiApplica
                 """
                 {
                     "status": 400,
-                    "error_code": "invalid_date_format"
+                    "errorCode": "invalid_date_format"
                 }
                 """
             );
@@ -129,7 +129,7 @@ public class PriceApplicableGetControllerShould extends ProductPricingApiApplica
                 """
                 {
                     "status": 404,
-                    "error_code": "price_not_found"
+                    "errorCode": "price_not_found"
                 }
                 """
             );

@@ -27,7 +27,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         HttpStatus status = statusFor(handlerMethod, error);
 
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, error.getMessage());
-        problem.setProperty("error_code", errorCodeFor(error));
+        problem.setProperty("errorCode", errorCodeFor(error));
         return ResponseEntity.status(status).body(problem);
     }
 

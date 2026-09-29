@@ -74,7 +74,7 @@ GET /api/v1/price?applicationDate=2020-06-14T16:00:00&productId=35455&brandId=1
 
 **Errores:**
 
-| Status | `error_code` | Cuándo |
+| Status | `errorCode` | Cuándo |
 |---|---|---|
 | `400 Bad Request` | `invalid_date_format` | `applicationDate` no es una fecha ISO-8601 válida |
 | `404 Not Found` | `price_not_found` | No hay ninguna tarifa vigente para esos parámetros |
