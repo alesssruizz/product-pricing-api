@@ -1,12 +1,13 @@
 package com.inditex.pricing.shared.infrastructure.bus.query;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 
-import org.reflections.Reflections;
+import org.springframework.core.ResolvableType;
 
 import com.inditex.pricing.shared.domain.Service;
+import com.inditex.pricing.shared.domain.bus.query.DuplicateQueryHandlerError;
 import com.inditex.pricing.shared.domain.bus.query.Query;
 import com.inditex.pricing.shared.domain.bus.query.QueryHandler;
 import com.inditex.pricing.shared.domain.bus.query.QueryNotRegisteredError;
@@ -14,40 +15,56 @@ import com.inditex.pricing.shared.domain.bus.query.QueryNotRegisteredError;
 @Service
 public final class QueryHandlersInformation {
 
-    HashMap<Class<? extends Query>, Class<? extends QueryHandler>> indexedQueryHandlers;
+    private final Map<Class<? extends Query>, QueryHandler> indexedQueryHandlers;
 
-    public QueryHandlersInformation() {
-        Reflections reflections = new Reflections("com.inditex");
-        Set<Class<? extends QueryHandler>> classes = reflections.getSubTypesOf(QueryHandler.class);
-
-        indexedQueryHandlers = formatHandlers(classes);
+    public QueryHandlersInformation(List<QueryHandler> queryHandlers) {
+        this.indexedQueryHandlers = formatHandlers(queryHandlers);
     }
 
-    public Class<? extends QueryHandler> search(Class<? extends Query> queryClass)
-        throws QueryNotRegisteredError {
-        Class<? extends QueryHandler> queryHandlerClass = indexedQueryHandlers.get(queryClass);
+    public QueryHandler search(Class<? extends Query> queryClass) throws QueryNotRegisteredError {
+        QueryHandler queryHandler = indexedQueryHandlers.get(queryClass);
 
-        if (null == queryHandlerClass) {
+        if (null == queryHandler) {
             throw new QueryNotRegisteredError(queryClass);
         }
 
-        return queryHandlerClass;
+        return queryHandler;
     }
 
-    private HashMap<Class<? extends Query>, Class<? extends QueryHandler>> formatHandlers(
-        Set<Class<? extends QueryHandler>> queryHandlers
+    private Map<Class<? extends Query>, QueryHandler> formatHandlers(
+        List<QueryHandler> queryHandlers
     ) {
-        HashMap<Class<? extends Query>, Class<? extends QueryHandler>> handlers = new HashMap<>();
+        Map<Class<? extends Query>, QueryHandler> handlers = new HashMap<>();
 
-        for (Class<? extends QueryHandler> handler : queryHandlers) {
-            ParameterizedType paramType = (ParameterizedType) handler.getGenericInterfaces()[0];
-            Class<? extends Query> queryClass = (Class<
-                    ? extends Query
-                >) paramType.getActualTypeArguments()[0];
+        for (QueryHandler handler : queryHandlers) {
+            Class<? extends Query> queryClass = resolveQueryType(handler);
+
+            if (handlers.containsKey(queryClass)) {
+                throw new DuplicateQueryHandlerError(queryClass);
+            }
 
             handlers.put(queryClass, handler);
         }
 
         return handlers;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<? extends Query> resolveQueryType(QueryHandler handler) {
+        Class<? extends Query> queryClass = (Class<? extends Query>) ResolvableType
+            .forClass(handler.getClass())
+            .as(QueryHandler.class)
+            .resolveGeneric(0);
+
+        if (null == queryClass) {
+            throw new IllegalStateException(
+                String.format(
+                    "Cannot resolve Query generic type for handler <%s>",
+                    handler.getClass()
+                )
+            );
+        }
+
+        return queryClass;
     }
 }
