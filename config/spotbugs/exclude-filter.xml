@@ -10,4 +10,12 @@
     </Not>
   </Match>
 
+  <!-- Project specific exclusions -->
+
+  <Match>
+<!--     Value Objects validate in the constructor by design: an invalid instance must never exist-->
+    <Bug pattern="CT_CONSTRUCTOR_THROW" />
+    <Class name="com.inditex.pricing.shared.domain.LocalDateTimeValueObject" />
+  </Match>
+
 </FindBugsFilter>
