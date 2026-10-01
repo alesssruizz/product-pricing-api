@@ -11,28 +11,27 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
-    private static final String HEALTH_CHECK_PACKAGE =
-        "com.inditex.apps.pricing.controller.health_check";
-    private static final String SPRINGDOC_PACKAGE = "org.springdoc";
+  private static final String HEALTH_CHECK_PACKAGE =
+      "com.inditex.apps.pricing.controller.healthcheck";
 
-    @Override
-    public void configureApiVersioning(ApiVersionConfigurer configurer) {
-        configurer.usePathSegment(1, this::isApiPath);
-        configurer.setVersionRequired(false);
-    }
+  private static final String SPRINGDOC_PACKAGE = "org.springdoc";
 
-    private boolean isApiPath(RequestPath path) {
-        return path.pathWithinApplication().value().startsWith("/api/");
-    }
+  @Override
+  public void configureApiVersioning(ApiVersionConfigurer configurer) {
+    configurer.usePathSegment(1, this::isApiPath);
+    configurer.setVersionRequired(false);
+  }
 
-    @Override
-    public void configurePathMatch(PathMatchConfigurer configurer) {
-        configurer.addPathPrefix(
-            "/api",
-            HandlerTypePredicate
-                .forAnnotation(RestController.class)
-                .and(HandlerTypePredicate.forBasePackage(HEALTH_CHECK_PACKAGE).negate())
-                .and(HandlerTypePredicate.forBasePackage(SPRINGDOC_PACKAGE).negate())
-        );
-    }
+  private boolean isApiPath(RequestPath path) {
+    return path.pathWithinApplication().value().startsWith("/api/");
+  }
+
+  @Override
+  public void configurePathMatch(PathMatchConfigurer configurer) {
+    configurer.addPathPrefix(
+        "/api",
+        HandlerTypePredicate.forAnnotation(RestController.class)
+            .and(HandlerTypePredicate.forBasePackage(HEALTH_CHECK_PACKAGE).negate())
+            .and(HandlerTypePredicate.forBasePackage(SPRINGDOC_PACKAGE).negate()));
+  }
 }

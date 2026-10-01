@@ -4,25 +4,27 @@ import com.inditex.pricing.shared.domain.bus.query.Query;
 
 public final class FindApplicablePriceQuery implements Query {
 
-    private final Long brandId;
-    private final Long productId;
-    private final String applicationDate;
+  private final Long brandId;
 
-    public FindApplicablePriceQuery(Long brandId, Long productId, String applicationDate) {
-        this.brandId = brandId;
-        this.productId = productId;
-        this.applicationDate = applicationDate;
-    }
+  private final Long productId;
 
-    public Long brandId() {
-        return brandId;
-    }
+  private final String applicationDate;
 
-    public Long productId() {
-        return productId;
-    }
+  public FindApplicablePriceQuery(Long brandId, Long productId, String applicationDate) {
+    this.brandId = brandId;
+    this.productId = productId;
+    this.applicationDate = applicationDate;
+  }
 
-    public String applicationDate() {
-        return applicationDate;
-    }
+  public Long brandId() {
+    return brandId;
+  }
+
+  public Long productId() {
+    return productId;
+  }
+
+  public String applicationDate() {
+    return applicationDate;
+  }
 }

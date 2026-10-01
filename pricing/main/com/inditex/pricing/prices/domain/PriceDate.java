@@ -6,11 +6,11 @@ import com.inditex.pricing.shared.domain.LocalDateTimeValueObject;
 
 public final class PriceDate extends LocalDateTimeValueObject {
 
-    public PriceDate(String value) {
-        super(value);
-    }
+  public PriceDate(String value) {
+    super(value);
+  }
 
-    public PriceDate(LocalDateTime value) {
-        super(value);
-    }
+  public PriceDate(LocalDateTime value) {
+    super(value);
+  }
 }

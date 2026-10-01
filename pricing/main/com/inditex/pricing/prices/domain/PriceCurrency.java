@@ -4,11 +4,11 @@ import com.inditex.pricing.shared.domain.StringValueObject;
 
 public class PriceCurrency extends StringValueObject {
 
-    public PriceCurrency(String value) {
-        super(value);
-    }
+  public PriceCurrency(String value) {
+    super(value);
+  }
 
-    public PriceCurrency() {
-        super("");
-    }
+  public PriceCurrency() {
+    super("");
+  }
 }

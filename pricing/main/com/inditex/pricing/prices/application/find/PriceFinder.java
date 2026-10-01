@@ -11,20 +11,20 @@ import com.inditex.pricing.shared.domain.Service;
 @Service
 public final class PriceFinder {
 
-    private final PriceRepository repository;
+  private final PriceRepository repository;
 
-    public PriceFinder(PriceRepository repository) {
-        this.repository = repository;
-    }
+  public PriceFinder(PriceRepository repository) {
+    this.repository = repository;
+  }
 
-    public PriceResponse find(FindApplicablePriceQuery query) {
-        PriceBrandId brandId = new PriceBrandId(query.brandId());
-        PriceProductId productId = new PriceProductId(query.productId());
-        PriceDate applicationDate = new PriceDate(query.applicationDate());
+  public PriceResponse find(FindApplicablePriceQuery query) {
+    PriceBrandId brandId = new PriceBrandId(query.brandId());
+    PriceProductId productId = new PriceProductId(query.productId());
+    PriceDate applicationDate = new PriceDate(query.applicationDate());
 
-        return repository
-            .findApplicablePrice(brandId, productId, applicationDate)
-            .map(PriceResponse::fromAggregate)
-            .orElseThrow(() -> new PriceNotFoundException(brandId, productId, applicationDate));
-    }
+    return repository
+        .findApplicablePrice(brandId, productId, applicationDate)
+        .map(PriceResponse::fromAggregate)
+        .orElseThrow(() -> new PriceNotFoundException(brandId, productId, applicationDate));
+  }
 }

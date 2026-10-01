@@ -4,11 +4,11 @@ import com.inditex.pricing.shared.domain.IntValueObject;
 
 public final class PricePriority extends IntValueObject {
 
-    public PricePriority(Integer value) {
-        super(value);
-    }
+  public PricePriority(Integer value) {
+    super(value);
+  }
 
-    public PricePriority() {
-        super(0);
-    }
+  public PricePriority() {
+    super(0);
+  }
 }

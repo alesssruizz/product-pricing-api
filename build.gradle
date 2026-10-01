@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'idea'
+    id 'checkstyle'
     id 'org.springframework.boot' version '4.1.1'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.diffplug.spotless' version '8.10.2'
@@ -38,14 +39,19 @@ dependencies {
 
 spotless {
     java {
-        prettier(['prettier': '3.0.3', 'prettier-plugin-java': '2.3.0'])
-                .config(['parser': 'java', 'tabWidth': 4, 'printWidth': 100, 'plugins': ['prettier-plugin-java']])
+        googleJavaFormat().reorderImports(false)
 
-        importOrder('\\#', 'java', '', 'com.inditex')
+        importOrder('\\#java', '\\#com.inditex', '\\#', 'java', 'com.inditex', '')
         removeUnusedImports()
         endWithNewline()
         formatAnnotations()
+        shortenFullyQualifiedTypes()
+
     }
+}
+
+checkstyle {
+    toolVersion = '14.3.0'
 }
 
 sourceSets {

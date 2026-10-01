@@ -8,14 +8,14 @@ import com.inditex.pricing.shared.domain.bus.query.QueryHandler;
 public class FindApplicablePriceHandler
     implements QueryHandler<FindApplicablePriceQuery, PriceResponse> {
 
-    private final PriceFinder finder;
+  private final PriceFinder finder;
 
-    public FindApplicablePriceHandler(PriceFinder finder) {
-        this.finder = finder;
-    }
+  public FindApplicablePriceHandler(PriceFinder finder) {
+    this.finder = finder;
+  }
 
-    @Override
-    public PriceResponse handle(FindApplicablePriceQuery query) {
-        return finder.find(query);
-    }
+  @Override
+  public PriceResponse handle(FindApplicablePriceQuery query) {
+    return finder.find(query);
+  }
 }

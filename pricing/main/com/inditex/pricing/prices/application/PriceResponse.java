@@ -13,18 +13,16 @@ public record PriceResponse(
     LocalDateTime startDate,
     LocalDateTime endDate,
     BigDecimal price,
-    String currency
-)
+    String currency)
     implements Response {
-    public static PriceResponse fromAggregate(Price price) {
-        return new PriceResponse(
-            price.productId().value(),
-            price.brandId().value(),
-            price.priceList().value(),
-            price.startDate().value(),
-            price.endDate().value(),
-            price.priceQuantity().value(),
-            price.currency().value()
-        );
-    }
+  public static PriceResponse fromAggregate(Price price) {
+    return new PriceResponse(
+        price.productId().value(),
+        price.brandId().value(),
+        price.priceList().value(),
+        price.startDate().value(),
+        price.endDate().value(),
+        price.priceQuantity().value(),
+        price.currency().value());
+  }
 }

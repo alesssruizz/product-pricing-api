@@ -15,37 +15,25 @@ import org.springframework.test.web.servlet.ResultMatcher;
 @AutoConfigureMockMvc
 public abstract class ProductPricingApiApplicationTests {
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    protected void assertResponse(
-        String endpoint,
-        Integer expectedStatusCode,
-        String expectedResponse
-    ) throws Exception {
-        ResultMatcher response = expectedResponse.isEmpty()
-            ? content().string("")
-            : content().json(expectedResponse);
+  protected void assertResponse(
+      String endpoint, Integer expectedStatusCode, String expectedResponse) throws Exception {
+    ResultMatcher response =
+        expectedResponse.isEmpty() ? content().string("") : content().json(expectedResponse);
 
-        mockMvc
-            .perform(get(endpoint))
-            .andExpect(status().is(expectedStatusCode))
-            .andExpect(response);
-    }
+    mockMvc.perform(get(endpoint)).andExpect(status().is(expectedStatusCode)).andExpect(response);
+  }
 
-    protected void assertResponse(
-        String endpoint,
-        Integer expectedStatusCode,
-        String expectedResponse,
-        HttpHeaders headers
-    ) throws Exception {
-        ResultMatcher response = expectedResponse.isEmpty()
-            ? content().string("")
-            : content().json(expectedResponse);
+  protected void assertResponse(
+      String endpoint, Integer expectedStatusCode, String expectedResponse, HttpHeaders headers)
+      throws Exception {
+    ResultMatcher response =
+        expectedResponse.isEmpty() ? content().string("") : content().json(expectedResponse);
 
-        mockMvc
-            .perform(get(endpoint).headers(headers))
-            .andExpect(status().is(expectedStatusCode))
-            .andExpect(response);
-    }
+    mockMvc
+        .perform(get(endpoint).headers(headers))
+        .andExpect(status().is(expectedStatusCode))
+        .andExpect(response);
+  }
 }

@@ -6,11 +6,11 @@ import com.inditex.pricing.shared.domain.BigDecimalValueObject;
 
 public final class PriceQuantity extends BigDecimalValueObject {
 
-    public PriceQuantity(BigDecimal value) {
-        super(value);
-    }
+  public PriceQuantity(BigDecimal value) {
+    super(value);
+  }
 
-    public PriceQuantity() {
-        super(BigDecimal.ZERO);
-    }
+  public PriceQuantity() {
+    super(BigDecimal.ZERO);
+  }
 }

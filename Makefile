@@ -1,13 +1,13 @@
 .PHONY: all test lint fix-lint run
 
 all:
-	@./gradlew spotlessApply clean build --warning-mode all
+	@./gradlew clean build --warning-mode all
 
 test:
 	@./gradlew test --warning-mode all
 
 lint:
-	@./gradlew spotlessCheck
+	@./gradlew checkstyleMain checkstyleTest
 
 fix-lint:
 	@./gradlew spotlessApply --info
