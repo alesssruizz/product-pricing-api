@@ -7,7 +7,7 @@ test:
 	@./gradlew test --warning-mode all
 
 lint:
-	@./gradlew checkstyleMain checkstyleTest
+	@./gradlew checkstyleMain checkstyleTest spotbugsMain spotbugsTest
 
 fix-lint:
 	@./gradlew spotlessApply --info

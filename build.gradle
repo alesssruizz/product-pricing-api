@@ -1,3 +1,4 @@
+//file:noinspection GroovyAssignabilityCheck
 plugins {
     id 'java'
     id 'idea'
@@ -5,6 +6,7 @@ plugins {
     id 'org.springframework.boot' version '4.1.1'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.diffplug.spotless' version '8.10.2'
+    id 'com.github.spotbugs' version '6.5.12'
 }
 
 group = 'com.inditex'
@@ -35,6 +37,8 @@ dependencies {
 
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.14.0'
 }
 
 spotless {
@@ -52,6 +56,29 @@ spotless {
 
 checkstyle {
     toolVersion = '14.3.0'
+}
+
+spotbugs {
+    toolVersion = '4.10.4'
+    excludeFilter = file('config/spotbugs/exclude-filter.xml')
+    onlyAnalyze = ['com.inditex.-']
+
+}
+
+spotbugsMain {
+    reports {
+        register('html') {
+            required = true
+        }
+    }
+}
+
+spotbugsTest {
+    reports {
+        register('html') {
+            required = true
+        }
+    }
 }
 
 sourceSets {
