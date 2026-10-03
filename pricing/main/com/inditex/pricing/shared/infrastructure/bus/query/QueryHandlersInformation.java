@@ -12,6 +12,7 @@ import com.inditex.pricing.shared.domain.bus.query.QueryNotRegisteredError;
 
 import org.springframework.core.ResolvableType;
 
+@SuppressWarnings("rawtypes")
 @Service
 public final class QueryHandlersInformation {
 
