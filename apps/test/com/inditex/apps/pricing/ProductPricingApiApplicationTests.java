@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -23,17 +22,5 @@ public abstract class ProductPricingApiApplicationTests {
         expectedResponse.isEmpty() ? content().string("") : content().json(expectedResponse);
 
     mockMvc.perform(get(endpoint)).andExpect(status().is(expectedStatusCode)).andExpect(response);
-  }
-
-  protected void assertResponse(
-      String endpoint, Integer expectedStatusCode, String expectedResponse, HttpHeaders headers)
-      throws Exception {
-    ResultMatcher response =
-        expectedResponse.isEmpty() ? content().string("") : content().json(expectedResponse);
-
-    mockMvc
-        .perform(get(endpoint).headers(headers))
-        .andExpect(status().is(expectedStatusCode))
-        .andExpect(response);
   }
 }
