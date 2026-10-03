@@ -19,11 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-public class JpaPriceRepository implements PriceRepository {
+public class PriceJpaRepository implements PriceRepository {
 
   private final SpringDataPriceRepository jpaRepository;
 
-  public JpaPriceRepository(SpringDataPriceRepository jpaRepository) {
+  public PriceJpaRepository(SpringDataPriceRepository jpaRepository) {
     this.jpaRepository = jpaRepository;
   }
 
