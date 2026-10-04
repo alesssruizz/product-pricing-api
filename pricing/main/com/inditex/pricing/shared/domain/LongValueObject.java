@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public abstract class LongValueObject {
 
-  private Long value;
+  private final Long value;
 
   public LongValueObject(Long value) {
     this.value = value;

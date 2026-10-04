@@ -1,6 +1,6 @@
 package com.inditex.pricing.shared.infrastructure.spring;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.bus.query.Query;
@@ -20,5 +20,7 @@ public abstract class ApiController {
     return queryBus.ask(query);
   }
 
-  public abstract HashMap<Class<? extends DomainError>, HttpStatus> errorMapping();
+  public Map<Class<? extends DomainError>, HttpStatus> errorMapping() {
+    return Map.of();
+  }
 }

@@ -45,14 +45,14 @@ public class PriceJpaRepository implements PriceRepository {
 
   private Price toDomain(PriceJpaEntity entity) {
     return Price.builder()
-		.brandId(new PriceBrandId(entity.getBrandId()))
-		.startDate(new PriceDate(entity.getStartDate()))
-		.endDate(new PriceDate(entity.getEndDate()))
-		.priceList(new PriceList(entity.getPriceList()))
-		.productId(new PriceProductId(entity.getProductId()))
-		.priority(new PricePriority(entity.getPriority()))
-		.priceQuantity(new PriceQuantity(entity.getPrice()))
-		.currency(new PriceCurrency(entity.getCurrency()))
-		.build();
+        .brandId(new PriceBrandId(entity.getBrandId()))
+        .startDate(new PriceDate(entity.getStartDate()))
+        .endDate(new PriceDate(entity.getEndDate()))
+        .priceList(new PriceList(entity.getPriceList()))
+        .productId(new PriceProductId(entity.getProductId()))
+        .priority(new PricePriority(entity.getPriority()))
+        .priceQuantity(new PriceQuantity(entity.getPrice()))
+        .currency(new PriceCurrency(entity.getCurrency()))
+        .build();
   }
 }

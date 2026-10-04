@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public abstract class IntValueObject {
 
-  private Integer value;
+  private final Integer value;
 
   public IntValueObject(Integer value) {
     this.value = value;
@@ -16,6 +16,9 @@ public abstract class IntValueObject {
 
   @Override
   public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
     if (o == null || getClass() != o.getClass()) {
       return false;
     }

@@ -1,6 +1,6 @@
 package com.inditex.apps.pricing.controller.prices.v1;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import com.inditex.pricing.prices.application.PriceResponse;
 import com.inditex.pricing.prices.application.find.FindApplicablePriceQuery;
@@ -36,12 +36,9 @@ public class PriceApplicableGetController extends ApiController {
   }
 
   @Override
-  public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
-    return new HashMap<>() {
-      {
-        put(PriceNotFoundException.class, HttpStatus.NOT_FOUND);
-        put(InvalidDateFormat.class, HttpStatus.BAD_REQUEST);
-      }
-    };
+  public Map<Class<? extends DomainError>, HttpStatus> errorMapping() {
+    return Map.of(
+        PriceNotFoundException.class, HttpStatus.NOT_FOUND,
+        InvalidDateFormat.class, HttpStatus.BAD_REQUEST);
   }
 }

@@ -7,14 +7,14 @@ import java.util.Objects;
 
 public abstract class LocalDateTimeValueObject {
 
-  private LocalDateTime value;
+  private final LocalDateTime value;
 
   public LocalDateTimeValueObject(String value) {
     this.value = ensureIsValidLocalDateTime(value);
   }
 
   public LocalDateTimeValueObject(LocalDateTime value) {
-    this.value = Objects.requireNonNull(value);
+    this.value = value;
   }
 
   private LocalDateTime ensureIsValidLocalDateTime(String value) throws InvalidDateFormat {

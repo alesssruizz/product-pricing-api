@@ -1,14 +1,10 @@
 package com.inditex.apps.pricing.controller.prices.v1;
 
-import java.util.HashMap;
-
 import com.inditex.pricing.prices.application.PricesResponse;
 import com.inditex.pricing.prices.application.searchall.PriceSearchAllQuery;
-import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,10 +23,5 @@ public class PriceGetAllController extends ApiController {
     PricesResponse prices = ask(new PriceSearchAllQuery());
 
     return ResponseEntity.ok().body(prices);
-  }
-
-  @Override
-  public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
-    return null;
   }
 }

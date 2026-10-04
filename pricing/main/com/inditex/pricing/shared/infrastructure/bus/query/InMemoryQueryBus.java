@@ -17,12 +17,12 @@ public final class InMemoryQueryBus implements QueryBus {
 
   @SuppressWarnings({"unchecked", "rawtypes"})
   @Override
-  public <R> R ask(Query query) throws QueryHandlerExecutionError {
+  public <R> R ask(Query query) {
     try {
       QueryHandler handler = information.search(query.getClass());
 
       return (R) handler.handle(query);
-    } catch (Throwable error) {
+    } catch (Exception error) {
       throw new QueryHandlerExecutionError(error);
     }
   }
