@@ -2,7 +2,6 @@ package com.inditex.pricing.prices.infrastructure.persistence.jpa;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.inditex.pricing.prices.domain.Price;
 import com.inditex.pricing.prices.domain.PriceBrandId;
@@ -15,45 +14,45 @@ import com.inditex.pricing.prices.domain.PriceQuantity;
 import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.shared.domain.Service;
 
+import org.springframework.data.domain.Limit;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 public class PriceJpaRepository implements PriceRepository {
 
-  private final SpringDataPriceRepository jpaRepository;
+  private final SpringDataPriceRepository repository;
 
-  public PriceJpaRepository(SpringDataPriceRepository jpaRepository) {
-    this.jpaRepository = jpaRepository;
+  public PriceJpaRepository(SpringDataPriceRepository repository) {
+    this.repository = repository;
   }
 
   @Override
   public Optional<Price> findApplicablePrice(
       PriceBrandId brandId, PriceProductId productId, PriceDate applicationDate) {
-    List<Price> candidates =
-        jpaRepository
-            .findApplicablePrice(brandId.value(), productId.value(), applicationDate.value())
-            .stream()
-            .map(this::toDomain)
-            .collect(Collectors.toList());
-
-    return Price.mostApplicable(candidates);
+    return repository
+        .findApplicablePrice(
+            brandId.value(), productId.value(), applicationDate.value(), Limit.of(1))
+        .stream()
+        .findFirst()
+        .map(this::toDomain);
   }
 
   @Override
-  public List<Price> searchAll() {
-    return jpaRepository.findAll().stream().map(this::toDomain).collect(Collectors.toList());
+  public List<Price> findAll() {
+    return repository.findAll().stream().map(this::toDomain).toList();
   }
 
   private Price toDomain(PriceJpaEntity entity) {
-    return new Price(
-        new PriceBrandId(entity.brandId()),
-        new PriceDate(entity.startDate()),
-        new PriceDate(entity.endDate()),
-        new PriceList(entity.priceList()),
-        new PriceProductId(entity.productId()),
-        new PricePriority(entity.priority()),
-        new PriceQuantity(entity.price()),
-        new PriceCurrency(entity.currency()));
+    return Price.builder()
+		.brandId(new PriceBrandId(entity.getBrandId()))
+		.startDate(new PriceDate(entity.getStartDate()))
+		.endDate(new PriceDate(entity.getEndDate()))
+		.priceList(new PriceList(entity.getPriceList()))
+		.productId(new PriceProductId(entity.getProductId()))
+		.priority(new PricePriority(entity.getPriority()))
+		.priceQuantity(new PriceQuantity(entity.getPrice()))
+		.currency(new PriceCurrency(entity.getCurrency()))
+		.build();
   }
 }

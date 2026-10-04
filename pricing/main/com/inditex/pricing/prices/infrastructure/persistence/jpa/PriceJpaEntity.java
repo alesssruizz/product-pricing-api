@@ -9,9 +9,16 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
+@Data
 @Entity
 @Table(name = "prices")
+@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class PriceJpaEntity {
 
   @Id
@@ -19,66 +26,24 @@ public class PriceJpaEntity {
   private Long id;
 
   @Column(name = "brand_id")
-  private Long brandId;
+  private final Long brandId;
 
   @Column(name = "start_date")
-  private LocalDateTime startDate;
+  private final LocalDateTime startDate;
 
   @Column(name = "end_date")
-  private LocalDateTime endDate;
+  private final LocalDateTime endDate;
 
   @Column(name = "price_list")
-  private Integer priceList;
+  private final Integer priceList;
 
   @Column(name = "product_id")
-  private Long productId;
+  private final Long productId;
 
-  @Column(name = "priority")
-  private Integer priority;
+  private final Integer priority;
 
-  @Column(name = "price")
-  private BigDecimal price;
+  private final BigDecimal price;
 
   @Column(name = "curr", columnDefinition = "CHAR(3)")
-  private String currency;
-
-  protected PriceJpaEntity() {
-    // Required by JPA
-  }
-
-  public Long id() {
-    return id;
-  }
-
-  public Long brandId() {
-    return brandId;
-  }
-
-  public LocalDateTime startDate() {
-    return startDate;
-  }
-
-  public LocalDateTime endDate() {
-    return endDate;
-  }
-
-  public Integer priceList() {
-    return priceList;
-  }
-
-  public Long productId() {
-    return productId;
-  }
-
-  public Integer priority() {
-    return priority;
-  }
-
-  public BigDecimal price() {
-    return price;
-  }
-
-  public String currency() {
-    return currency;
-  }
+  private final String currency;
 }

@@ -7,5 +7,5 @@ public interface PriceRepository {
   Optional<Price> findApplicablePrice(
       PriceBrandId brandId, PriceProductId productId, PriceDate applicationDate);
 
-  List<Price> searchAll();
+  List<Price> findAll();
 }

@@ -16,6 +16,6 @@ public class PriceSearcher {
 
   public PricesResponse search() {
     return new PricesResponse(
-        repository.searchAll().stream().map(PriceResponse::fromAggregate).toList());
+        repository.findAll().stream().map(PriceResponse::fromAggregate).toList());
   }
 }
