@@ -9,6 +9,8 @@ import com.inditex.pricing.shared.domain.Utils;
 import com.inditex.pricing.shared.domain.bus.query.QueryHandlerExecutionError;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +22,21 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
-  @ExceptionHandler({DomainError.class, QueryHandlerExecutionError.class})
+  private static final Logger LOGGER = LoggerFactory.getLogger(ApiExceptionHandler.class);
+
+  @ExceptionHandler
   public ResponseEntity<ProblemDetail> handleDomainError(
       Exception exception, HandlerMethod handlerMethod) {
     Throwable error = unwrap(exception);
     HttpStatus status = statusFor(handlerMethod, error);
 
-    ProblemDetail problem = forStatusAndDetail(status, error.getMessage());
+    String detail = error.getMessage();
+    if (status.is5xxServerError()) {
+      LOGGER.error("Unhandled error in {}", handlerMethod, error);
+      detail = "Unexpected error";
+    }
+
+    ProblemDetail problem = forStatusAndDetail(status, detail);
     problem.setProperty("errorCode", errorCodeFor(error));
     return ResponseEntity.status(status).body(problem);
   }

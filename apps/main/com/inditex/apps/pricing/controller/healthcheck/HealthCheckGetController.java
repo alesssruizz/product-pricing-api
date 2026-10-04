@@ -12,10 +12,9 @@ public final class HealthCheckGetController {
   @GetMapping("/health-check")
   public ResponseEntity<Map<String, String>> healthCheck() {
     Map<String, String> status =
-		Map.of(
+        Map.of(
             "application", "product-pricing-api",
-            "status", "ok"
-        );
+            "status", "ok");
 
     return ResponseEntity.ok().body(status);
   }
