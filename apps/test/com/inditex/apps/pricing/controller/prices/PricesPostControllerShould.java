@@ -2,7 +2,6 @@ package com.inditex.apps.pricing.controller.prices;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -12,8 +11,6 @@ import com.inditex.apps.pricing.ProductPricingApiApplicationTests;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -35,17 +32,13 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
       }
       """;
 
-  private ResultActions postBody(String body) throws Exception {
-    return perform(post(ENDPOINT).contentType(MediaType.APPLICATION_JSON).content(body));
-  }
-
   @Nested
   class HappyPathTests {
 
     @Test
     @DisplayName("Returns 201 with Location and the created price including its id")
     void createsThePrice() throws Exception {
-      postBody(VALID_BODY)
+      postBody(ENDPOINT, VALID_BODY)
           .andExpect(status().isCreated())
           .andExpect(header().string("Location", containsString("/api/v1/prices/")))
           .andExpect(jsonPath("$.id").isNumber())
@@ -58,7 +51,22 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
     void ignoresClientId() throws Exception {
       String bodyWithId = VALID_BODY.replace("{", "{\n    \"id\": 999,");
 
-      postBody(bodyWithId).andExpect(status().isCreated()).andExpect(jsonPath("$.id", not(999)));
+      postBody(ENDPOINT, bodyWithId)
+          .andExpect(status().isCreated())
+          .andExpect(jsonPath("$.id", not(999)));
+    }
+
+    @Test
+    @DisplayName("Returns 201 when dates match an existing price but priority differs")
+    void createsPriceWhenOnlyPriorityDiffers() throws Exception {
+      String samePeriodDifferentPriority =
+          VALID_BODY
+              .replace(
+                  "\"startDate\": \"2021-01-01T00:00:00\"",
+                  "\"startDate\": \"2020-06-14T00:00:00\"")
+              .replace("\"priority\": 5", "\"priority\": 1");
+
+      postBody(ENDPOINT, samePeriodDifferentPriority).andExpect(status().isCreated());
     }
   }
 
@@ -82,7 +90,7 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
           }
           """;
 
-      postBody(conflicting)
+      postBody(ENDPOINT, conflicting)
           .andExpect(status().isConflict())
           .andExpect(jsonPath("$.errorCode").value("price_already_exists"));
     }
@@ -90,15 +98,23 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
     @Test
     @DisplayName("Returns 400 with invalid_reference when the brand does not exist")
     void returns400OnUnknownBrand() throws Exception {
-      postBody(VALID_BODY.replace("\"brandId\": 1", "\"brandId\": 999"))
+      postBody(ENDPOINT, VALID_BODY.replace("\"brandId\": 1", "\"brandId\": 999"))
           .andExpect(status().isBadRequest())
           .andExpect(jsonPath("$.errorCode").value("invalid_reference"));
     }
 
     @Test
+    @DisplayName("Returns 400 with invalid_price_currency when the currency is not ISO 4217")
+    void returns400OnInvalidCurrency() throws Exception {
+      postBody(ENDPOINT, VALID_BODY.replace("\"currency\": \"EUR\"", "\"currency\": \"ABC\""))
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.errorCode").value("invalid_price_currency"));
+    }
+
+    @Test
     @DisplayName("Returns 400 with invalid_price_quantity when price is zero")
     void returns400OnZeroQuantity() throws Exception {
-      postBody(VALID_BODY.replace("\"price\": 12.30", "\"price\": 0"))
+      postBody(ENDPOINT, VALID_BODY.replace("\"price\": 12.30", "\"price\": 0"))
           .andExpect(status().isBadRequest())
           .andExpect(jsonPath("$.errorCode").value("invalid_price_quantity"));
     }
@@ -106,7 +122,7 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
     @Test
     @DisplayName("Returns 400 without errorCode when the JSON is malformed")
     void returns400WithoutErrorCodeOnMalformedJson() throws Exception {
-      postBody("{\"brandId\": ")
+      postBody(ENDPOINT, "{\"brandId\": ")
           .andExpect(status().isBadRequest())
           .andExpect(jsonPath("$.errorCode").doesNotExist());
     }

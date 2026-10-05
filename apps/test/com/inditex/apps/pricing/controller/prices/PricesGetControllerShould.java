@@ -8,6 +8,7 @@ public class PricesGetControllerShould extends ProductPricingApiApplicationTests
 
   @Test
   public void returnAllSeededPrices() throws Exception {
+
     assertResponse(
         "/api/v1/prices",
         200,
