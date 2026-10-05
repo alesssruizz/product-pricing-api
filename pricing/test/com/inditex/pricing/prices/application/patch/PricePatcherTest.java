@@ -1,0 +1,112 @@
+package com.inditex.pricing.prices.application.patch;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.util.Optional;
+
+import com.inditex.pricing.prices.domain.Price;
+import com.inditex.pricing.prices.domain.PriceId;
+import com.inditex.pricing.prices.domain.PriceIntegrityChecker;
+import com.inditex.pricing.prices.domain.PriceRepository;
+import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
+import com.inditex.pricing.prices.domain.exceptions.PriceAlreadyExists;
+import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("PricePatcher")
+class PricePatcherTest {
+
+  @Mock private PriceRepository repository;
+
+  @Mock private PriceIntegrityChecker integrityChecker;
+
+  private PricePatcher patcher;
+
+  @BeforeEach
+  void setUp() {
+    patcher = new PricePatcher(repository, integrityChecker);
+  }
+
+  private static Price existing() {
+    return Price.create(
+            1L,
+            35455L,
+            1,
+            0,
+            "2020-06-14T00:00:00",
+            "2020-12-31T23:59:59",
+            new BigDecimal("35.50"),
+            "EUR")
+        .withId(new PriceId(1L));
+  }
+
+  private static PatchPriceCommand command(
+      BigDecimal price, String startDate, String endDate, String currency) {
+    return new PatchPriceCommand(1L, null, null, null, null, startDate, endDate, price, currency);
+  }
+
+  @Test
+  @DisplayName("Keeps the stored values for fields that were not sent")
+  void mergesOnlyTheSentFields() {
+    when(repository.findById(any())).thenReturn(Optional.of(existing()));
+    when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+    ArgumentCaptor<Price> saved = ArgumentCaptor.forClass(Price.class);
+
+    patcher.patch(command(new BigDecimal("40.00"), null, null, null));
+
+    verify(repository).save(saved.capture());
+    Price price = saved.getValue();
+    assertThat(price.id().value()).isEqualTo(1L);
+    assertThat(price.priceQuantity().value()).isEqualByComparingTo("40.00");
+    assertThat(price.priceList().value()).isEqualTo(1);
+    assertThat(price.currency().value()).isEqualTo("EUR");
+    assertThat(price.startDate().value().toString()).isEqualTo("2020-06-14T00:00");
+  }
+
+  @Test
+  @DisplayName("Validates the merged final state and does not save when it is invalid")
+  void validatesTheMergedFinalState() {
+    when(repository.findById(any())).thenReturn(Optional.of(existing()));
+
+    assertThatThrownBy(() -> patcher.patch(command(null, null, "2020-06-13T00:00:00", null)))
+        .isInstanceOf(InvalidPriceDateRange.class);
+    verify(repository, never()).save(any());
+  }
+
+  @Test
+  @DisplayName("Throws not found when the id does not exist")
+  void throwsNotFoundWhenMissing() {
+    when(repository.findById(any())).thenReturn(Optional.empty());
+
+    assertThatThrownBy(() -> patcher.patch(command(new BigDecimal("40.00"), null, null, null)))
+        .isInstanceOf(PriceNotFoundException.class);
+    verify(integrityChecker, never()).ensureCanBeSaved(any());
+    verify(repository, never()).save(any());
+  }
+
+  @Test
+  @DisplayName("Does not save when the integrity check reports a conflict")
+  void doesNotSaveOnConflict() {
+    when(repository.findById(any())).thenReturn(Optional.of(existing()));
+    doThrow(new PriceAlreadyExists()).when(integrityChecker).ensureCanBeSaved(any());
+
+    assertThatThrownBy(() -> patcher.patch(command(new BigDecimal("40.00"), null, null, null)))
+        .isInstanceOf(PriceAlreadyExists.class);
+    verify(repository, never()).save(any());
+  }
+}
