@@ -18,4 +18,10 @@
     <Class name="com.inditex.pricing.shared.domain.LocalDateTimeValueObject" />
   </Match>
 
+  <!-- Injected collaborators are services held by reference, not mutable state exposed by the class -->
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP2" />
+    <Class name="~.*\.(application|domain|infrastructure|controller)\..*" />
+  </Match>
+
 </FindBugsFilter>
