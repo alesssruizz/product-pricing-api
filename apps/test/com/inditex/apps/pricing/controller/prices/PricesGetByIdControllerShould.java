@@ -15,11 +15,11 @@ public class PricesGetByIdControllerShould extends ProductPricingApiApplicationT
     @DisplayName("Returns 200 with the price identified by id")
     void returnsThePriceById() throws Exception {
       assertResponse(
-          "/api/v1/prices/2",
+          "/api/v1/prices/00000000-0000-0000-0000-000000000002",
           200,
           """
           {
-              "id": 2,
+              "id": "00000000-0000-0000-0000-000000000002",
               "productId": 35455,
               "brandId": 1,
               "priceList": 2,
@@ -39,12 +39,26 @@ public class PricesGetByIdControllerShould extends ProductPricingApiApplicationT
     @DisplayName("Returns 404 with price_not_found when no price has the id")
     void returns404WhenPriceDoesNotExist() throws Exception {
       assertResponse(
-          "/api/v1/prices/999",
+          "/api/v1/prices/00000000-0000-0000-0000-000000000999",
           404,
           """
           {
               "status": 404,
               "errorCode": "price_not_found"
+          }
+          """);
+    }
+
+    @Test
+    @DisplayName("Returns 400 with invalid_uuid when the id is not a UUID")
+    void returns400WhenIdIsMalformed() throws Exception {
+      assertResponse(
+          "/api/v1/prices/not-a-uuid",
+          400,
+          """
+          {
+              "status": 400,
+              "errorCode": "invalid_uuid"
           }
           """);
     }

@@ -1,7 +1,7 @@
 package com.inditex.apps.pricing.controller.prices;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -18,9 +18,14 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
 
   private static final String ENDPOINT = "/api/v1/prices";
 
+  private static final String NEW_ID = "00000000-0000-0000-0000-000000000009";
+
+  private static final String SEED_ID = "00000000-0000-0000-0000-000000000001";
+
   private static final String VALID_BODY =
       """
       {
+          "id": "00000000-0000-0000-0000-000000000009",
           "brandId": 1,
           "productId": 35455,
           "priceList": 9,
@@ -36,24 +41,19 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
   class HappyPathTests {
 
     @Test
-    @DisplayName("Returns 201 with Location and the created price including its id")
+    @DisplayName("Returns 201 with Location and the created price with the client supplied id")
     void createsThePrice() throws Exception {
       postBody(ENDPOINT, VALID_BODY)
           .andExpect(status().isCreated())
-          .andExpect(header().string("Location", containsString("/api/v1/prices/")))
-          .andExpect(jsonPath("$.id").isNumber())
+          .andExpect(header().string("Location", containsString("/api/v1/prices/" + NEW_ID)))
+          .andExpect(jsonPath("$.id").value(NEW_ID))
           .andExpect(jsonPath("$.priceList").value(9))
           .andExpect(jsonPath("$.currency").value("EUR"));
-    }
 
-    @Test
-    @DisplayName("Ignores a client supplied id and assigns its own")
-    void ignoresClientId() throws Exception {
-      String bodyWithId = VALID_BODY.replace("{", "{\n    \"id\": 999,");
-
-      postBody(ENDPOINT, bodyWithId)
-          .andExpect(status().isCreated())
-          .andExpect(jsonPath("$.id", not(999)));
+      perform(get(ENDPOINT + "/" + NEW_ID))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.id").value(NEW_ID))
+          .andExpect(jsonPath("$.priceList").value(9));
     }
 
     @Test
@@ -79,6 +79,7 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
       String conflicting =
           """
           {
+              "id": "00000000-0000-0000-0000-000000000009",
               "brandId": 1,
               "productId": 35455,
               "priceList": 9,
@@ -96,6 +97,65 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
     }
 
     @Test
+    @DisplayName("Returns 400 with price_field_required when the id is missing")
+    void returns400WhenIdIsMissing() throws Exception {
+      postBody(ENDPOINT, VALID_BODY.replace("\"id\": \"" + NEW_ID + "\",", ""))
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.errorCode").value("price_field_required"));
+    }
+
+    @Test
+    @DisplayName("Returns 400 with price_field_required when the id is blank")
+    void returns400WhenIdIsBlank() throws Exception {
+      postBody(ENDPOINT, VALID_BODY.replace(NEW_ID, " "))
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.errorCode").value("price_field_required"));
+    }
+
+    @Test
+    @DisplayName("Returns 400 with invalid_uuid when the id is not a UUID")
+    void returns400WhenIdIsMalformed() throws Exception {
+      postBody(ENDPOINT, VALID_BODY.replace(NEW_ID, "not-a-uuid"))
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.errorCode").value("invalid_uuid"));
+    }
+
+    @Test
+    @DisplayName(
+        "Returns 409 with price_id_already_exists when the id is already taken, "
+            + "leaving the existing price unchanged")
+    void returns409WhenIdAlreadyExists() throws Exception {
+      postBody(ENDPOINT, VALID_BODY.replace(NEW_ID, SEED_ID))
+          .andExpect(status().isConflict())
+          .andExpect(jsonPath("$.errorCode").value("price_id_already_exists"));
+
+      perform(get(ENDPOINT + "/" + SEED_ID))
+          .andExpect(status().isOk())
+          .andExpect(jsonPath("$.priceList").value(1))
+          .andExpect(jsonPath("$.price").value(35.50))
+          .andExpect(jsonPath("$.startDate").value("2020-06-14T00:00:00"));
+    }
+
+    @Test
+    @DisplayName(
+        "Returns 409 with price_id_already_exists taking precedence over price_already_exists")
+    void idConflictTakesPrecedenceOverBusinessKeyConflict() throws Exception {
+      String sameIdAndSameKey =
+          VALID_BODY
+              .replace(NEW_ID, SEED_ID)
+              .replace(
+                  "\"startDate\": \"2021-01-01T00:00:00\"",
+                  "\"startDate\": \"2020-06-14T00:00:00\"")
+              .replace(
+                  "\"endDate\": \"2021-01-31T23:59:59\"", "\"endDate\": \"2020-12-31T23:59:59\"")
+              .replace("\"priority\": 5", "\"priority\": 0");
+
+      postBody(ENDPOINT, sameIdAndSameKey)
+          .andExpect(status().isConflict())
+          .andExpect(jsonPath("$.errorCode").value("price_id_already_exists"));
+    }
+
+    @Test
     @DisplayName("Returns 400 with invalid_reference when the brand does not exist")
     void returns400OnUnknownBrand() throws Exception {
       postBody(ENDPOINT, VALID_BODY.replace("\"brandId\": 1", "\"brandId\": 999"))
@@ -109,6 +169,14 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
       postBody(ENDPOINT, VALID_BODY.replace("\"currency\": \"EUR\"", "\"currency\": \"ABC\""))
           .andExpect(status().isBadRequest())
           .andExpect(jsonPath("$.errorCode").value("invalid_price_currency"));
+    }
+
+    @Test
+    @DisplayName("Returns 400 with price_field_required when the currency is blank")
+    void returns400OnBlankCurrency() throws Exception {
+      postBody(ENDPOINT, VALID_BODY.replace("\"currency\": \"EUR\"", "\"currency\": \" \""))
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.errorCode").value("price_field_required"));
     }
 
     @Test

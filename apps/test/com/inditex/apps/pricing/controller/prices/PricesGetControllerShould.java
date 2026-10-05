@@ -2,11 +2,13 @@ package com.inditex.apps.pricing.controller.prices;
 
 import com.inditex.apps.pricing.ProductPricingApiApplicationTests;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class PricesGetControllerShould extends ProductPricingApiApplicationTests {
 
   @Test
+  @DisplayName("Returns every seeded price with UUID ids, compared without order")
   public void returnAllSeededPrices() throws Exception {
 
     assertResponse(
@@ -16,7 +18,7 @@ public class PricesGetControllerShould extends ProductPricingApiApplicationTests
         {
             "prices": [
                 {
-                    "id": 1,
+                    "id": "00000000-0000-0000-0000-000000000001",
                     "productId": 35455,
                     "brandId": 1,
                     "priceList": 1,
@@ -26,7 +28,7 @@ public class PricesGetControllerShould extends ProductPricingApiApplicationTests
                     "currency": "EUR"
                 },
                 {
-                    "id": 2,
+                    "id": "00000000-0000-0000-0000-000000000002",
                     "productId": 35455,
                     "brandId": 1,
                     "priceList": 2,
@@ -36,7 +38,7 @@ public class PricesGetControllerShould extends ProductPricingApiApplicationTests
                     "currency": "EUR"
                 },
                 {
-                    "id": 3,
+                    "id": "00000000-0000-0000-0000-000000000003",
                     "productId": 35455,
                     "brandId": 1,
                     "priceList": 3,
@@ -46,7 +48,7 @@ public class PricesGetControllerShould extends ProductPricingApiApplicationTests
                     "currency": "EUR"
                 },
                 {
-                    "id": 4,
+                    "id": "00000000-0000-0000-0000-000000000004",
                     "productId": 35455,
                     "brandId": 1,
                     "priceList": 4,

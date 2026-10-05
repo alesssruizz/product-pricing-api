@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PricesPatchControllerShould extends ProductPricingApiApplicationTests {
 
-  private static final String ENDPOINT = "/api/v1/prices/1";
+  private static final String ENDPOINT = "/api/v1/prices/00000000-0000-0000-0000-000000000001";
 
   private ResultActions patchBody(String endpoint, String body) throws Exception {
     return perform(patch(endpoint).contentType(MediaType.APPLICATION_JSON).content(body));
@@ -28,9 +28,9 @@ public class PricesPatchControllerShould extends ProductPricingApiApplicationTes
     @Test
     @DisplayName("Returns 200 with the price keeping the fields that were not sent")
     void mergesOnlyTheSentFields() throws Exception {
-      patchBody("/api/v1/prices/2", "{\"priority\": 0}")
+      patchBody("/api/v1/prices/00000000-0000-0000-0000-000000000002", "{\"priority\": 0}")
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.id").value(2))
+          .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000002"))
           .andExpect(jsonPath("$.priority").value(0))
           .andExpect(jsonPath("$.startDate").value("2020-06-14T15:00:00"))
           .andExpect(jsonPath("$.priceList").value(2));
@@ -41,16 +41,18 @@ public class PricesPatchControllerShould extends ProductPricingApiApplicationTes
     void allowsItsOwnKey() throws Exception {
       patchBody(ENDPOINT, "{\"price\": 41.00}")
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.id").value(1))
+          .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000001"))
           .andExpect(jsonPath("$.currency").value("EUR"));
     }
 
     @Test
     @DisplayName("Ignores an id sent in the body and keeps the path id")
     void ignoresBodyId() throws Exception {
-      patchBody("/api/v1/prices/2", "{\"id\": 999, \"price\": 30.00}")
+      patchBody(
+              "/api/v1/prices/00000000-0000-0000-0000-000000000002",
+              "{\"id\": \"00000000-0000-0000-0000-000000000999\", \"price\": 30.00}")
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.id").value(2));
+          .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000002"));
     }
   }
 
@@ -60,7 +62,7 @@ public class PricesPatchControllerShould extends ProductPricingApiApplicationTes
     @Test
     @DisplayName("Returns 404 with price_not_found when the id does not exist")
     void returns404WhenPriceDoesNotExist() throws Exception {
-      patchBody("/api/v1/prices/999", "{\"price\": 40.00}")
+      patchBody("/api/v1/prices/00000000-0000-0000-0000-000000000999", "{\"price\": 40.00}")
           .andExpect(status().isNotFound())
           .andExpect(jsonPath("$.errorCode").value("price_not_found"));
     }
@@ -78,9 +80,19 @@ public class PricesPatchControllerShould extends ProductPricingApiApplicationTes
     @DisplayName(
         "Returns 409 with price_already_exists when the merged key collides with another price")
     void returns409OnCollisionWithAnotherPrice() throws Exception {
-      patchBody("/api/v1/prices/2", "{\"priority\": 0, \"startDate\": \"2020-06-14T00:00:00\"}")
+      patchBody(
+              "/api/v1/prices/00000000-0000-0000-0000-000000000002",
+              "{\"priority\": 0, \"startDate\": \"2020-06-14T00:00:00\"}")
           .andExpect(status().isConflict())
           .andExpect(jsonPath("$.errorCode").value("price_already_exists"));
+    }
+
+    @Test
+    @DisplayName("Returns 400 with invalid_uuid when the path id is not a UUID")
+    void returns400WhenPathIdIsMalformed() throws Exception {
+      patchBody("/api/v1/prices/not-a-uuid", "{\"price\": 40.00}")
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.errorCode").value("invalid_uuid"));
     }
 
     @Test

@@ -36,7 +36,15 @@ class PriceIntegrityCheckerTest {
 
   private static Price price() {
     return Price.create(
-        1L, 35455L, 1, 0, "2020-06-14T00:00:00", "2020-12-31T23:59:59", BigDecimal.TEN, "EUR");
+        "00000000-0000-0000-0000-000000000001",
+        1L,
+        35455L,
+        1,
+        0,
+        "2020-06-14T00:00:00",
+        "2020-12-31T23:59:59",
+        BigDecimal.TEN,
+        "EUR");
   }
 
   @Test

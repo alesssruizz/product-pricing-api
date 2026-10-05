@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import com.inditex.pricing.prices.domain.Price;
-import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceIntegrityChecker;
 import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
@@ -31,6 +30,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("PricePatcher")
 class PricePatcherTest {
 
+  private static final String ID = "00000000-0000-0000-0000-000000000001";
+
   @Mock private PriceRepository repository;
 
   @Mock private PriceIntegrityChecker integrityChecker;
@@ -44,20 +45,20 @@ class PricePatcherTest {
 
   private static Price existing() {
     return Price.create(
-            1L,
-            35455L,
-            1,
-            0,
-            "2020-06-14T00:00:00",
-            "2020-12-31T23:59:59",
-            new BigDecimal("35.50"),
-            "EUR")
-        .withId(new PriceId(1L));
+        ID,
+        1L,
+        35455L,
+        1,
+        0,
+        "2020-06-14T00:00:00",
+        "2020-12-31T23:59:59",
+        new BigDecimal("35.50"),
+        "EUR");
   }
 
   private static PatchPriceCommand command(
       BigDecimal price, String startDate, String endDate, String currency) {
-    return new PatchPriceCommand(1L, null, null, null, null, startDate, endDate, price, currency);
+    return new PatchPriceCommand(ID, null, null, null, null, startDate, endDate, price, currency);
   }
 
   @Test
@@ -71,7 +72,7 @@ class PricePatcherTest {
 
     verify(repository).save(saved.capture());
     Price price = saved.getValue();
-    assertThat(price.id().value()).isEqualTo(1L);
+    assertThat(price.id().value()).isEqualTo(ID);
     assertThat(price.priceQuantity().value()).isEqualByComparingTo("40.00");
     assertThat(price.priceList().value()).isEqualTo(1);
     assertThat(price.currency().value()).isEqualTo("EUR");

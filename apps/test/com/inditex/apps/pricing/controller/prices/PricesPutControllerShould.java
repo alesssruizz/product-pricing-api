@@ -1,5 +1,6 @@
 package com.inditex.apps.pricing.controller.prices;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PricesPutControllerShould extends ProductPricingApiApplicationTests {
 
-  private static final String ENDPOINT = "/api/v1/prices/1";
+  private static final String ENDPOINT = "/api/v1/prices/00000000-0000-0000-0000-000000000001";
 
   private static final String VALID_BODY =
       """
@@ -40,11 +41,15 @@ public class PricesPutControllerShould extends ProductPricingApiApplicationTests
   class HappyPathTests {
 
     @Test
-    @DisplayName("Returns 200 with the replaced price keeping the path id")
+    @DisplayName("Returns 200 with the replaced price keeping the path id and ignoring a body id")
     void replacesThePrice() throws Exception {
-      putBody(ENDPOINT, VALID_BODY.replace("\"priceList\": 9", "\"priceList\": 9, \"id\": 999"))
+      putBody(
+              ENDPOINT,
+              VALID_BODY.replace(
+                  "\"priceList\": 9",
+                  "\"priceList\": 9, \"id\": \"00000000-0000-0000-0000-000000000999\""))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.id").value(1))
+          .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000001"))
           .andExpect(jsonPath("$.priceList").value(9))
           .andExpect(jsonPath("$.currency").value("EUR"));
     }
@@ -54,7 +59,7 @@ public class PricesPutControllerShould extends ProductPricingApiApplicationTests
     void allowsItsOwnKey() throws Exception {
       putBody(ENDPOINT, VALID_BODY.replace("\"price\": 40.00", "\"price\": 41.00"))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.id").value(1));
+          .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000001"));
     }
   }
 
@@ -64,15 +69,36 @@ public class PricesPutControllerShould extends ProductPricingApiApplicationTests
     @Test
     @DisplayName("Returns 404 with price_not_found when the id does not exist")
     void returns404WhenPriceDoesNotExist() throws Exception {
-      putBody("/api/v1/prices/999", VALID_BODY)
+      putBody("/api/v1/prices/00000000-0000-0000-0000-000000000999", VALID_BODY)
           .andExpect(status().isNotFound())
           .andExpect(jsonPath("$.errorCode").value("price_not_found"));
     }
 
     @Test
+    @DisplayName("Does not create the price when the id does not exist")
+    void doesNotUpsert() throws Exception {
+      putBody("/api/v1/prices/00000000-0000-0000-0000-000000000999", VALID_BODY)
+          .andExpect(status().isNotFound());
+
+      perform(get("/api/v1/prices/00000000-0000-0000-0000-000000000999"))
+          .andExpect(status().isNotFound())
+          .andExpect(jsonPath("$.errorCode").value("price_not_found"));
+    }
+
+    @Test
+    @DisplayName("Returns 400 with invalid_uuid when the path id is not a UUID")
+    void returns400WhenPathIdIsMalformed() throws Exception {
+      putBody("/api/v1/prices/not-a-uuid", VALID_BODY)
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.errorCode").value("invalid_uuid"));
+    }
+
+    @Test
     @DisplayName("Returns 409 with price_already_exists when it collides with another price")
     void returns409OnConflictWithAnotherPrice() throws Exception {
-      putBody("/api/v1/prices/2", VALID_BODY.replace("\"priceList\": 9", "\"priceList\": 2"))
+      putBody(
+              "/api/v1/prices/00000000-0000-0000-0000-000000000002",
+              VALID_BODY.replace("\"priceList\": 9", "\"priceList\": 2"))
           .andExpect(status().isConflict())
           .andExpect(jsonPath("$.errorCode").value("price_already_exists"));
     }
