@@ -15,7 +15,7 @@
   <Match>
 <!--     Value Objects validate in the constructor by design: an invalid instance must never exist-->
     <Bug pattern="CT_CONSTRUCTOR_THROW" />
-    <Class name="com.inditex.pricing.shared.domain.LocalDateTimeValueObject" />
+    <Class name="~com\.inditex\.pricing\.shared\.domain\.(LocalDateTimeValueObject|Identifier)" />
   </Match>
 
   <!-- Injected collaborators are services held by reference, not mutable state exposed by the class -->

@@ -5,29 +5,52 @@ import java.util.Objects;
 
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
 import com.inditex.pricing.prices.domain.exceptions.PriceFieldRequired;
-import com.inditex.pricing.shared.domain.StringValueObject;
+import com.inditex.pricing.shared.domain.AggregateRoot;
 
-import lombok.Builder;
+public final class Price extends AggregateRoot {
 
-@Builder
-public record Price(
-    PriceId id,
-    PriceBrandId brandId,
-    PriceDate startDate,
-    PriceDate endDate,
-    PriceList priceList,
-    PriceProductId productId,
-    PricePriority priority,
-    PriceQuantity priceQuantity,
-    PriceCurrency currency) {
+  private final PriceId id;
 
-  public Price {
-    if (!endDate.value().isAfter(startDate.value())) {
-      throw new InvalidPriceDateRange();
-    }
+  private final PriceBrandId brandId;
+
+  private final PriceDate startDate;
+
+  private final PriceDate endDate;
+
+  private final PriceList priceList;
+
+  private final PriceProductId productId;
+
+  private final PricePriority priority;
+
+  private final PriceQuantity priceQuantity;
+
+  private final PriceCurrency currency;
+
+  private Price(
+      String id,
+      Long brandId,
+      String startDate,
+      String endDate,
+      Integer priceList,
+      Long productId,
+      Integer priority,
+      BigDecimal priceQuantity,
+      String currency) {
+    this.id = new PriceId(id);
+    this.brandId = new PriceBrandId(brandId);
+    this.startDate = new PriceDate(startDate);
+    this.endDate = new PriceDate(endDate);
+    this.priceList = new PriceList(priceList);
+    this.productId = new PriceProductId(productId);
+    this.priority = new PricePriority(priority);
+    this.priceQuantity = new PriceQuantity(priceQuantity);
+    this.currency = new PriceCurrency(currency);
+    ensureValidDateRange();
   }
 
   public static Price create(
+      String id,
       Long brandId,
       Long productId,
       Integer priceList,
@@ -36,35 +59,62 @@ public record Price(
       String endDate,
       BigDecimal price,
       String currency) {
-    final PriceBrandId brand = new PriceBrandId(required(brandId, "brandId"));
-    final PriceProductId product = new PriceProductId(required(productId, "productId"));
-    final PriceDate start = new PriceDate(required(startDate, "startDate"));
-    final PriceDate end = new PriceDate(required(endDate, "endDate"));
-    final PriceList list = new PriceList(required(priceList, "priceList"));
-    final PricePriority rank = new PricePriority(required(priority, "priority"));
-    final PriceQuantity quantity = new PriceQuantity(required(price, "price"));
-    final PriceCurrency currencyCode = new PriceCurrency(required(currency, "currency"));
-
-    return Price.builder()
-        .brandId(brand)
-        .startDate(start)
-        .endDate(end)
-        .priceList(list)
-        .productId(product)
-        .priority(rank)
-        .priceQuantity(quantity)
-        .currency(currencyCode)
-        .build();
+    return new Price(
+        required(id, "id"),
+        required(brandId, "brandId"),
+        required(startDate, "startDate"),
+        required(endDate, "endDate"),
+        required(priceList, "priceList"),
+        required(productId, "productId"),
+        required(priority, "priority"),
+        required(price, "price"),
+        required(currency, "currency"));
   }
 
-  public Price withId(PriceId id) {
-    return new Price(
-        id, brandId, startDate, endDate, priceList, productId, priority, priceQuantity, currency);
+  public PriceId id() {
+    return id;
+  }
+
+  public PriceBrandId brandId() {
+    return brandId;
+  }
+
+  public PriceProductId productId() {
+    return productId;
+  }
+
+  public PriceList priceList() {
+    return priceList;
+  }
+
+  public PricePriority priority() {
+    return priority;
+  }
+
+  public PriceDate startDate() {
+    return startDate;
+  }
+
+  public PriceDate endDate() {
+    return endDate;
+  }
+
+  public PriceQuantity priceQuantity() {
+    return priceQuantity;
+  }
+
+  public PriceCurrency currency() {
+    return currency;
+  }
+
+  private void ensureValidDateRange() {
+    if (!endDate.value().isAfter(startDate.value())) {
+      throw new InvalidPriceDateRange();
+    }
   }
 
   private static <T> T required(T value, String field) {
-    if (Objects.isNull(value)
-        || (value instanceof StringValueObject str && str.value().isBlank())) {
+    if (Objects.isNull(value) || (value instanceof String str && str.isBlank())) {
       throw new PriceFieldRequired(field);
     }
     return value;

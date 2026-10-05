@@ -16,4 +16,6 @@ public interface PriceRepository {
   void deleteById(PriceId id);
 
   boolean existsConflict(Price price);
+
+  boolean existsById(PriceId id);
 }
