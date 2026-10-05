@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS products (
 );
 
 CREATE TABLE IF NOT EXISTS prices (
-    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id         UUID PRIMARY KEY,
     brand_id   BIGINT NOT NULL REFERENCES brands(id),
     start_date TIMESTAMP NOT NULL,
     end_date   TIMESTAMP NOT NULL,

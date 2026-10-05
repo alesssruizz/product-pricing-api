@@ -2,12 +2,13 @@ package com.inditex.pricing.prices.infrastructure.persistence.jpa;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.domain.Limit;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 
-public interface PriceJpaRepository extends ListCrudRepository<PriceJpaEntity, Long> {
+public interface PriceJpaRepository extends ListCrudRepository<PriceJpaEntity, UUID> {
 
   @Query(
       """
@@ -21,8 +22,6 @@ public interface PriceJpaRepository extends ListCrudRepository<PriceJpaEntity, L
   List<PriceJpaEntity> findApplicablePrice(
       Long brandId, Long productId, LocalDateTime applicationDate, Limit limit);
 
-  List<PriceJpaEntity> findAllByOrderByIdAsc();
-
   @Query(
       """
       SELECT COUNT(p)
@@ -31,8 +30,8 @@ public interface PriceJpaRepository extends ListCrudRepository<PriceJpaEntity, L
           AND p.productId = :productId
           AND p.priority = :priority
           AND p.startDate = :startDate
-          AND (:id IS NULL OR p.id <> :id)
+          AND p.id <> :id
       """)
   long countConflicts(
-      Long brandId, Long productId, Integer priority, LocalDateTime startDate, Long id);
+      Long brandId, Long productId, Integer priority, LocalDateTime startDate, UUID id);
 }

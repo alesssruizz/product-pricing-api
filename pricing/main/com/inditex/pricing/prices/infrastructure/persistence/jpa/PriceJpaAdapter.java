@@ -5,13 +5,9 @@ import java.util.Optional;
 
 import com.inditex.pricing.prices.domain.Price;
 import com.inditex.pricing.prices.domain.PriceBrandId;
-import com.inditex.pricing.prices.domain.PriceCurrency;
 import com.inditex.pricing.prices.domain.PriceDate;
 import com.inditex.pricing.prices.domain.PriceId;
-import com.inditex.pricing.prices.domain.PriceList;
-import com.inditex.pricing.prices.domain.PricePriority;
 import com.inditex.pricing.prices.domain.PriceProductId;
-import com.inditex.pricing.prices.domain.PriceQuantity;
 import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.shared.domain.Service;
 
@@ -41,12 +37,12 @@ public class PriceJpaAdapter implements PriceRepository {
 
   @Override
   public Optional<Price> findById(PriceId id) {
-    return repository.findById(id.value()).map(this::toDomain);
+    return repository.findById(id.toUuid()).map(this::toDomain);
   }
 
   @Override
   public List<Price> findAll() {
-    return repository.findAllByOrderByIdAsc().stream().map(this::toDomain).toList();
+    return repository.findAll().stream().map(this::toDomain).toList();
   }
 
   @Override
@@ -58,7 +54,7 @@ public class PriceJpaAdapter implements PriceRepository {
   @Override
   @Transactional
   public void deleteById(PriceId id) {
-    repository.deleteById(id.value());
+    repository.deleteById(id.toUuid());
   }
 
   @Override
@@ -68,21 +64,25 @@ public class PriceJpaAdapter implements PriceRepository {
             price.productId().value(),
             price.priority().value(),
             price.startDate().value(),
-            price.id() == null ? null : price.id().value())
+            price.id().toUuid())
         > 0;
   }
 
+  @Override
+  public boolean existsById(PriceId id) {
+    return repository.existsById(id.toUuid());
+  }
+
   private Price toDomain(PriceJpaEntity entity) {
-    return Price.builder()
-        .id(new PriceId(entity.getId()))
-        .brandId(new PriceBrandId(entity.getBrandId()))
-        .startDate(new PriceDate(entity.getStartDate()))
-        .endDate(new PriceDate(entity.getEndDate()))
-        .priceList(new PriceList(entity.getPriceList()))
-        .productId(new PriceProductId(entity.getProductId()))
-        .priority(new PricePriority(entity.getPriority()))
-        .priceQuantity(new PriceQuantity(entity.getPrice()))
-        .currency(new PriceCurrency(entity.getCurrency()))
-        .build();
+    return Price.create(
+        entity.getId().toString(),
+        entity.getBrandId(),
+        entity.getProductId(),
+        entity.getPriceList(),
+        entity.getPriority(),
+        entity.getStartDate().toString(),
+        entity.getEndDate().toString(),
+        entity.getPrice(),
+        entity.getCurrency());
   }
 }
