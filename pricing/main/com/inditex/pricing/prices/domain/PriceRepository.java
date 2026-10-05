@@ -7,5 +7,13 @@ public interface PriceRepository {
   Optional<Price> findApplicablePrice(
       PriceBrandId brandId, PriceProductId productId, PriceDate applicationDate);
 
+  Optional<Price> findById(PriceId id);
+
   List<Price> findAll();
+
+  Price save(Price price);
+
+  void deleteById(PriceId id);
+
+  boolean existsConflict(Price price);
 }

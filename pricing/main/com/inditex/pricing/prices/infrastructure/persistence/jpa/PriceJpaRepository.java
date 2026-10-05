@@ -20,4 +20,19 @@ public interface PriceJpaRepository extends ListCrudRepository<PriceJpaEntity, L
       """)
   List<PriceJpaEntity> findApplicablePrice(
       Long brandId, Long productId, LocalDateTime applicationDate, Limit limit);
+
+  List<PriceJpaEntity> findAllByOrderByIdAsc();
+
+  @Query(
+      """
+      SELECT COUNT(p)
+      FROM PriceJpaEntity p
+      WHERE p.brandId = :brandId
+          AND p.productId = :productId
+          AND p.priority = :priority
+          AND p.startDate = :startDate
+          AND (:id IS NULL OR p.id <> :id)
+      """)
+  long countConflicts(
+      Long brandId, Long productId, Integer priority, LocalDateTime startDate, Long id);
 }
