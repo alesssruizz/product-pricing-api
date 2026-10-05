@@ -12,8 +12,10 @@ import com.inditex.pricing.prices.domain.exceptions.InvalidPriceQuantity;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceReference;
 import com.inditex.pricing.prices.domain.exceptions.PriceAlreadyExists;
 import com.inditex.pricing.prices.domain.exceptions.PriceFieldRequired;
+import com.inditex.pricing.prices.domain.exceptions.PriceIdAlreadyExists;
 import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.InvalidDateFormat;
+import com.inditex.pricing.shared.domain.InvalidUUID;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
@@ -52,7 +54,8 @@ public class PricesPostController extends ApiController {
                 schema = @Schema(implementation = ProblemDetail.class))),
     @ApiResponse(
         responseCode = "409",
-        description = "price_already_exists",
+        description =
+            "price_id_already_exists (id taken) or price_already_exists (business key conflict)",
         content =
             @Content(
                 mediaType = "application/problem+json",
@@ -70,6 +73,7 @@ public class PricesPostController extends ApiController {
     PriceResponse price =
         creator.create(
             new CreatePriceCommand(
+                request.id(),
                 request.brandId(),
                 request.productId(),
                 request.priceList(),
@@ -91,7 +95,9 @@ public class PricesPostController extends ApiController {
   @Override
   public Map<Class<? extends DomainError>, HttpStatus> errorMapping() {
     return Map.of(
+        PriceIdAlreadyExists.class, HttpStatus.CONFLICT,
         PriceAlreadyExists.class, HttpStatus.CONFLICT,
+        InvalidUUID.class, HttpStatus.BAD_REQUEST,
         InvalidPriceReference.class, HttpStatus.BAD_REQUEST,
         InvalidPriceQuantity.class, HttpStatus.BAD_REQUEST,
         InvalidPriceDateRange.class, HttpStatus.BAD_REQUEST,

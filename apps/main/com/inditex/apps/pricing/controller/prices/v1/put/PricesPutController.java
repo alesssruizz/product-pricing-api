@@ -14,6 +14,7 @@ import com.inditex.pricing.prices.domain.exceptions.PriceFieldRequired;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.InvalidDateFormat;
+import com.inditex.pricing.shared.domain.InvalidUUID;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
@@ -74,7 +75,7 @@ public class PricesPutController extends ApiController {
   })
   @PutMapping(value = "/prices/{id}", version = "v1")
   public ResponseEntity<PriceResponse> update(
-      @PathVariable Long id, @RequestBody PricePutRequest request) {
+      @PathVariable String id, @RequestBody PricePutRequest request) {
     PriceResponse price =
         updater.update(
             new UpdatePriceCommand(
@@ -96,6 +97,7 @@ public class PricesPutController extends ApiController {
     return Map.of(
         PriceNotFoundException.class, HttpStatus.NOT_FOUND,
         PriceAlreadyExists.class, HttpStatus.CONFLICT,
+        InvalidUUID.class, HttpStatus.BAD_REQUEST,
         InvalidPriceReference.class, HttpStatus.BAD_REQUEST,
         InvalidPriceQuantity.class, HttpStatus.BAD_REQUEST,
         InvalidPriceDateRange.class, HttpStatus.BAD_REQUEST,

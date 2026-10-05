@@ -6,6 +6,7 @@ import com.inditex.pricing.prices.application.PriceResponse;
 import com.inditex.pricing.prices.application.findbyid.FindPriceByIdQuery;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.DomainError;
+import com.inditex.pricing.shared.domain.InvalidUUID;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
@@ -32,6 +33,13 @@ public class PricesGetByIdController extends ApiController {
   @ApiResponses({
     @ApiResponse(responseCode = "200", description = "Price found"),
     @ApiResponse(
+        responseCode = "400",
+        description = "invalid_uuid",
+        content =
+            @Content(
+                mediaType = "application/problem+json",
+                schema = @Schema(implementation = ProblemDetail.class))),
+    @ApiResponse(
         responseCode = "404",
         description = "price_not_found",
         content =
@@ -47,13 +55,15 @@ public class PricesGetByIdController extends ApiController {
                 schema = @Schema(implementation = ProblemDetail.class)))
   })
   @GetMapping(value = "/prices/{id}", version = "v1")
-  public ResponseEntity<PriceResponse> index(@PathVariable Long id) {
+  public ResponseEntity<PriceResponse> index(@PathVariable String id) {
     PriceResponse price = ask(new FindPriceByIdQuery(id));
     return ResponseEntity.ok().body(price);
   }
 
   @Override
   public Map<Class<? extends DomainError>, HttpStatus> errorMapping() {
-    return Map.of(PriceNotFoundException.class, HttpStatus.NOT_FOUND);
+    return Map.of(
+        PriceNotFoundException.class, HttpStatus.NOT_FOUND,
+        InvalidUUID.class, HttpStatus.BAD_REQUEST);
   }
 }

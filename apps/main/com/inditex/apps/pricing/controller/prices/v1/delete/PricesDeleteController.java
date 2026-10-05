@@ -5,6 +5,7 @@ import java.util.Map;
 import com.inditex.pricing.prices.application.delete.PriceDeleter;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.DomainError;
+import com.inditex.pricing.shared.domain.InvalidUUID;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
@@ -34,6 +35,13 @@ public class PricesDeleteController extends ApiController {
   @ApiResponses({
     @ApiResponse(responseCode = "204", description = "Price deleted, no body"),
     @ApiResponse(
+        responseCode = "400",
+        description = "invalid_uuid",
+        content =
+            @Content(
+                mediaType = "application/problem+json",
+                schema = @Schema(implementation = ProblemDetail.class))),
+    @ApiResponse(
         responseCode = "404",
         description = "price_not_found",
         content =
@@ -49,13 +57,15 @@ public class PricesDeleteController extends ApiController {
                 schema = @Schema(implementation = ProblemDetail.class)))
   })
   @DeleteMapping(value = "/prices/{id}", version = "v1")
-  public ResponseEntity<Void> delete(@PathVariable Long id) {
+  public ResponseEntity<Void> delete(@PathVariable String id) {
     deleter.delete(id);
     return ResponseEntity.noContent().build();
   }
 
   @Override
   public Map<Class<? extends DomainError>, HttpStatus> errorMapping() {
-    return Map.of(PriceNotFoundException.class, HttpStatus.NOT_FOUND);
+    return Map.of(
+        PriceNotFoundException.class, HttpStatus.NOT_FOUND,
+        InvalidUUID.class, HttpStatus.BAD_REQUEST);
   }
 }

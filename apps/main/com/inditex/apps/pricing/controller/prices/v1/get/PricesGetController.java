@@ -24,7 +24,7 @@ public class PricesGetController extends ApiController {
   }
 
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "All prices ordered by id"),
+    @ApiResponse(responseCode = "200", description = "All prices (order not guaranteed)"),
     @ApiResponse(
         responseCode = "500",
         description = "Unexpected error",

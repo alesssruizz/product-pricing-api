@@ -3,6 +3,7 @@ package com.inditex.apps.pricing.controller.prices.v1.post;
 import java.math.BigDecimal;
 
 public record PricePostRequest(
+    String id,
     Long brandId,
     Long productId,
     Integer priceList,
