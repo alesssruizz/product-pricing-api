@@ -1,10 +1,10 @@
-package com.inditex.apps.pricing.controller.prices.v1;
+package com.inditex.apps.pricing.controller.prices.v1.patch;
 
 import java.util.Map;
 
 import com.inditex.pricing.prices.application.PriceResponse;
-import com.inditex.pricing.prices.application.update.PriceUpdater;
-import com.inditex.pricing.prices.application.update.UpdatePriceCommand;
+import com.inditex.pricing.prices.application.patch.PatchPriceCommand;
+import com.inditex.pricing.prices.application.patch.PricePatcher;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceCurrency;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceQuantity;
@@ -25,27 +25,28 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Tag(name = "Prices")
-public class PricesPutController extends ApiController {
+public class PricesPatchController extends ApiController {
 
-  private final PriceUpdater updater;
+  private final PricePatcher patcher;
 
-  public PricesPutController(QueryBus queryBus, PriceUpdater updater) {
+  public PricesPatchController(QueryBus queryBus, PricePatcher patcher) {
     super(queryBus);
-    this.updater = updater;
+    this.patcher = patcher;
   }
 
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Price replaced"),
+    @ApiResponse(responseCode = "200", description = "Price patched"),
     @ApiResponse(
         responseCode = "400",
-        description = "Domain validation error (with errorCode) or malformed body (no errorCode)",
+        description =
+            "Domain validation error on the merged state (with errorCode) or malformed body (no errorCode)",
         content =
             @Content(
                 mediaType = "application/problem+json",
@@ -72,12 +73,12 @@ public class PricesPutController extends ApiController {
                 mediaType = "application/problem+json",
                 schema = @Schema(implementation = ProblemDetail.class)))
   })
-  @PutMapping(value = "/prices/{id}", version = "v1")
-  public ResponseEntity<PriceResponse> update(
-      @PathVariable Long id, @RequestBody PricePutRequest request) {
+  @PatchMapping(value = "/prices/{id}", version = "v1")
+  public ResponseEntity<PriceResponse> patch(
+      @PathVariable Long id, @RequestBody PricePatchRequest request) {
     PriceResponse price =
-        updater.update(
-            new UpdatePriceCommand(
+        patcher.patch(
+            new PatchPriceCommand(
                 id,
                 request.brandId(),
                 request.productId(),

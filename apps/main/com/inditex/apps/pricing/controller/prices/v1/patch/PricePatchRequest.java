@@ -1,8 +1,8 @@
-package com.inditex.apps.pricing.controller.prices.v1;
+package com.inditex.apps.pricing.controller.prices.v1.patch;
 
 import java.math.BigDecimal;
 
-public record PricePostRequest(
+public record PricePatchRequest(
     Long brandId,
     Long productId,
     Integer priceList,

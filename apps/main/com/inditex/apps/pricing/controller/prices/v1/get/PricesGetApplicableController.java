@@ -1,4 +1,4 @@
-package com.inditex.apps.pricing.controller.prices.v1;
+package com.inditex.apps.pricing.controller.prices.v1.get;
 
 import java.util.Map;
 
