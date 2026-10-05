@@ -1,5 +1,9 @@
-package com.inditex.pricing.prices.domain;
+package com.inditex.pricing.prices.domain.exceptions;
 
+import com.inditex.pricing.prices.domain.PriceBrandId;
+import com.inditex.pricing.prices.domain.PriceDate;
+import com.inditex.pricing.prices.domain.PriceId;
+import com.inditex.pricing.prices.domain.PriceProductId;
 import com.inditex.pricing.shared.domain.DomainError;
 
 public final class PriceNotFoundException extends DomainError {
@@ -11,5 +15,9 @@ public final class PriceNotFoundException extends DomainError {
             "Precio no encontrado para la brandId <%s>, el productId <%s> y la fecha de aplicación <%s>",
             brandId.value(), productId.value(), applicationDate.value()),
         "price_not_found");
+  }
+
+  public PriceNotFoundException(PriceId id) {
+    super(String.format("Precio no encontrado para el id <%s>", id.value()), "price_not_found");
   }
 }

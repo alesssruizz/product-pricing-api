@@ -15,6 +15,7 @@ public class PricesGetControllerShould extends ProductPricingApiApplicationTests
         {
             "prices": [
                 {
+                    "id": 1,
                     "productId": 35455,
                     "brandId": 1,
                     "priceList": 1,
@@ -24,6 +25,7 @@ public class PricesGetControllerShould extends ProductPricingApiApplicationTests
                     "currency": "EUR"
                 },
                 {
+                    "id": 2,
                     "productId": 35455,
                     "brandId": 1,
                     "priceList": 2,
@@ -33,6 +35,7 @@ public class PricesGetControllerShould extends ProductPricingApiApplicationTests
                     "currency": "EUR"
                 },
                 {
+                    "id": 3,
                     "productId": 35455,
                     "brandId": 1,
                     "priceList": 3,
@@ -42,6 +45,7 @@ public class PricesGetControllerShould extends ProductPricingApiApplicationTests
                     "currency": "EUR"
                 },
                 {
+                    "id": 4,
                     "productId": 35455,
                     "brandId": 1,
                     "priceList": 4,

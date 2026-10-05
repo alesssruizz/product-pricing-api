@@ -1,12 +1,12 @@
 package com.inditex.pricing.prices.application.find;
 
-import com.inditex.pricing.prices.application.PriceResponse;
+import com.inditex.pricing.prices.application.ApplicablePriceResponse;
 import com.inditex.pricing.shared.domain.Service;
 import com.inditex.pricing.shared.domain.bus.query.QueryHandler;
 
 @Service
 public class FindApplicablePriceHandler
-    implements QueryHandler<FindApplicablePriceQuery, PriceResponse> {
+    implements QueryHandler<FindApplicablePriceQuery, ApplicablePriceResponse> {
 
   private final PriceFinder finder;
 
@@ -15,7 +15,7 @@ public class FindApplicablePriceHandler
   }
 
   @Override
-  public PriceResponse handle(FindApplicablePriceQuery query) {
+  public ApplicablePriceResponse handle(FindApplicablePriceQuery query) {
     return finder.find(query);
   }
 }

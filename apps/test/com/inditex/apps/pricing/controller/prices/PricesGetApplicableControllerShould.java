@@ -12,10 +12,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-public class PriceApplicableGetControllerShould extends ProductPricingApiApplicationTests {
+public class PricesGetApplicableControllerShould extends ProductPricingApiApplicationTests {
 
   private static final String ENDPOINT =
-      "/api/v1/price?applicationDate=%s&productId=35455&brandId=1";
+      "/api/v1/prices/find?applicationDate=%s&productId=35455&brandId=1";
 
   static Stream<Arguments> happyPathScenarios() {
     return Stream.of(
@@ -61,7 +61,7 @@ public class PriceApplicableGetControllerShould extends ProductPricingApiApplica
 
     @ParameterizedTest(name = "{0}")
     @MethodSource(
-        "com.inditex.apps.pricing.controller.prices.PriceApplicableGetControllerShould#happyPathScenarios")
+        "com.inditex.apps.pricing.controller.prices.PricesGetApplicableControllerShould#happyPathScenarios")
     void appliesExpectedPrice(
         String displayName,
         String applicationDate,
@@ -122,6 +122,18 @@ public class PriceApplicableGetControllerShould extends ProductPricingApiApplica
               "errorCode": "price_not_found"
           }
           """);
+    }
+
+    @Test
+    @DisplayName("Returns 400 without errorCode when a required parameter is missing")
+    void returns400WithoutErrorCodeWhenParamsArePartial() throws Exception {
+      assertStatusWithoutErrorCode("/api/v1/prices/find?brandId=1", 400);
+    }
+
+    @Test
+    @DisplayName("Returns the applicable price without the id field")
+    void omitsIdFromApplicablePrice() throws Exception {
+      assertJsonPathAbsent(String.format(ENDPOINT, "2020-06-14T10:00:00"), "$.id");
     }
   }
 }

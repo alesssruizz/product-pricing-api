@@ -8,17 +8,18 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import com.inditex.pricing.prices.application.PriceResponse;
+import com.inditex.pricing.prices.application.ApplicablePriceResponse;
 import com.inditex.pricing.prices.domain.Price;
 import com.inditex.pricing.prices.domain.PriceBrandId;
 import com.inditex.pricing.prices.domain.PriceCurrency;
 import com.inditex.pricing.prices.domain.PriceDate;
+import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceList;
-import com.inditex.pricing.prices.domain.PriceNotFoundException;
 import com.inditex.pricing.prices.domain.PricePriority;
 import com.inditex.pricing.prices.domain.PriceProductId;
 import com.inditex.pricing.prices.domain.PriceQuantity;
 import com.inditex.pricing.prices.domain.PriceRepository;
+import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -43,6 +44,7 @@ class PriceFinderTest {
 
   private static Price buildPrice() {
     return new Price(
+        new PriceId(1L),
         new PriceBrandId(1L),
         new PriceDate("2020-06-14T00:00:00"),
         new PriceDate("2020-12-31T23:59:59"),
@@ -62,10 +64,10 @@ class PriceFinderTest {
       Price price = buildPrice();
       when(repository.findApplicablePrice(any(), any(), any())).thenReturn(Optional.of(price));
 
-      PriceResponse response =
+      ApplicablePriceResponse response =
           finder.find(new FindApplicablePriceQuery(1L, 35455L, "2020-06-14T10:00:00"));
 
-      assertThat(response).isEqualTo(PriceResponse.fromAggregate(price));
+      assertThat(response).isEqualTo(ApplicablePriceResponse.fromAggregate(price));
     }
   }
 

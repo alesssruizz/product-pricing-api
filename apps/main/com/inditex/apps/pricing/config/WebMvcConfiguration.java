@@ -29,7 +29,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
   @Override
   public void configurePathMatch(PathMatchConfigurer configurer) {
     configurer.addPathPrefix(
-        "/api",
+        "/api/{version}",
         HandlerTypePredicate.forAnnotation(RestController.class)
             .and(HandlerTypePredicate.forBasePackage(HEALTH_CHECK_PACKAGE).negate())
             .and(HandlerTypePredicate.forBasePackage(SPRINGDOC_PACKAGE).negate()));
