@@ -14,7 +14,7 @@ public final class PriceDeleter {
     this.repository = repository;
   }
 
-  public void delete(Long id) {
+  public void delete(String id) {
     PriceId priceId = new PriceId(id);
 
     repository.findById(priceId).orElseThrow(() -> new PriceNotFoundException(priceId));

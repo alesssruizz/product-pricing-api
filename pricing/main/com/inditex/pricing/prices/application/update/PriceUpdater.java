@@ -27,15 +27,15 @@ public final class PriceUpdater {
 
     Price price =
         Price.create(
-                command.brandId(),
-                command.productId(),
-                command.priceList(),
-                command.priority(),
-                command.startDate(),
-                command.endDate(),
-                command.price(),
-                command.currency())
-            .withId(id);
+            command.id(),
+            command.brandId(),
+            command.productId(),
+            command.priceList(),
+            command.priority(),
+            command.startDate(),
+            command.endDate(),
+            command.price(),
+            command.currency());
 
     integrityChecker.ensureCanBeSaved(price);
 

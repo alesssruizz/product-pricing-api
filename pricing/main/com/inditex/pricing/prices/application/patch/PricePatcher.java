@@ -29,16 +29,15 @@ public final class PricePatcher {
 
     Price price =
         Price.create(
-                Objects.requireNonNullElse(command.brandId(), current.brandId().value()),
-                Objects.requireNonNullElse(command.productId(), current.productId().value()),
-                Objects.requireNonNullElse(command.priceList(), current.priceList().value()),
-                Objects.requireNonNullElse(command.priority(), current.priority().value()),
-                Objects.requireNonNullElse(
-                    command.startDate(), current.startDate().value().toString()),
-                Objects.requireNonNullElse(command.endDate(), current.endDate().value().toString()),
-                Objects.requireNonNullElse(command.price(), current.priceQuantity().value()),
-                Objects.requireNonNullElse(command.currency(), current.currency().value()))
-            .withId(id);
+            command.id(),
+            Objects.requireNonNullElse(command.brandId(), current.brandId().value()),
+            Objects.requireNonNullElse(command.productId(), current.productId().value()),
+            Objects.requireNonNullElse(command.priceList(), current.priceList().value()),
+            Objects.requireNonNullElse(command.priority(), current.priority().value()),
+            Objects.requireNonNullElse(command.startDate(), current.startDate().value().toString()),
+            Objects.requireNonNullElse(command.endDate(), current.endDate().value().toString()),
+            Objects.requireNonNullElse(command.price(), current.priceQuantity().value()),
+            Objects.requireNonNullElse(command.currency(), current.currency().value()));
 
     integrityChecker.ensureCanBeSaved(price);
 

@@ -7,7 +7,7 @@ import com.inditex.pricing.prices.domain.Price;
 import com.inditex.pricing.shared.domain.bus.query.Response;
 
 public record PriceResponse(
-    Long id,
+    String id,
     Long productId,
     Long brandId,
     Integer priceList,

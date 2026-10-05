@@ -3,7 +3,7 @@ package com.inditex.pricing.prices.application.patch;
 import java.math.BigDecimal;
 
 public record PatchPriceCommand(
-    Long id,
+    String id,
     Long brandId,
     Long productId,
     Integer priceList,
