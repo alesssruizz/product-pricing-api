@@ -1,6 +1,7 @@
 package com.inditex.pricing.prices.infrastructure.persistence.jpa;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.inditex.pricing.prices.domain.Price;
@@ -11,7 +12,6 @@ import com.inditex.pricing.prices.domain.PriceProductId;
 import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.shared.domain.Service;
 
-import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Limit;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,11 +21,8 @@ public class PriceJpaAdapter implements PriceRepository {
 
   private final PriceJpaRepository repository;
 
-  private final EntityManager entityManager;
-
-  public PriceJpaAdapter(PriceJpaRepository repository, EntityManager entityManager) {
+  public PriceJpaAdapter(PriceJpaRepository repository) {
     this.repository = repository;
-    this.entityManager = entityManager;
   }
 
   @Override
@@ -51,8 +48,14 @@ public class PriceJpaAdapter implements PriceRepository {
 
   @Override
   @Transactional
-  public Price save(Price price) {
-    return toDomain(repository.save(PriceJpaEntity.fromDomain(price)));
+  public void create(Price price) {
+    repository.save(PriceJpaEntity.forCreate(price));
+  }
+
+  @Override
+  @Transactional
+  public void update(Price price) {
+    repository.save(PriceJpaEntity.forUpdate(price));
   }
 
   @Override
@@ -79,14 +82,14 @@ public class PriceJpaAdapter implements PriceRepository {
 
   private Price toDomain(PriceJpaEntity entity) {
     return Price.create(
-        entity.id().toString(),
-        entity.brandId(),
-        entity.productId(),
-        entity.priceList(),
-        entity.priority(),
-        entity.startDate().toString(),
-        entity.endDate().toString(),
-        entity.price(),
-        entity.currency());
+        Objects.requireNonNull(entity.getId()).toString(),
+        entity.getBrandId(),
+        entity.getProductId(),
+        entity.getPriceList(),
+        entity.getPriority(),
+        entity.getStartDate().toString(),
+        entity.getEndDate().toString(),
+        entity.getPrice(),
+        entity.getCurrency());
   }
 }

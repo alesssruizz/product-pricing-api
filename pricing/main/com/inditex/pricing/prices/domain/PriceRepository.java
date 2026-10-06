@@ -11,7 +11,9 @@ public interface PriceRepository {
 
   List<Price> findAll();
 
-  Price save(Price price);
+  void create(Price price);
+
+  void update(Price price);
 
   void deleteById(PriceId id);
 

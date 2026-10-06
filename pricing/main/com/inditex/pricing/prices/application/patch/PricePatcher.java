@@ -40,6 +40,6 @@ public final class PricePatcher {
 
     integrityChecker.ensureCanBeSaved(price);
 
-    repository.save(price);
+    repository.update(price);
   }
 }

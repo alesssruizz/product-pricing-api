@@ -10,43 +10,75 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.Transient;
+import org.springframework.data.domain.Persistable;
 
-@Data
 @Entity
 @Table(name = "prices")
-@AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
-public class PriceJpaEntity {
+public class PriceJpaEntity implements Persistable<UUID> {
 
-  @Id private final UUID id;
+  @Id private UUID id;
 
   @Column(name = "brand_id")
-  private final Long brandId;
+  private Long brandId;
 
   @Column(name = "start_date")
-  private final LocalDateTime startDate;
+  private LocalDateTime startDate;
 
   @Column(name = "end_date")
-  private final LocalDateTime endDate;
+  private LocalDateTime endDate;
 
   @Column(name = "price_list")
-  private final Integer priceList;
+  private Integer priceList;
 
   @Column(name = "product_id")
-  private final Long productId;
+  private Long productId;
 
-  private final Integer priority;
+  private Integer priority;
 
-  private final BigDecimal price;
+  private BigDecimal price;
 
   @Column(name = "curr", columnDefinition = "CHAR(3)")
-  private final String currency;
+  private String currency;
 
-  public static PriceJpaEntity fromDomain(Price price) {
+  @Transient private boolean newEntity;
+
+  protected PriceJpaEntity() {
+    // Required by JPA
+  }
+
+  private PriceJpaEntity(
+      UUID id,
+      Long brandId,
+      LocalDateTime startDate,
+      LocalDateTime endDate,
+      Integer priceList,
+      Long productId,
+      Integer priority,
+      BigDecimal price,
+      String currency,
+      boolean newEntity) {
+    this.id = id;
+    this.brandId = brandId;
+    this.startDate = startDate;
+    this.endDate = endDate;
+    this.priceList = priceList;
+    this.productId = productId;
+    this.priority = priority;
+    this.price = price;
+    this.currency = currency;
+    this.newEntity = newEntity;
+  }
+
+  public static PriceJpaEntity forCreate(Price price) {
+    return fromDomain(price, true);
+  }
+
+  public static PriceJpaEntity forUpdate(Price price) {
+    return fromDomain(price, false);
+  }
+
+  private static PriceJpaEntity fromDomain(Price price, boolean newEntity) {
     return new PriceJpaEntity(
         price.id().toUuid(),
         price.brandId().value(),
@@ -56,6 +88,49 @@ public class PriceJpaEntity {
         price.productId().value(),
         price.priority().value(),
         price.priceQuantity().value(),
-        price.currency().value());
+        price.currency().value(),
+        newEntity);
+  }
+
+  @Override
+  public UUID getId() {
+    return id;
+  }
+
+  public Long getBrandId() {
+    return brandId;
+  }
+
+  public LocalDateTime getStartDate() {
+    return startDate;
+  }
+
+  public LocalDateTime getEndDate() {
+    return endDate;
+  }
+
+  public Integer getPriceList() {
+    return priceList;
+  }
+
+  public Long getProductId() {
+    return productId;
+  }
+
+  public Integer getPriority() {
+    return priority;
+  }
+
+  public BigDecimal getPrice() {
+    return price;
+  }
+
+  public String getCurrency() {
+    return currency;
+  }
+
+  @Override
+  public boolean isNew() {
+    return newEntity;
   }
 }
