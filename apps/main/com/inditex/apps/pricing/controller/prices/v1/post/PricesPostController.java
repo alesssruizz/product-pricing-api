@@ -43,10 +43,10 @@ public class PricesPostController extends ApiController {
   }
 
   @Operation(
-      summary = "Crear un precio",
+      summary = "Create a price",
       description =
-          "Crea un precio con id UUID aportado por el cliente y devuelve 201 con la cabecera Location;"
-              + " responde 409 si el id ya existe o si ya hay otro precio con la misma marca, producto, prioridad y fecha de inicio.")
+          "Creates a price with a UUID id supplied by the client and returns 201 with the Location header;"
+              + " responds 409 if the id already exists or if another price already has the same brand, product, priority and start date.")
   @ApiResponses({
     @ApiResponse(
         responseCode = "201",

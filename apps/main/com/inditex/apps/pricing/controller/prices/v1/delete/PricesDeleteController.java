@@ -32,8 +32,8 @@ public class PricesDeleteController extends ApiController {
   }
 
   @Operation(
-      summary = "Eliminar un precio",
-      description = "Elimina el precio identificado por id; responde 404 si no existe.")
+      summary = "Delete a price",
+      description = "Deletes the price identified by id; responds 404 if it does not exist.")
   @ApiResponses({
     @ApiResponse(responseCode = "204", description = "Price deleted, no body"),
     @ApiResponse(

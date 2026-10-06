@@ -40,10 +40,10 @@ public class PricesPatchController extends ApiController {
   }
 
   @Operation(
-      summary = "Modificar parcialmente un precio",
+      summary = "Partially update a price",
       description =
-          "Aplica los campos enviados sobre el precio existente y valida el estado resultante;"
-              + " responde 404 si no existe y 409 si la clave de negocio resultante ya pertenece a otro precio.")
+          "Applies the submitted fields over the existing price and validates the resulting state;"
+              + " responds 404 if it does not exist and 409 if the resulting business key already belongs to another price.")
   @ApiResponses({
     @ApiResponse(responseCode = "204", description = "Price patched, no body"),
     @ApiResponse(

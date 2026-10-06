@@ -33,8 +33,8 @@ public class PricesGetByIdController extends ApiController {
   }
 
   @Operation(
-      summary = "Obtener un precio por id",
-      description = "Devuelve el precio identificado por su UUID; responde 404 si no existe.")
+      summary = "Get a price by id",
+      description = "Returns the price identified by its UUID; responds 404 if it does not exist.")
   @ApiResponses({
     @ApiResponse(
         responseCode = "200",

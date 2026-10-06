@@ -40,10 +40,10 @@ public class PricesPutController extends ApiController {
   }
 
   @Operation(
-      summary = "Reemplazar un precio",
+      summary = "Replace a price",
       description =
-          "Reemplaza por completo el precio identificado por id;"
-              + " responde 404 si no existe y 409 si la clave de negocio resultante ya pertenece a otro precio.")
+          "Fully replaces the price identified by id;"
+              + " responds 404 if it does not exist and 409 if the resulting business key already belongs to another price.")
   @ApiResponses({
     @ApiResponse(responseCode = "204", description = "Price replaced, no body"),
     @ApiResponse(

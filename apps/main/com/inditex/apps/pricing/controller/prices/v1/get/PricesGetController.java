@@ -26,8 +26,8 @@ public class PricesGetController extends ApiController {
   }
 
   @Operation(
-      summary = "Listar todos los precios",
-      description = "Devuelve todos los precios registrados, sin garantía de orden.")
+      summary = "List all prices",
+      description = "Returns all registered prices, with no guaranteed order.")
   @ApiResponses({
     @ApiResponse(
         responseCode = "200",

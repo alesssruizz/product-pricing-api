@@ -33,9 +33,9 @@ public class PricesGetApplicableController extends ApiController {
   }
 
   @Operation(
-      summary = "Obtener el precio aplicable",
+      summary = "Get the applicable price",
       description =
-          "Devuelve el precio aplicable para una marca, producto y fecha; la prioridad decide entre precios solapados.")
+          "Returns the applicable price for a brand, product and date; the priority decides between overlapping prices.")
   @ApiResponses({
     @ApiResponse(
         responseCode = "200",

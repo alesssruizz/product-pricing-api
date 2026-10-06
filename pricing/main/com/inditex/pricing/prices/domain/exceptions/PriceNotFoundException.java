@@ -12,12 +12,12 @@ public final class PriceNotFoundException extends DomainError {
       PriceBrandId brandId, PriceProductId productId, PriceDate applicationDate) {
     super(
         String.format(
-            "Precio no encontrado para la brandId <%s>, el productId <%s> y la fecha de aplicación <%s>",
+            "Price not found for brandId <%s>, productId <%s> and application date <%s>",
             brandId.value(), productId.value(), applicationDate.value()),
         "price_not_found");
   }
 
   public PriceNotFoundException(PriceId id) {
-    super(String.format("Precio no encontrado para el id <%s>", id.value()), "price_not_found");
+    super(String.format("Price not found for id <%s>", id.value()), "price_not_found");
   }
 }

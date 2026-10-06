@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 public final class HealthCheckGetController {
 
   @Operation(
-      summary = "Comprobar el estado de la aplicación",
-      description = "Devuelve 200 si la aplicación está levantada.")
+      summary = "Check the application health status",
+      description = "Returns 200 if the application is up.")
   @ApiResponse(
       responseCode = "200",
       description = "Application is up",
