@@ -22,7 +22,9 @@ public final class PriceUpdater {
   public void update(UpdatePriceCommand command) {
     PriceId id = new PriceId(command.id());
 
-    repository.findById(id).orElseThrow(() -> new PriceNotFoundException(id));
+    if (!repository.existsById(id)) {
+      throw new PriceNotFoundException(id);
+    }
 
     Price price =
         Price.create(

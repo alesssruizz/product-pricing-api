@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
-import java.util.Optional;
 
 import com.inditex.pricing.prices.domain.Price;
 import com.inditex.pricing.prices.domain.PriceIntegrityChecker;
@@ -56,26 +55,13 @@ class PriceUpdaterTest {
         "EUR");
   }
 
-  private static Price existing() {
-    return Price.create(
-        ID,
-        1L,
-        35455L,
-        1,
-        0,
-        "2020-06-14T00:00:00",
-        "2020-12-31T23:59:59",
-        new BigDecimal("35.50"),
-        "EUR");
-  }
-
   @Nested
   @DisplayName("when the id does not exist")
   class WhenIdIsMissing {
 
     @Test
     void throwsNotFoundWithoutCheckingIntegrityNorUpdating() {
-      when(repository.findById(any())).thenReturn(Optional.empty());
+      when(repository.existsById(any())).thenReturn(false);
 
       assertThatThrownBy(() -> updater.update(command()))
           .isInstanceOf(PriceNotFoundException.class);
@@ -90,7 +76,7 @@ class PriceUpdaterTest {
 
     @Test
     void updatesThePriceWithTheCommandValues() {
-      when(repository.findById(any())).thenReturn(Optional.of(existing()));
+      when(repository.existsById(any())).thenReturn(true);
       ArgumentCaptor<Price> saved = ArgumentCaptor.forClass(Price.class);
 
       updater.update(command());
@@ -112,7 +98,7 @@ class PriceUpdaterTest {
 
     @Test
     void doesNotUpdateWhenTheIntegrityCheckFails() {
-      when(repository.findById(any())).thenReturn(Optional.of(existing()));
+      when(repository.existsById(any())).thenReturn(true);
       doThrow(new PriceAlreadyExists()).when(integrityChecker).ensureCanBeSaved(any());
 
       assertThatThrownBy(() -> updater.update(command())).isInstanceOf(PriceAlreadyExists.class);
