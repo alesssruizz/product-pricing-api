@@ -39,7 +39,7 @@ class InMemoryCommandBusTest {
   @Test
   @DisplayName("Delegates the command to the registered handler")
   void delegatesToHandler() throws CommandNotRegisteredError {
-    DeletePriceCommand command = new DeletePriceCommand("3f1c2b4e-8a6d-4c1e-9f2a-7b5d0e9c1a23");
+    var command = new DeletePriceCommand("3f1c2b4e-8a6d-4c1e-9f2a-7b5d0e9c1a23");
     when(information.search(DeletePriceCommand.class)).thenReturn(handler);
 
     bus.dispatch(command);
@@ -50,8 +50,7 @@ class InMemoryCommandBusTest {
   @Test
   @DisplayName("Wraps a domain error thrown by the handler")
   void wrapsDomainError() throws CommandNotRegisteredError {
-    PriceNotFoundException cause =
-        new PriceNotFoundException(new PriceId("3f1c2b4e-8a6d-4c1e-9f2a-7b5d0e9c1a23"));
+    var cause = new PriceNotFoundException(new PriceId("3f1c2b4e-8a6d-4c1e-9f2a-7b5d0e9c1a23"));
     when(information.search(DeletePriceCommand.class)).thenReturn(handler);
     doThrow(cause).when(handler).handle(any());
 
@@ -64,7 +63,7 @@ class InMemoryCommandBusTest {
   @Test
   @DisplayName("Wraps a runtime error thrown by the handler")
   void wrapsRuntimeError() throws CommandNotRegisteredError {
-    RuntimeException cause = new RuntimeException("boom");
+    var cause = new RuntimeException("boom");
     when(information.search(DeletePriceCommand.class)).thenReturn(handler);
     doThrow(cause).when(handler).handle(any());
 
@@ -77,8 +76,8 @@ class InMemoryCommandBusTest {
   @Test
   @DisplayName("Wraps the not registered error when no handler exists")
   void wrapsNotRegistered() throws CommandNotRegisteredError {
-    DeletePriceCommand command = new DeletePriceCommand("3f1c2b4e-8a6d-4c1e-9f2a-7b5d0e9c1a23");
-    CommandNotRegisteredError cause = new CommandNotRegisteredError(DeletePriceCommand.class);
+    var command = new DeletePriceCommand("3f1c2b4e-8a6d-4c1e-9f2a-7b5d0e9c1a23");
+    var cause = new CommandNotRegisteredError(DeletePriceCommand.class);
     when(information.search(DeletePriceCommand.class)).thenThrow(cause);
 
     assertThatThrownBy(() -> bus.dispatch(command))

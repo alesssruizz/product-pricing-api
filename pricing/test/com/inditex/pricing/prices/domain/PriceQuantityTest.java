@@ -26,7 +26,7 @@ class PriceQuantityTest {
 
   @Test
   void rejectsNegativeValues() {
-    BigDecimal negativeValue = new BigDecimal("-1");
+    var negativeValue = new BigDecimal("-1");
     assertThatThrownBy(() -> new PriceQuantity(negativeValue))
         .isInstanceOf(InvalidPriceQuantity.class);
   }

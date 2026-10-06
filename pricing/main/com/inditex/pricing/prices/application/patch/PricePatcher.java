@@ -22,7 +22,7 @@ public final class PricePatcher {
   }
 
   public void patch(PatchPriceCommand command) {
-    PriceId id = new PriceId(command.id());
+    var id = new PriceId(command.id());
 
     Price current = repository.findById(id).orElseThrow(() -> new PriceNotFoundException(id));
 

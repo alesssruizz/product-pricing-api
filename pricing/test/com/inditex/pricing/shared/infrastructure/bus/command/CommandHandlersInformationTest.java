@@ -46,9 +46,9 @@ class CommandHandlersInformationTest {
   @Test
   @DisplayName("Resolves each handler by its command type")
   void resolvesHandlersByCommandType() throws CommandNotRegisteredError {
-    FirstCommandHandler first = new FirstCommandHandler();
-    SecondCommandHandler second = new SecondCommandHandler();
-    CommandHandlersInformation information = new CommandHandlersInformation(List.of(first, second));
+    var first = new FirstCommandHandler();
+    var second = new SecondCommandHandler();
+    var information = new CommandHandlersInformation(List.of(first, second));
 
     assertThat(information.search(FirstCommand.class)).isSameAs(first);
     assertThat(information.search(SecondCommand.class)).isSameAs(second);
@@ -57,8 +57,7 @@ class CommandHandlersInformationTest {
   @Test
   @DisplayName("Throws not registered for a command without handler")
   void throwsNotRegisteredForUnknownCommand() {
-    CommandHandlersInformation information =
-        new CommandHandlersInformation(List.of(new FirstCommandHandler()));
+    var information = new CommandHandlersInformation(List.of(new FirstCommandHandler()));
 
     assertThatThrownBy(() -> information.search(UnknownCommand.class))
         .isInstanceOf(CommandNotRegisteredError.class);

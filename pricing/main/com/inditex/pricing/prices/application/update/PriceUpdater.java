@@ -20,7 +20,7 @@ public final class PriceUpdater {
   }
 
   public void update(UpdatePriceCommand command) {
-    PriceId id = new PriceId(command.id());
+    var id = new PriceId(command.id());
 
     if (!repository.existsById(id)) {
       throw new PriceNotFoundException(id);
