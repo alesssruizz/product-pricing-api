@@ -46,7 +46,9 @@ public class PricesGetApplicableController extends ApiController {
                 schema = @Schema(implementation = ApplicablePriceResponse.class))),
     @ApiResponse(
         responseCode = "400",
-        description = "Missing or invalid parameter, or invalid_date_format",
+        description =
+            "invalid_date_format when applicationDate is not ISO-8601, "
+                + "or missing/mistyped parameter (no errorCode)",
         content =
             @Content(
                 mediaType = "application/problem+json",

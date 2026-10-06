@@ -19,6 +19,7 @@ import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -47,7 +48,14 @@ public class PricesPostController extends ApiController {
           "Crea un precio con id UUID aportado por el cliente y devuelve 201 con la cabecera Location;"
               + " responde 409 si el id ya existe o si ya hay otro precio con la misma marca, producto, prioridad y fecha de inicio.")
   @ApiResponses({
-    @ApiResponse(responseCode = "201", description = "Price created, Location header set"),
+    @ApiResponse(
+        responseCode = "201",
+        description = "Price created, no body",
+        headers =
+            @Header(
+                name = "Location",
+                description = "URI of the created price",
+                schema = @Schema(type = "string", format = "uri"))),
     @ApiResponse(
         responseCode = "400",
         description =
