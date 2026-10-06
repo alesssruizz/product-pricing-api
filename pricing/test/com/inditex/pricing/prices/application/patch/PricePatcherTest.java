@@ -73,7 +73,7 @@ class PricePatcherTest {
     verify(repository, never()).create(any());
     Price price = saved.getValue();
     assertThat(price.id().value()).isEqualTo(ID);
-    assertThat(price.priceQuantity().value()).isEqualByComparingTo("40.00");
+    assertThat(price.priceAmount().value()).isEqualByComparingTo("40.00");
     assertThat(price.priceList().value()).isEqualTo(1);
     assertThat(price.currency().value()).isEqualTo("EUR");
     assertThat(price.startDate().value().toString()).isEqualTo("2020-06-14T00:00");

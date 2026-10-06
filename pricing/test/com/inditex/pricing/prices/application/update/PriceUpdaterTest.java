@@ -92,7 +92,7 @@ class PriceUpdaterTest {
       assertThat(price.priority().value()).isEqualTo(1);
       assertThat(price.startDate().value().toString()).isEqualTo("2020-06-14T00:00");
       assertThat(price.endDate().value().toString()).isEqualTo("2020-12-31T23:59:59");
-      assertThat(price.priceQuantity().value()).isEqualByComparingTo("40.00");
+      assertThat(price.priceAmount().value()).isEqualByComparingTo("40.00");
       assertThat(price.currency().value()).isEqualTo("EUR");
     }
 

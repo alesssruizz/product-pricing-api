@@ -35,7 +35,7 @@ public final class PricePatcher {
             Objects.requireNonNullElse(command.priority(), current.priority().value()),
             Objects.requireNonNullElse(command.startDate(), current.startDate().value().toString()),
             Objects.requireNonNullElse(command.endDate(), current.endDate().value().toString()),
-            Objects.requireNonNullElse(command.price(), current.priceQuantity().value()),
+            Objects.requireNonNullElse(command.price(), current.priceAmount().value()),
             Objects.requireNonNullElse(command.currency(), current.currency().value()));
 
     integrityChecker.ensureCanBeSaved(price);

@@ -87,7 +87,7 @@ public class PriceJpaEntity implements Persistable<UUID> {
         price.priceList().value(),
         price.productId().value(),
         price.priority().value(),
-        price.priceQuantity().value(),
+        price.priceAmount().value(),
         price.currency().value(),
         newEntity);
   }

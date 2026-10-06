@@ -7,9 +7,9 @@ import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
 import com.inditex.pricing.prices.domain.exceptions.PriceFieldRequired;
 import com.inditex.pricing.shared.domain.AggregateRoot;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.Getter;
 
-@Slf4j
+@Getter
 public final class Price extends AggregateRoot {
 
   private final PriceId id;
@@ -72,42 +72,6 @@ public final class Price extends AggregateRoot {
         required(endDate, "endDate"),
         required(price, "price"),
         required(currency, "currency"));
-  }
-
-  public PriceId id() {
-    return id;
-  }
-
-  public PriceBrandId brandId() {
-    return brandId;
-  }
-
-  public PriceProductId productId() {
-    return productId;
-  }
-
-  public PriceList priceList() {
-    return priceList;
-  }
-
-  public PricePriority priority() {
-    return priority;
-  }
-
-  public PriceDate startDate() {
-    return startDate;
-  }
-
-  public PriceDate endDate() {
-    return endDate;
-  }
-
-  public PriceAmount priceQuantity() {
-    return priceAmount;
-  }
-
-  public PriceCurrency currency() {
-    return currency;
   }
 
   private void ensureValidDateRange() {

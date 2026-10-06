@@ -22,7 +22,7 @@ public record ApplicablePriceResponse(
         price.priceList().value(),
         price.startDate().value(),
         price.endDate().value(),
-        price.priceQuantity().value(),
+        price.priceAmount().value(),
         price.currency().value());
   }
 }
