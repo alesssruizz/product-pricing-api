@@ -1,5 +1,6 @@
 package com.inditex.pricing.prices.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceCurrency;
@@ -12,7 +13,7 @@ class PriceCurrencyTest {
 
   @Test
   void acceptsAnIso4217Code() {
-    new PriceCurrency("EUR");
+    assertThat(new PriceCurrency("EUR").value()).isEqualTo("EUR");
   }
 
   @Test

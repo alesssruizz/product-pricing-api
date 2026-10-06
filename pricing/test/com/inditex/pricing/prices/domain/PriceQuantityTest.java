@@ -1,5 +1,6 @@
 package com.inditex.pricing.prices.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
@@ -14,7 +15,7 @@ class PriceQuantityTest {
 
   @Test
   void acceptsAPositiveValue() {
-    new PriceQuantity(new BigDecimal("0.01"));
+    assertThat(new PriceQuantity(new BigDecimal("0.01")).value()).isEqualTo(new BigDecimal("0.01"));
   }
 
   @Test
@@ -25,7 +26,8 @@ class PriceQuantityTest {
 
   @Test
   void rejectsNegativeValues() {
-    assertThatThrownBy(() -> new PriceQuantity(new BigDecimal("-1")))
+    BigDecimal negativeValue = new BigDecimal("-1");
+    assertThatThrownBy(() -> new PriceQuantity(negativeValue))
         .isInstanceOf(InvalidPriceQuantity.class);
   }
 }

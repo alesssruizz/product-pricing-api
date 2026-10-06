@@ -67,10 +67,9 @@ class CommandHandlersInformationTest {
   @Test
   @DisplayName("Rejects two handlers for the same command type")
   void rejectsDuplicateHandlers() {
-    assertThatThrownBy(
-            () ->
-                new CommandHandlersInformation(
-                    List.of(new FirstCommandHandler(), new DuplicatedFirstCommandHandler())))
+    List<CommandHandler> handlers =
+        List.of(new FirstCommandHandler(), new DuplicatedFirstCommandHandler());
+    assertThatThrownBy(() -> new CommandHandlersInformation(handlers))
         .isInstanceOf(DuplicateCommandHandlerError.class);
   }
 }
