@@ -2,6 +2,8 @@ package com.inditex.pricing.prices.application.patch;
 
 import java.math.BigDecimal;
 
+import com.inditex.pricing.shared.domain.bus.command.Command;
+
 public record PatchPriceCommand(
     String id,
     Long brandId,
@@ -11,4 +13,5 @@ public record PatchPriceCommand(
     String startDate,
     String endDate,
     BigDecimal price,
-    String currency) {}
+    String currency)
+    implements Command {}

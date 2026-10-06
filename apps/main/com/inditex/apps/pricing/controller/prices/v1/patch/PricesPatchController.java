@@ -2,9 +2,7 @@ package com.inditex.apps.pricing.controller.prices.v1.patch;
 
 import java.util.Map;
 
-import com.inditex.pricing.prices.application.PriceResponse;
 import com.inditex.pricing.prices.application.patch.PatchPriceCommand;
-import com.inditex.pricing.prices.application.patch.PricePatcher;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceCurrency;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceQuantity;
@@ -15,9 +13,11 @@ import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.InvalidDateFormat;
 import com.inditex.pricing.shared.domain.InvalidUUID;
+import com.inditex.pricing.shared.domain.bus.command.CommandBus;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,15 +35,17 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Prices")
 public class PricesPatchController extends ApiController {
 
-  private final PricePatcher patcher;
-
-  public PricesPatchController(QueryBus queryBus, PricePatcher patcher) {
-    super(queryBus);
-    this.patcher = patcher;
+  public PricesPatchController(QueryBus queryBus, CommandBus commandBus) {
+    super(queryBus, commandBus);
   }
 
+  @Operation(
+      summary = "Modificar parcialmente un precio",
+      description =
+          "Aplica los campos enviados sobre el precio existente y valida el estado resultante;"
+              + " responde 404 si no existe y 409 si la clave de negocio resultante ya pertenece a otro precio.")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Price patched"),
+    @ApiResponse(responseCode = "204", description = "Price patched, no body"),
     @ApiResponse(
         responseCode = "400",
         description =
@@ -75,26 +77,27 @@ public class PricesPatchController extends ApiController {
                 schema = @Schema(implementation = ProblemDetail.class)))
   })
   @PatchMapping(value = "/prices/{id}", version = "v1")
-  public ResponseEntity<PriceResponse> patch(
+  public ResponseEntity<Void> patch(
       @PathVariable String id, @RequestBody PricePatchRequest request) {
-    PriceResponse price =
-        patcher.patch(
-            new PatchPriceCommand(
-                id,
-                request.brandId(),
-                request.productId(),
-                request.priceList(),
-                request.priority(),
-                request.startDate(),
-                request.endDate(),
-                request.price(),
-                request.currency()));
 
-    return ResponseEntity.ok(price);
+    dispatch(
+        new PatchPriceCommand(
+            id,
+            request.brandId(),
+            request.productId(),
+            request.priceList(),
+            request.priority(),
+            request.startDate(),
+            request.endDate(),
+            request.price(),
+            request.currency()));
+
+    return ResponseEntity.noContent().build();
   }
 
   @Override
   public Map<Class<? extends DomainError>, HttpStatus> errorMapping() {
+
     return Map.of(
         PriceNotFoundException.class, HttpStatus.NOT_FOUND,
         PriceAlreadyExists.class, HttpStatus.CONFLICT,

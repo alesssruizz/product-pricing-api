@@ -7,9 +7,11 @@ import com.inditex.pricing.prices.application.findbyid.FindPriceByIdQuery;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.InvalidUUID;
+import com.inditex.pricing.shared.domain.bus.command.CommandBus;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -26,12 +28,21 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Prices")
 public class PricesGetByIdController extends ApiController {
 
-  public PricesGetByIdController(QueryBus queryBus) {
-    super(queryBus);
+  public PricesGetByIdController(QueryBus queryBus, CommandBus commandBus) {
+    super(queryBus, commandBus);
   }
 
+  @Operation(
+      summary = "Obtener un precio por id",
+      description = "Devuelve el precio identificado por su UUID; responde 404 si no existe.")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Price found"),
+    @ApiResponse(
+        responseCode = "200",
+        description = "Price found",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = PriceResponse.class))),
     @ApiResponse(
         responseCode = "400",
         description = "invalid_uuid",
@@ -56,12 +67,15 @@ public class PricesGetByIdController extends ApiController {
   })
   @GetMapping(value = "/prices/{id}", version = "v1")
   public ResponseEntity<PriceResponse> index(@PathVariable String id) {
+
     PriceResponse price = ask(new FindPriceByIdQuery(id));
+
     return ResponseEntity.ok().body(price);
   }
 
   @Override
   public Map<Class<? extends DomainError>, HttpStatus> errorMapping() {
+
     return Map.of(
         PriceNotFoundException.class, HttpStatus.NOT_FOUND,
         InvalidUUID.class, HttpStatus.BAD_REQUEST);

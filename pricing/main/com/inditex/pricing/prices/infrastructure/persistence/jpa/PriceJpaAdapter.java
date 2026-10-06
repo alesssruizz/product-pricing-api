@@ -11,6 +11,7 @@ import com.inditex.pricing.prices.domain.PriceProductId;
 import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.shared.domain.Service;
 
+import jakarta.persistence.EntityManager;
 import org.springframework.data.domain.Limit;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +21,11 @@ public class PriceJpaAdapter implements PriceRepository {
 
   private final PriceJpaRepository repository;
 
-  public PriceJpaAdapter(PriceJpaRepository repository) {
+  private final EntityManager entityManager;
+
+  public PriceJpaAdapter(PriceJpaRepository repository, EntityManager entityManager) {
     this.repository = repository;
+    this.entityManager = entityManager;
   }
 
   @Override

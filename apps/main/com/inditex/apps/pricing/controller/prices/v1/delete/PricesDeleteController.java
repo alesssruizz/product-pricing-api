@@ -2,13 +2,15 @@ package com.inditex.apps.pricing.controller.prices.v1.delete;
 
 import java.util.Map;
 
-import com.inditex.pricing.prices.application.delete.PriceDeleter;
+import com.inditex.pricing.prices.application.delete.DeletePriceCommand;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.InvalidUUID;
+import com.inditex.pricing.shared.domain.bus.command.CommandBus;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,13 +27,13 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Prices")
 public class PricesDeleteController extends ApiController {
 
-  private final PriceDeleter deleter;
-
-  public PricesDeleteController(QueryBus queryBus, PriceDeleter deleter) {
-    super(queryBus);
-    this.deleter = deleter;
+  public PricesDeleteController(QueryBus queryBus, CommandBus commandBus) {
+    super(queryBus, commandBus);
   }
 
+  @Operation(
+      summary = "Eliminar un precio",
+      description = "Elimina el precio identificado por id; responde 404 si no existe.")
   @ApiResponses({
     @ApiResponse(responseCode = "204", description = "Price deleted, no body"),
     @ApiResponse(
@@ -58,12 +60,15 @@ public class PricesDeleteController extends ApiController {
   })
   @DeleteMapping(value = "/prices/{id}", version = "v1")
   public ResponseEntity<Void> delete(@PathVariable String id) {
-    deleter.delete(id);
+
+    dispatch(new DeletePriceCommand(id));
+
     return ResponseEntity.noContent().build();
   }
 
   @Override
   public Map<Class<? extends DomainError>, HttpStatus> errorMapping() {
+
     return Map.of(
         PriceNotFoundException.class, HttpStatus.NOT_FOUND,
         InvalidUUID.class, HttpStatus.BAD_REQUEST);

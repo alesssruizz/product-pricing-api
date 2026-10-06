@@ -41,14 +41,14 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
   class HappyPathTests {
 
     @Test
-    @DisplayName("Returns 201 with Location and the created price with the client supplied id")
+    @DisplayName("Returns 201 with Location and the message body, and the price is readable")
     void createsThePrice() throws Exception {
       postBody(ENDPOINT, VALID_BODY)
           .andExpect(status().isCreated())
           .andExpect(header().string("Location", containsString("/api/v1/prices/" + NEW_ID)))
-          .andExpect(jsonPath("$.id").value(NEW_ID))
-          .andExpect(jsonPath("$.priceList").value(9))
-          .andExpect(jsonPath("$.currency").value("EUR"));
+          .andExpect(jsonPath("$.id").doesNotExist())
+          .andExpect(jsonPath("$.priceList").doesNotExist())
+          .andExpect(jsonPath("$.currency").doesNotExist());
 
       perform(get(ENDPOINT + "/" + NEW_ID))
           .andExpect(status().isOk())

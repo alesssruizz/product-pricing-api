@@ -10,7 +10,6 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 
-import com.inditex.pricing.prices.application.PriceResponse;
 import com.inditex.pricing.prices.domain.Price;
 import com.inditex.pricing.prices.domain.PriceIntegrityChecker;
 import com.inditex.pricing.prices.domain.PriceRepository;
@@ -22,6 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -77,15 +77,15 @@ class PriceCreatorTest {
   class WhenIdIsFree {
 
     @Test
-    void savesAndReturnsTheCreatedPrice() {
+    void savesTheCreatedPrice() {
       when(repository.existsById(any())).thenReturn(false);
-      when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+      ArgumentCaptor<Price> saved = ArgumentCaptor.forClass(Price.class);
 
-      PriceResponse response = creator.create(command());
+      creator.create(command());
 
-      assertThat(response.id()).isEqualTo(ID);
       verify(integrityChecker).ensureCanBeSaved(any(Price.class));
-      verify(repository).save(any(Price.class));
+      verify(repository).save(saved.capture());
+      assertThat(saved.getValue().id().value()).isEqualTo(ID);
     }
 
     @Test

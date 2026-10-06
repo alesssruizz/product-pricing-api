@@ -3,9 +3,7 @@ package com.inditex.apps.pricing.controller.prices.v1.post;
 import java.net.URI;
 import java.util.Map;
 
-import com.inditex.pricing.prices.application.PriceResponse;
 import com.inditex.pricing.prices.application.create.CreatePriceCommand;
-import com.inditex.pricing.prices.application.create.PriceCreator;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceCurrency;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceQuantity;
@@ -16,14 +14,17 @@ import com.inditex.pricing.prices.domain.exceptions.PriceIdAlreadyExists;
 import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.InvalidDateFormat;
 import com.inditex.pricing.shared.domain.InvalidUUID;
+import com.inditex.pricing.shared.domain.bus.command.CommandBus;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -36,13 +37,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @Tag(name = "Prices")
 public class PricesPostController extends ApiController {
 
-  private final PriceCreator creator;
-
-  public PricesPostController(QueryBus queryBus, PriceCreator creator) {
-    super(queryBus);
-    this.creator = creator;
+  public PricesPostController(QueryBus queryBus, CommandBus commandBus) {
+    super(queryBus, commandBus);
   }
 
+  @Operation(
+      summary = "Crear un precio",
+      description =
+          "Crea un precio con id UUID aportado por el cliente y devuelve 201 con la cabecera Location;"
+              + " responde 409 si el id ya existe o si ya hay otro precio con la misma marca, producto, prioridad y fecha de inicio.")
   @ApiResponses({
     @ApiResponse(responseCode = "201", description = "Price created, Location header set"),
     @ApiResponse(
@@ -69,31 +72,34 @@ public class PricesPostController extends ApiController {
                 schema = @Schema(implementation = ProblemDetail.class)))
   })
   @PostMapping(value = "/prices", version = "v1")
-  public ResponseEntity<PriceResponse> create(@RequestBody PricePostRequest request) {
-    PriceResponse price =
-        creator.create(
-            new CreatePriceCommand(
-                request.id(),
-                request.brandId(),
-                request.productId(),
-                request.priceList(),
-                request.priority(),
-                request.startDate(),
-                request.endDate(),
-                request.price(),
-                request.currency()));
+  public ResponseEntity<Void> create(@RequestBody PricePostRequest request) {
 
-    URI location =
-        ServletUriComponentsBuilder.fromCurrentRequestUri()
-            .path("/{id}")
-            .buildAndExpand(price.id())
-            .toUri();
+    dispatch(
+        new CreatePriceCommand(
+            request.id(),
+            request.brandId(),
+            request.productId(),
+            request.priceList(),
+            request.priority(),
+            request.startDate(),
+            request.endDate(),
+            request.price(),
+            request.currency()));
 
-    return ResponseEntity.created(location).body(price);
+    return ResponseEntity.created(uriLocation(request.id())).build();
+  }
+
+  private @NonNull URI uriLocation(String id) {
+
+    return ServletUriComponentsBuilder.fromCurrentRequestUri()
+        .path("/{id}")
+        .buildAndExpand(id)
+        .toUri();
   }
 
   @Override
   public Map<Class<? extends DomainError>, HttpStatus> errorMapping() {
+
     return Map.of(
         PriceIdAlreadyExists.class, HttpStatus.CONFLICT,
         PriceAlreadyExists.class, HttpStatus.CONFLICT,

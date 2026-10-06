@@ -2,6 +2,7 @@ package com.inditex.apps.pricing.controller.prices;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,13 +42,17 @@ public class PricesPutControllerShould extends ProductPricingApiApplicationTests
   class HappyPathTests {
 
     @Test
-    @DisplayName("Returns 200 with the replaced price keeping the path id and ignoring a body id")
+    @DisplayName("Returns 204 with no body and replaces the price keeping the path id")
     void replacesThePrice() throws Exception {
       putBody(
               ENDPOINT,
               VALID_BODY.replace(
                   "\"priceList\": 9",
                   "\"priceList\": 9, \"id\": \"00000000-0000-0000-0000-000000000999\""))
+          .andExpect(status().isNoContent())
+          .andExpect(content().string(""));
+
+      perform(get(ENDPOINT))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000001"))
           .andExpect(jsonPath("$.priceList").value(9))
@@ -55,11 +60,10 @@ public class PricesPutControllerShould extends ProductPricingApiApplicationTests
     }
 
     @Test
-    @DisplayName("Returns 200 when the price keeps its own dates and priority key")
+    @DisplayName("Returns 204 when the price keeps its own dates and priority key")
     void allowsItsOwnKey() throws Exception {
       putBody(ENDPOINT, VALID_BODY.replace("\"price\": 40.00", "\"price\": 41.00"))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000001"));
+          .andExpect(status().isNoContent());
     }
   }
 

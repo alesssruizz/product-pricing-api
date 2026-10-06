@@ -2,8 +2,6 @@ package com.inditex.apps.pricing.controller.prices.v1.put;
 
 import java.util.Map;
 
-import com.inditex.pricing.prices.application.PriceResponse;
-import com.inditex.pricing.prices.application.update.PriceUpdater;
 import com.inditex.pricing.prices.application.update.UpdatePriceCommand;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceCurrency;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
@@ -15,9 +13,11 @@ import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.InvalidDateFormat;
 import com.inditex.pricing.shared.domain.InvalidUUID;
+import com.inditex.pricing.shared.domain.bus.command.CommandBus;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -35,15 +35,17 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Prices")
 public class PricesPutController extends ApiController {
 
-  private final PriceUpdater updater;
-
-  public PricesPutController(QueryBus queryBus, PriceUpdater updater) {
-    super(queryBus);
-    this.updater = updater;
+  public PricesPutController(QueryBus queryBus, CommandBus commandBus) {
+    super(queryBus, commandBus);
   }
 
+  @Operation(
+      summary = "Reemplazar un precio",
+      description =
+          "Reemplaza por completo el precio identificado por id;"
+              + " responde 404 si no existe y 409 si la clave de negocio resultante ya pertenece a otro precio.")
   @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Price replaced"),
+    @ApiResponse(responseCode = "204", description = "Price replaced, no body"),
     @ApiResponse(
         responseCode = "400",
         description = "Domain validation error (with errorCode) or malformed body (no errorCode)",
@@ -74,26 +76,27 @@ public class PricesPutController extends ApiController {
                 schema = @Schema(implementation = ProblemDetail.class)))
   })
   @PutMapping(value = "/prices/{id}", version = "v1")
-  public ResponseEntity<PriceResponse> update(
+  public ResponseEntity<Void> update(
       @PathVariable String id, @RequestBody PricePutRequest request) {
-    PriceResponse price =
-        updater.update(
-            new UpdatePriceCommand(
-                id,
-                request.brandId(),
-                request.productId(),
-                request.priceList(),
-                request.priority(),
-                request.startDate(),
-                request.endDate(),
-                request.price(),
-                request.currency()));
 
-    return ResponseEntity.ok(price);
+    dispatch(
+        new UpdatePriceCommand(
+            id,
+            request.brandId(),
+            request.productId(),
+            request.priceList(),
+            request.priority(),
+            request.startDate(),
+            request.endDate(),
+            request.price(),
+            request.currency()));
+
+    return ResponseEntity.noContent().build();
   }
 
   @Override
   public Map<Class<? extends DomainError>, HttpStatus> errorMapping() {
+
     return Map.of(
         PriceNotFoundException.class, HttpStatus.NOT_FOUND,
         PriceAlreadyExists.class, HttpStatus.CONFLICT,

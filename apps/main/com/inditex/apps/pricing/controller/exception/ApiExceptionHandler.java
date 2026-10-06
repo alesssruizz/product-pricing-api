@@ -6,6 +6,8 @@ import java.util.Map;
 
 import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.Utils;
+import com.inditex.pricing.shared.domain.bus.command.CommandHandlerExecutionError;
+import com.inditex.pricing.shared.domain.bus.command.DuplicateCommandHandlerError;
 import com.inditex.pricing.shared.domain.bus.query.QueryHandlerExecutionError;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
@@ -50,7 +52,10 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   private Throwable unwrap(Exception exception) {
-    return (exception instanceof QueryHandlerExecutionError && exception.getCause() != null)
+    return ((exception instanceof QueryHandlerExecutionError
+                || exception instanceof CommandHandlerExecutionError
+                || exception instanceof DuplicateCommandHandlerError)
+            && exception.getCause() != null)
         ? exception.getCause()
         : exception;
   }

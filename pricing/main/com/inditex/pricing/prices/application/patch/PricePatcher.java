@@ -2,7 +2,6 @@ package com.inditex.pricing.prices.application.patch;
 
 import java.util.Objects;
 
-import com.inditex.pricing.prices.application.PriceResponse;
 import com.inditex.pricing.prices.domain.Price;
 import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceIntegrityChecker;
@@ -22,7 +21,7 @@ public final class PricePatcher {
     this.integrityChecker = integrityChecker;
   }
 
-  public PriceResponse patch(PatchPriceCommand command) {
+  public void patch(PatchPriceCommand command) {
     PriceId id = new PriceId(command.id());
 
     Price current = repository.findById(id).orElseThrow(() -> new PriceNotFoundException(id));
@@ -41,6 +40,6 @@ public final class PricePatcher {
 
     integrityChecker.ensureCanBeSaved(price);
 
-    return PriceResponse.fromAggregate(repository.save(price));
+    repository.save(price);
   }
 }

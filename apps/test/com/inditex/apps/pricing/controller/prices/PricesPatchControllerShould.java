@@ -1,6 +1,8 @@
 package com.inditex.apps.pricing.controller.prices;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -26,9 +28,13 @@ public class PricesPatchControllerShould extends ProductPricingApiApplicationTes
   class HappyPathTests {
 
     @Test
-    @DisplayName("Returns 200 with the price keeping the fields that were not sent")
+    @DisplayName("Returns 204 with no body and keeps the fields that were not sent")
     void mergesOnlyTheSentFields() throws Exception {
       patchBody("/api/v1/prices/00000000-0000-0000-0000-000000000002", "{\"priority\": 0}")
+          .andExpect(status().isNoContent())
+          .andExpect(content().string(""));
+
+      perform(get("/api/v1/prices/00000000-0000-0000-0000-000000000002"))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000002"))
           .andExpect(jsonPath("$.priority").value(0))
@@ -37,9 +43,11 @@ public class PricesPatchControllerShould extends ProductPricingApiApplicationTes
     }
 
     @Test
-    @DisplayName("Returns 200 when only the price changes and the own key is kept")
+    @DisplayName("Returns 204 when only the price changes and the own key is kept")
     void allowsItsOwnKey() throws Exception {
-      patchBody(ENDPOINT, "{\"price\": 41.00}")
+      patchBody(ENDPOINT, "{\"price\": 41.00}").andExpect(status().isNoContent());
+
+      perform(get(ENDPOINT))
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000001"))
           .andExpect(jsonPath("$.currency").value("EUR"));
@@ -51,8 +59,12 @@ public class PricesPatchControllerShould extends ProductPricingApiApplicationTes
       patchBody(
               "/api/v1/prices/00000000-0000-0000-0000-000000000002",
               "{\"id\": \"00000000-0000-0000-0000-000000000999\", \"price\": 30.00}")
+          .andExpect(status().isNoContent());
+
+      perform(get("/api/v1/prices/00000000-0000-0000-0000-000000000002"))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000002"));
+          .andExpect(jsonPath("$.id").value("00000000-0000-0000-0000-000000000002"))
+          .andExpect(jsonPath("$.price").value(30.00));
     }
   }
 

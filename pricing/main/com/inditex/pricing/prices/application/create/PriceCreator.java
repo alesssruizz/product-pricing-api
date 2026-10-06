@@ -1,6 +1,5 @@
 package com.inditex.pricing.prices.application.create;
 
-import com.inditex.pricing.prices.application.PriceResponse;
 import com.inditex.pricing.prices.domain.Price;
 import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceIntegrityChecker;
@@ -20,7 +19,7 @@ public final class PriceCreator {
     this.integrityChecker = integrityChecker;
   }
 
-  public PriceResponse create(CreatePriceCommand command) {
+  public void create(CreatePriceCommand command) {
     Price price =
         Price.create(
             command.id(),
@@ -39,6 +38,6 @@ public final class PriceCreator {
     }
     integrityChecker.ensureCanBeSaved(price);
 
-    return PriceResponse.fromAggregate(repository.save(price));
+    repository.save(price);
   }
 }
