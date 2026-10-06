@@ -24,7 +24,9 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ApiExceptionHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
+
+  private static final String UNEXPECTED_ERROR_DETAIL = "Unexpected error";
 
   @ExceptionHandler
   public ResponseEntity<ProblemDetail> handleDomainError(
@@ -34,8 +36,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
     String detail = error.getMessage();
     if (status.is5xxServerError()) {
-      LOGGER.error("Unhandled error in {}", handlerMethod, error);
-      detail = "Unexpected error";
+      log.error("Unhandled error in {}", handlerMethod, error);
+      detail = UNEXPECTED_ERROR_DETAIL;
     }
 
     ProblemDetail problem = forStatusAndDetail(status, detail);
