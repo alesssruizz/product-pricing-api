@@ -30,11 +30,11 @@ public final class Price extends AggregateRoot {
   private Price(
       String id,
       Long brandId,
+      Long productId,
+      Integer priceList,
+      Integer priority,
       String startDate,
       String endDate,
-      Integer priceList,
-      Long productId,
-      Integer priority,
       BigDecimal priceQuantity,
       String currency) {
     this.id = new PriceId(id);
@@ -62,11 +62,11 @@ public final class Price extends AggregateRoot {
     return new Price(
         required(id, "id"),
         required(brandId, "brandId"),
+        required(productId, "productId"),
+        required(priceList, "priceList"),
+        required(priority, "priority"),
         required(startDate, "startDate"),
         required(endDate, "endDate"),
-        required(priceList, "priceList"),
-        required(productId, "productId"),
-        required(priority, "priority"),
         required(price, "price"),
         required(currency, "currency"));
   }
