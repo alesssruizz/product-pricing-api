@@ -3,8 +3,12 @@ package com.inditex.pricing.shared.domain;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Objects;
 
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+
+@Getter
+@EqualsAndHashCode
 public abstract class LocalDateTimeValueObject {
 
   private final LocalDateTime value;
@@ -23,27 +27,5 @@ public abstract class LocalDateTimeValueObject {
     } catch (DateTimeParseException ex) {
       throw new InvalidDateFormat(value);
     }
-  }
-
-  public LocalDateTime value() {
-    return value;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    LocalDateTimeValueObject that = (LocalDateTimeValueObject) o;
-    return Objects.equals(value, that.value);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(value);
   }
 }

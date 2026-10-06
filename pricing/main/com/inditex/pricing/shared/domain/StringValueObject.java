@@ -1,7 +1,10 @@
 package com.inditex.pricing.shared.domain;
 
-import java.util.Objects;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
+@Getter
+@EqualsAndHashCode
 public abstract class StringValueObject {
 
   private final String value;
@@ -10,30 +13,8 @@ public abstract class StringValueObject {
     this.value = value;
   }
 
-  public String value() {
-    return value;
-  }
-
   @Override
   public String toString() {
     return this.value();
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    StringValueObject that = (StringValueObject) o;
-    return Objects.equals(value, that.value);
-  }
-
-  @Override
-  public int hashCode() {
-    return Objects.hashCode(value);
   }
 }

@@ -79,14 +79,14 @@ public class PriceJpaAdapter implements PriceRepository {
 
   private Price toDomain(PriceJpaEntity entity) {
     return Price.create(
-        entity.getId().toString(),
-        entity.getBrandId(),
-        entity.getProductId(),
-        entity.getPriceList(),
-        entity.getPriority(),
-        entity.getStartDate().toString(),
-        entity.getEndDate().toString(),
-        entity.getPrice(),
-        entity.getCurrency());
+        entity.id().toString(),
+        entity.brandId(),
+        entity.productId(),
+        entity.priceList(),
+        entity.priority(),
+        entity.startDate().toString(),
+        entity.endDate().toString(),
+        entity.price(),
+        entity.currency());
   }
 }
