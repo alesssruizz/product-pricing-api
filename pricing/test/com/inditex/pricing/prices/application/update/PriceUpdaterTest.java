@@ -1,0 +1,122 @@
+package com.inditex.pricing.prices.application.update;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.util.Optional;
+
+import com.inditex.pricing.prices.domain.Price;
+import com.inditex.pricing.prices.domain.PriceIntegrityChecker;
+import com.inditex.pricing.prices.domain.PriceRepository;
+import com.inditex.pricing.prices.domain.exceptions.PriceAlreadyExists;
+import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("PriceUpdater")
+class PriceUpdaterTest {
+
+  private static final String ID = "00000000-0000-0000-0000-000000000001";
+
+  @Mock private PriceRepository repository;
+
+  @Mock private PriceIntegrityChecker integrityChecker;
+
+  private PriceUpdater updater;
+
+  @BeforeEach
+  void setUp() {
+    updater = new PriceUpdater(repository, integrityChecker);
+  }
+
+  private static UpdatePriceCommand command() {
+    return new UpdatePriceCommand(
+        ID,
+        1L,
+        35455L,
+        2,
+        1,
+        "2020-06-14T00:00:00",
+        "2020-12-31T23:59:59",
+        new BigDecimal("40.00"),
+        "EUR");
+  }
+
+  private static Price existing() {
+    return Price.create(
+        ID,
+        1L,
+        35455L,
+        1,
+        0,
+        "2020-06-14T00:00:00",
+        "2020-12-31T23:59:59",
+        new BigDecimal("35.50"),
+        "EUR");
+  }
+
+  @Nested
+  @DisplayName("when the id does not exist")
+  class WhenIdIsMissing {
+
+    @Test
+    void throwsNotFoundWithoutCheckingIntegrityNorUpdating() {
+      when(repository.findById(any())).thenReturn(Optional.empty());
+
+      assertThatThrownBy(() -> updater.update(command()))
+          .isInstanceOf(PriceNotFoundException.class);
+      verify(integrityChecker, never()).ensureCanBeSaved(any());
+      verify(repository, never()).update(any());
+    }
+  }
+
+  @Nested
+  @DisplayName("when the id exists")
+  class WhenIdExists {
+
+    @Test
+    void updatesThePriceWithTheCommandValues() {
+      when(repository.findById(any())).thenReturn(Optional.of(existing()));
+      ArgumentCaptor<Price> saved = ArgumentCaptor.forClass(Price.class);
+
+      updater.update(command());
+
+      verify(integrityChecker).ensureCanBeSaved(any(Price.class));
+      verify(repository).update(saved.capture());
+      verify(repository, never()).create(any());
+      Price price = saved.getValue();
+      assertThat(price.id().value()).isEqualTo(ID);
+      assertThat(price.brandId().value()).isEqualTo(1L);
+      assertThat(price.productId().value()).isEqualTo(35455L);
+      assertThat(price.priceList().value()).isEqualTo(2);
+      assertThat(price.priority().value()).isEqualTo(1);
+      assertThat(price.startDate().value().toString()).isEqualTo("2020-06-14T00:00");
+      assertThat(price.endDate().value().toString()).isEqualTo("2020-12-31T23:59:59");
+      assertThat(price.priceQuantity().value()).isEqualByComparingTo("40.00");
+      assertThat(price.currency().value()).isEqualTo("EUR");
+    }
+
+    @Test
+    void doesNotUpdateWhenTheIntegrityCheckFails() {
+      when(repository.findById(any())).thenReturn(Optional.of(existing()));
+      doThrow(new PriceAlreadyExists()).when(integrityChecker).ensureCanBeSaved(any());
+
+      assertThatThrownBy(() -> updater.update(command())).isInstanceOf(PriceAlreadyExists.class);
+      verify(repository, never()).update(any());
+    }
+  }
+}

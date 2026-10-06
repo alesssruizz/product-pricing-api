@@ -65,12 +65,12 @@ class PricePatcherTest {
   @DisplayName("Keeps the stored values for fields that were not sent")
   void mergesOnlyTheSentFields() {
     when(repository.findById(any())).thenReturn(Optional.of(existing()));
-    when(repository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
     ArgumentCaptor<Price> saved = ArgumentCaptor.forClass(Price.class);
 
     patcher.patch(command(new BigDecimal("40.00"), null, null, null));
 
-    verify(repository).save(saved.capture());
+    verify(repository).update(saved.capture());
+    verify(repository, never()).create(any());
     Price price = saved.getValue();
     assertThat(price.id().value()).isEqualTo(ID);
     assertThat(price.priceQuantity().value()).isEqualByComparingTo("40.00");
@@ -86,7 +86,7 @@ class PricePatcherTest {
 
     assertThatThrownBy(() -> patcher.patch(command(null, null, "2020-06-13T00:00:00", null)))
         .isInstanceOf(InvalidPriceDateRange.class);
-    verify(repository, never()).save(any());
+    verify(repository, never()).update(any());
   }
 
   @Test
@@ -97,7 +97,7 @@ class PricePatcherTest {
     assertThatThrownBy(() -> patcher.patch(command(new BigDecimal("40.00"), null, null, null)))
         .isInstanceOf(PriceNotFoundException.class);
     verify(integrityChecker, never()).ensureCanBeSaved(any());
-    verify(repository, never()).save(any());
+    verify(repository, never()).update(any());
   }
 
   @Test
@@ -108,6 +108,6 @@ class PricePatcherTest {
 
     assertThatThrownBy(() -> patcher.patch(command(new BigDecimal("40.00"), null, null, null)))
         .isInstanceOf(PriceAlreadyExists.class);
-    verify(repository, never()).save(any());
+    verify(repository, never()).update(any());
   }
 }

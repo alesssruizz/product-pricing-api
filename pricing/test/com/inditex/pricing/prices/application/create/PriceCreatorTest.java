@@ -68,7 +68,7 @@ class PriceCreatorTest {
               PriceIdAlreadyExists.class,
               error -> assertThat(error.errorCode()).isEqualTo("price_id_already_exists"));
       verify(integrityChecker, never()).ensureCanBeSaved(any());
-      verify(repository, never()).save(any());
+      verify(repository, never()).create(any());
     }
   }
 
@@ -77,14 +77,15 @@ class PriceCreatorTest {
   class WhenIdIsFree {
 
     @Test
-    void savesTheCreatedPrice() {
+    void createsThePrice() {
       when(repository.existsById(any())).thenReturn(false);
       ArgumentCaptor<Price> saved = ArgumentCaptor.forClass(Price.class);
 
       creator.create(command());
 
       verify(integrityChecker).ensureCanBeSaved(any(Price.class));
-      verify(repository).save(saved.capture());
+      verify(repository).create(saved.capture());
+      verify(repository, never()).update(any());
       assertThat(saved.getValue().id().value()).isEqualTo(ID);
     }
 
@@ -94,7 +95,7 @@ class PriceCreatorTest {
       doThrow(new PriceAlreadyExists()).when(integrityChecker).ensureCanBeSaved(any());
 
       assertThatThrownBy(() -> creator.create(command())).isInstanceOf(PriceAlreadyExists.class);
-      verify(repository, never()).save(any());
+      verify(repository, never()).create(any());
     }
   }
 }
