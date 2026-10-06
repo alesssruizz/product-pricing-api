@@ -49,7 +49,10 @@ public class PricesPatchController extends ApiController {
     @ApiResponse(
         responseCode = "400",
         description =
-            "Domain validation error on the merged state (with errorCode) or malformed body (no errorCode)",
+            "invalid_uuid when the path id is not a UUID, or domain validation error on the "
+                + "merged state with errorCode (price_field_required, invalid_reference, "
+                + "invalid_price_quantity, invalid_price_date_range, invalid_price_currency, "
+                + "invalid_date_format), or malformed body (no errorCode)",
         content =
             @Content(
                 mediaType = "application/problem+json",

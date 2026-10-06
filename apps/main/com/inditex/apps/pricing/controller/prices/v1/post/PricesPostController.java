@@ -50,7 +50,10 @@ public class PricesPostController extends ApiController {
     @ApiResponse(responseCode = "201", description = "Price created, Location header set"),
     @ApiResponse(
         responseCode = "400",
-        description = "Domain validation error (with errorCode) or malformed body (no errorCode)",
+        description =
+            "Domain validation error with errorCode (invalid_uuid, price_field_required, "
+                + "invalid_reference, invalid_price_quantity, invalid_price_date_range, "
+                + "invalid_price_currency, invalid_date_format) or malformed body (no errorCode)",
         content =
             @Content(
                 mediaType = "application/problem+json",
