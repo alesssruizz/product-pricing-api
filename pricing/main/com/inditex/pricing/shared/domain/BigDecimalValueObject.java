@@ -11,7 +11,7 @@ public abstract class BigDecimalValueObject {
 
   private final BigDecimal value;
 
-  public BigDecimalValueObject(BigDecimal value) {
+  protected BigDecimalValueObject(BigDecimal value) {
     this.value = value;
   }
 }

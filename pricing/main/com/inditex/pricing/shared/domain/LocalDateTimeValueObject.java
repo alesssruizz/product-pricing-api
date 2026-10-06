@@ -13,11 +13,11 @@ public abstract class LocalDateTimeValueObject {
 
   private final LocalDateTime value;
 
-  public LocalDateTimeValueObject(String value) {
+  protected LocalDateTimeValueObject(String value) {
     this.value = ensureIsValidLocalDateTime(value);
   }
 
-  public LocalDateTimeValueObject(LocalDateTime value) {
+  protected LocalDateTimeValueObject(LocalDateTime value) {
     this.value = value;
   }
 

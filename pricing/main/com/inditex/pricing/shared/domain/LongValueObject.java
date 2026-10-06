@@ -9,7 +9,7 @@ public abstract class LongValueObject {
 
   private final Long value;
 
-  public LongValueObject(Long value) {
+  protected LongValueObject(Long value) {
     this.value = value;
   }
 }

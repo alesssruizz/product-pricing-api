@@ -9,7 +9,7 @@ public abstract class StringValueObject {
 
   private final String value;
 
-  public StringValueObject(String value) {
+  protected StringValueObject(String value) {
     this.value = value;
   }
 

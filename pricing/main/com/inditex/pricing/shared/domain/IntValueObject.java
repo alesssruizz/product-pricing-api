@@ -9,7 +9,7 @@ public abstract class IntValueObject {
 
   private final Integer value;
 
-  public IntValueObject(Integer value) {
+  protected IntValueObject(Integer value) {
     this.value = value;
   }
 }
