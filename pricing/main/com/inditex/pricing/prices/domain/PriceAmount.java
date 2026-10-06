@@ -6,9 +6,9 @@ import java.util.Objects;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceQuantity;
 import com.inditex.pricing.shared.domain.BigDecimalValueObject;
 
-public final class PriceQuantity extends BigDecimalValueObject {
+public final class PriceAmount extends BigDecimalValueObject {
 
-  public PriceQuantity(BigDecimal value) {
+  public PriceAmount(BigDecimal value) {
     super(ensureIsPositive(value));
   }
 

@@ -34,12 +34,11 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     Throwable error = unwrap(exception);
     HttpStatus status = statusFor(handlerMethod, error);
 
-    String detail = error.getMessage();
     if (status.is5xxServerError()) {
       log.error("Unhandled error in {}", handlerMethod, error);
-      detail = UNEXPECTED_ERROR_DETAIL;
     }
 
+    String detail = status.is5xxServerError() ? UNEXPECTED_ERROR_DETAIL : error.getMessage();
     ProblemDetail problem = forStatusAndDetail(status, detail);
     problem.setProperty("errorCode", errorCodeFor(error));
     return ResponseEntity.status(status).body(problem);
@@ -54,12 +53,15 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
   }
 
   private Throwable unwrap(Exception exception) {
-    return ((exception instanceof QueryHandlerExecutionError
-                || exception instanceof CommandHandlerExecutionError
-                || exception instanceof DuplicateCommandHandlerError)
-            && exception.getCause() != null)
+    return isBusWrapper(exception) && exception.getCause() != null
         ? exception.getCause()
         : exception;
+  }
+
+  private boolean isBusWrapper(Exception exception) {
+    return exception instanceof QueryHandlerExecutionError
+        || exception instanceof CommandHandlerExecutionError
+        || exception instanceof DuplicateCommandHandlerError;
   }
 
   private String errorCodeFor(Throwable error) {

@@ -81,7 +81,7 @@ public class PriceJpaAdapter implements PriceRepository {
   }
 
   private Price toDomain(PriceJpaEntity entity) {
-    return Price.create(
+    return new Price(
         Objects.requireNonNull(entity.getId()).toString(),
         entity.getBrandId(),
         entity.getProductId(),

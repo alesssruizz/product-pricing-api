@@ -10,24 +10,24 @@ import com.inditex.pricing.prices.domain.exceptions.InvalidPriceQuantity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("PriceQuantity")
-class PriceQuantityTest {
+@DisplayName("PriceAmount")
+class PriceAmountTest {
 
   @Test
   void acceptsAPositiveValue() {
-    assertThat(new PriceQuantity(new BigDecimal("0.01")).value()).isEqualTo(new BigDecimal("0.01"));
+    assertThat(new PriceAmount(new BigDecimal("0.01")).value()).isEqualTo(new BigDecimal("0.01"));
   }
 
   @Test
   void rejectsZero() {
-    assertThatThrownBy(() -> new PriceQuantity(BigDecimal.ZERO))
+    assertThatThrownBy(() -> new PriceAmount(BigDecimal.ZERO))
         .isInstanceOf(InvalidPriceQuantity.class);
   }
 
   @Test
   void rejectsNegativeValues() {
     var negativeValue = new BigDecimal("-1");
-    assertThatThrownBy(() -> new PriceQuantity(negativeValue))
+    assertThatThrownBy(() -> new PriceAmount(negativeValue))
         .isInstanceOf(InvalidPriceQuantity.class);
   }
 }
