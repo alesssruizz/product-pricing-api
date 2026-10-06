@@ -15,10 +15,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -36,38 +34,20 @@ public class PricesGetApplicableController extends ApiController {
       summary = "Get the applicable price",
       description =
           "Returns the applicable price for a brand, product and date; the priority decides between overlapping prices.")
-  @ApiResponses({
-    @ApiResponse(
-        responseCode = "200",
-        description = "Applicable price",
-        content =
-            @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = ApplicablePriceResponse.class))),
-    @ApiResponse(
-        responseCode = "400",
-        description =
-            "invalid_date_format when applicationDate is not ISO-8601, "
-                + "or missing/mistyped parameter (no errorCode)",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class))),
-    @ApiResponse(
-        responseCode = "404",
-        description = "price_not_found: no price applies",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class))),
-    @ApiResponse(
-        responseCode = "500",
-        description = "Unexpected error",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class)))
-  })
+  @ApiResponse(
+      responseCode = "200",
+      description = "Applicable price",
+      content =
+          @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = ApplicablePriceResponse.class)))
+  @ApiResponse(
+      responseCode = "400",
+      description =
+          "invalid_date_format when applicationDate is not ISO-8601, "
+              + "or missing/mistyped parameter (no errorCode)")
+  @ApiResponse(responseCode = "404", description = "price_not_found: no price applies")
+  @ApiResponse(responseCode = "500", description = "Unexpected error")
   @GetMapping(value = "/prices/find", version = "v1")
   public ResponseEntity<ApplicablePriceResponse> index(
       @RequestParam String applicationDate,

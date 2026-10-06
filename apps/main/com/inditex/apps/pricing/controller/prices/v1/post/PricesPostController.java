@@ -20,14 +20,11 @@ import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,41 +44,25 @@ public class PricesPostController extends ApiController {
       description =
           "Creates a price with a UUID id supplied by the client and returns 201 with the Location header;"
               + " responds 409 if the id already exists or if another price already has the same brand, product, priority and start date.")
-  @ApiResponses({
-    @ApiResponse(
-        responseCode = "201",
-        description = "Price created, no body",
-        headers =
-            @Header(
-                name = "Location",
-                description = "URI of the created price",
-                schema = @Schema(type = "string", format = "uri"))),
-    @ApiResponse(
-        responseCode = "400",
-        description =
-            "Domain validation error with errorCode (invalid_uuid, price_field_required, "
-                + "invalid_reference, invalid_price_quantity, invalid_price_date_range, "
-                + "invalid_price_currency, invalid_date_format) or malformed body (no errorCode)",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class))),
-    @ApiResponse(
-        responseCode = "409",
-        description =
-            "price_id_already_exists (id taken) or price_already_exists (business key conflict)",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class))),
-    @ApiResponse(
-        responseCode = "500",
-        description = "Unexpected error",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class)))
-  })
+  @ApiResponse(
+      responseCode = "201",
+      description = "Price created, no body",
+      headers =
+          @Header(
+              name = "Location",
+              description = "URI of the created price",
+              schema = @Schema(type = "string", format = "uri")))
+  @ApiResponse(
+      responseCode = "400",
+      description =
+          "Domain validation error with errorCode (invalid_uuid, price_field_required, "
+              + "invalid_reference, invalid_price_quantity, invalid_price_date_range, "
+              + "invalid_price_currency, invalid_date_format) or malformed body (no errorCode)")
+  @ApiResponse(
+      responseCode = "409",
+      description =
+          "price_id_already_exists (id taken) or price_already_exists (business key conflict)")
+  @ApiResponse(responseCode = "500", description = "Unexpected error")
   @PostMapping(value = "/prices", version = "v1")
   public ResponseEntity<Void> create(@RequestBody PricePostRequest request) {
 

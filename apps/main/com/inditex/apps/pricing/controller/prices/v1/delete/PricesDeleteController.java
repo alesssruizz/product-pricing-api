@@ -11,13 +11,9 @@ import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,30 +30,10 @@ public class PricesDeleteController extends ApiController {
   @Operation(
       summary = "Delete a price",
       description = "Deletes the price identified by id; responds 404 if it does not exist.")
-  @ApiResponses({
-    @ApiResponse(responseCode = "204", description = "Price deleted, no body"),
-    @ApiResponse(
-        responseCode = "400",
-        description = "invalid_uuid",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class))),
-    @ApiResponse(
-        responseCode = "404",
-        description = "price_not_found",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class))),
-    @ApiResponse(
-        responseCode = "500",
-        description = "Unexpected error",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class)))
-  })
+  @ApiResponse(responseCode = "204", description = "Price deleted, no body")
+  @ApiResponse(responseCode = "400", description = "invalid_uuid")
+  @ApiResponse(responseCode = "404", description = "price_not_found")
+  @ApiResponse(responseCode = "500", description = "Unexpected error")
   @DeleteMapping(value = "/prices/{id}", version = "v1")
   public ResponseEntity<Void> delete(@PathVariable String id) {
 

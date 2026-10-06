@@ -10,9 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,22 +26,14 @@ public class PricesGetController extends ApiController {
   @Operation(
       summary = "List all prices",
       description = "Returns all registered prices, with no guaranteed order.")
-  @ApiResponses({
-    @ApiResponse(
-        responseCode = "200",
-        description = "All prices (order not guaranteed)",
-        content =
-            @Content(
-                mediaType = "application/json",
-                schema = @Schema(implementation = PricesResponse.class))),
-    @ApiResponse(
-        responseCode = "500",
-        description = "Unexpected error",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class)))
-  })
+  @ApiResponse(
+      responseCode = "200",
+      description = "All prices (order not guaranteed)",
+      content =
+          @Content(
+              mediaType = "application/json",
+              schema = @Schema(implementation = PricesResponse.class)))
+  @ApiResponse(responseCode = "500", description = "Unexpected error")
   @GetMapping(value = "/prices", version = "v1")
   public ResponseEntity<PricesResponse> index() {
 

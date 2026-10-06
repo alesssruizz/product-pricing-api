@@ -18,13 +18,9 @@ import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -44,41 +40,17 @@ public class PricesPutController extends ApiController {
       description =
           "Fully replaces the price identified by id;"
               + " responds 404 if it does not exist and 409 if the resulting business key already belongs to another price.")
-  @ApiResponses({
-    @ApiResponse(responseCode = "204", description = "Price replaced, no body"),
-    @ApiResponse(
-        responseCode = "400",
-        description =
-            "invalid_uuid when the path id is not a UUID, or domain validation error with "
-                + "errorCode (price_field_required, invalid_reference, invalid_price_quantity, "
-                + "invalid_price_date_range, invalid_price_currency, invalid_date_format), "
-                + "or malformed body (no errorCode)",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class))),
-    @ApiResponse(
-        responseCode = "404",
-        description = "price_not_found",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class))),
-    @ApiResponse(
-        responseCode = "409",
-        description = "price_already_exists",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class))),
-    @ApiResponse(
-        responseCode = "500",
-        description = "Unexpected error",
-        content =
-            @Content(
-                mediaType = "application/problem+json",
-                schema = @Schema(implementation = ProblemDetail.class)))
-  })
+  @ApiResponse(responseCode = "204", description = "Price replaced, no body")
+  @ApiResponse(
+      responseCode = "400",
+      description =
+          "invalid_uuid when the path id is not a UUID, or domain validation error with "
+              + "errorCode (price_field_required, invalid_reference, invalid_price_quantity, "
+              + "invalid_price_date_range, invalid_price_currency, invalid_date_format), "
+              + "or malformed body (no errorCode)")
+  @ApiResponse(responseCode = "404", description = "price_not_found")
+  @ApiResponse(responseCode = "409", description = "price_already_exists")
+  @ApiResponse(responseCode = "500", description = "Unexpected error")
   @PutMapping(value = "/prices/{id}", version = "v1")
   public ResponseEntity<Void> update(
       @PathVariable String id, @RequestBody PricePutRequest request) {
