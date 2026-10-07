@@ -12,7 +12,6 @@ import com.inditex.pricing.prices.domain.PriceProductId;
 import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.shared.domain.Service;
 
-import org.springframework.data.domain.Limit;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -29,8 +28,7 @@ public class PriceJpaAdapter implements PriceRepository {
   public Optional<Price> findApplicablePrice(
       PriceBrandId brandId, PriceProductId productId, PriceDate applicationDate) {
     return repository
-        .findApplicablePrice(
-            brandId.value(), productId.value(), applicationDate.value())
+        .findApplicablePrice(brandId.value(), productId.value(), applicationDate.value())
         .stream()
         .findFirst()
         .map(this::toDomain);

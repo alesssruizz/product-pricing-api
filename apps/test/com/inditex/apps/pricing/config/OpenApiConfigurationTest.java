@@ -11,7 +11,6 @@ import io.swagger.v3.oas.models.media.Content;
 import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,7 +20,9 @@ import org.junit.jupiter.api.Test;
 class OpenApiConfigurationTest {
 
   private static final String PATH = "/p";
+
   private static final String PROBLEM_MEDIA_TYPE = "application/problem+json";
+
   private static final String PROBLEM_SCHEMA_REF = "#/components/schemas/ProblemDetail";
 
   private OpenApiConfiguration configuration;
@@ -96,8 +97,9 @@ class OpenApiConfigurationTest {
     void preservesMixedWildcardContent() {
       var openApi = new OpenAPI();
       var original =
-          new Content().addMediaType("*/*", new MediaType()).addMediaType(
-              "application/json", new MediaType());
+          new Content()
+              .addMediaType("*/*", new MediaType())
+              .addMediaType("application/json", new MediaType());
       var response = new ApiResponse().content(original);
       var responses = new ApiResponses().addApiResponse("400", response);
       openApi.paths(pathWithResponses(responses));
