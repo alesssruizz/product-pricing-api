@@ -11,8 +11,6 @@ import com.inditex.pricing.shared.domain.bus.command.DuplicateCommandHandlerErro
 import com.inditex.pricing.shared.domain.bus.query.QueryHandlerExecutionError;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -24,21 +22,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RestControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
-  private static final Logger log = LoggerFactory.getLogger(ApiExceptionHandler.class);
-
-  private static final String UNEXPECTED_ERROR_DETAIL = "Unexpected error";
-
   @ExceptionHandler
   public ResponseEntity<ProblemDetail> handleDomainError(
       Exception exception, HandlerMethod handlerMethod) {
     Throwable error = unwrap(exception);
     HttpStatus status = statusFor(handlerMethod, error);
 
-    if (status.is5xxServerError()) {
-      log.error("Unhandled error in {}", handlerMethod, error);
-    }
-
-    String detail = status.is5xxServerError() ? UNEXPECTED_ERROR_DETAIL : error.getMessage();
+    String detail = error.getMessage();
     ProblemDetail problem = forStatusAndDetail(status, detail);
     problem.setProperty("errorCode", errorCodeFor(error));
     return ResponseEntity.status(status).body(problem);
