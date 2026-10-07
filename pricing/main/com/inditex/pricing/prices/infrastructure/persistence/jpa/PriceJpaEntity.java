@@ -19,26 +19,28 @@ public class PriceJpaEntity implements Persistable<UUID> {
 
   @Id private UUID id;
 
-  @Column(name = "brand_id")
+  @Column(name = "brand_id", nullable = false)
   private Long brandId;
 
-  @Column(name = "start_date")
+  @Column(name = "start_date", nullable = false)
   private LocalDateTime startDate;
 
-  @Column(name = "end_date")
+  @Column(name = "end_date", nullable = false)
   private LocalDateTime endDate;
 
-  @Column(name = "price_list")
+  @Column(name = "price_list", nullable = false)
   private Integer priceList;
 
-  @Column(name = "product_id")
+  @Column(name = "product_id", nullable = false)
   private Long productId;
 
+  @Column(nullable = false)
   private Integer priority;
 
+  @Column(nullable = false)
   private BigDecimal price;
 
-  @Column(name = "curr", columnDefinition = "CHAR(3)")
+  @Column(name = "curr", columnDefinition = "CHAR(3)", nullable = false)
   private String currency;
 
   @Transient private boolean newEntity;
