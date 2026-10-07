@@ -18,9 +18,10 @@ public interface PriceJpaRepository extends ListCrudRepository<PriceJpaEntity, U
           AND p.productId = :productId
           AND :applicationDate BETWEEN p.startDate AND p.endDate
       ORDER BY p.priority DESC, p.startDate DESC
+      LIMIT 1
       """)
   List<PriceJpaEntity> findApplicablePrice(
-      Long brandId, Long productId, LocalDateTime applicationDate, Limit limit);
+      Long brandId, Long productId, LocalDateTime applicationDate);
 
   @Query(
       """

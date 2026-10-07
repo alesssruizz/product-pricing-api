@@ -30,7 +30,7 @@ public class PriceJpaAdapter implements PriceRepository {
       PriceBrandId brandId, PriceProductId productId, PriceDate applicationDate) {
     return repository
         .findApplicablePrice(
-            brandId.value(), productId.value(), applicationDate.value(), Limit.of(1))
+            brandId.value(), productId.value(), applicationDate.value())
         .stream()
         .findFirst()
         .map(this::toDomain);
