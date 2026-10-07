@@ -8,7 +8,7 @@
 
 Servicio REST que resuelve el precio aplicable a un producto de una cadena en una fecha determinada y permite gestionar las tarifas que lo determinan.
 
-Cuando varias tarifas se solapan en el tiempo, el servicio decide cuál aplica según su prioridad. Además de la consulta, expone un CRUD completo sobre las tarifas (`/prices`), con validación de dominio y errores homogéneos en formato [RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9457).
+Cuando varias tarifas se solapan en el tiempo, el servicio decide cuál aplica según su prioridad y fecha de inicio. Además de la consulta, expone un CRUD completo sobre las tarifas (`/prices`), con validación de dominio y errores homogéneos en formato [RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9457).
 
 ## Tabla de contenidos
 
@@ -207,8 +207,15 @@ Los ids completos son `00000000-0000-0000-0000-00000000000N` (N = 1..4).
 make test         # ./gradlew test
 ```
 
-- **Unitarios** (`pricing/test`): dominio y casos de uso, sin Spring, con Mockito.
-- **Aceptación** (`apps/test`): peticiones HTTP reales con MockMvc contra H2. Cada contexto de Spring usa su propia base de datos en memoria.
+La suite se organiza en tres niveles:
+
+| Nivel | Qué valida | Dónde |
+|---|---|---|
+| **Unitarios** | Dominio, casos de uso, buses, adaptador JPA (con el repositorio mockeado), manejo de errores y configuración. Sin contexto de Spring, con Mockito. | `pricing/test`, `ApiExceptionHandlerShould`, `apps/test/.../config` |
+| **Integración** | Componentes reales dentro del contexto de Spring: las consultas JPA del adaptador contra H2 (`PriceConflictQueryShould`) y la traducción a `500` de un fallo inesperado de infraestructura (`PricesUnexpectedErrorShould`). | `apps/test` |
+| **Aceptación** | Cada endpoint de extremo a extremo: petición HTTP con MockMvc → bus → dominio → H2, comprobando status, cuerpo y `errorCode`. | `apps/test/.../controller` (`*ControllerShould`) |
+
+Los tests de integración y aceptación levantan el contexto completo de Spring y cada contexto usa su propia base de datos H2 en memoria; los que escriben datos son `@Transactional` y se revierten al terminar.
 
 Los escenarios del enunciado están cubiertos en `PricesGetApplicableControllerShould` (producto 35455, cadena 1):
 
@@ -236,11 +243,11 @@ El informe se genera automáticamente al ejecutar `make test`, en `build/reports
 
 ## Calidad de código
 
-| Herramienta | Uso |
-|---|---|
-| Spotless + google-java-format | Formato del código (`make fix-lint`) |
-| Checkstyle | Estilo Google (configuración en `config/checkstyle`), 0 avisos permitidos |
-| SpotBugs + FindSecBugs | Análisis estático y de seguridad (exclusiones en `config/spotbugs`) |
+| Herramienta                   | Uso                                                                       |
+|-------------------------------|---------------------------------------------------------------------------|
+| Spotless + google-java-format | Formato del código (`make fix-lint`)                                      |
+| Checkstyle                    | Estilo Google (configuración en `config/checkstyle`), 0 avisos permitidos |
+| SpotBugs + FindSecBugs        | Análisis estático y de seguridad (exclusiones en `config/spotbugs`)       |
 
 `make fix-lint` deja el código listo para que `make lint` pase sin avisos.
 
@@ -273,27 +280,17 @@ Consola en `http://localhost:8080/pricing-service/h2-console` (JDBC URL `jdbc:h2
 - **Errores por caso de uso.** Cada controller decide qué status corresponde a cada error de dominio; el dominio no conoce HTTP.
 - **Versionado por ruta.** `/api/v1/...`, resuelto con el soporte nativo de versionado de API de Spring.
 
-## Contribuir
-
-Las incidencias y dudas se gestionan mediante [issues](https://github.com/alesssruizz/product-pricing-api/issues). Las pull requests son bienvenidas; antes de abrir una:
-
-1. Ejecuta `make fix-lint`, `make lint` y `make test`.
-2. Usa [Conventional Commits](https://www.conventionalcommits.org/) en los mensajes (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`…).
-
 ## Notas del autor
 
-Estaré atento al repositorio estos días por si tenéis cualquier incidencia o duda: podéis abrir una issue y la contestaré lo antes posible. Y, por supuesto, encantado de recibir cualquier PR para mejorar el código y tener así feedback directo vuestro.
+
+
+### Decisiones a destacar
+
+- **El cliente genera el id.** Así la identidad se conoce antes de persistir y el `201` devuelve el `Location` sin esperar a la base de datos. Como contrapartida, repetir un `POST` con el mismo id devuelve `409 price_id_already_exists`.
+- **Validación de UUID compartida.** `Identifier` vive en el kernel compartido para que cualquier identificador la reutilice, y lanza un error genérico (`invalid_uuid`) en lugar de uno por agregado.
+- **`persist` en vez de `merge` en las altas.** Con ids asignados, Spring Data trataría todo `save()` como una actualización (`SELECT` + `INSERT`). La entidad JPA implementa `Persistable` y el adaptador indica explícitamente si es un alta o una modificación.
+- **`existsById` antes de crear.** La clave primaria protege la base de datos, pero su error no distingue qué restricción falló y acabaría en un `500`; la comprobación previa expresa la regla de negocio y devuelve un `409` claro.
 
 ### Desarrollo asistido por IA
 
-Parte de este proyecto se construyó con ayuda de Claude Code, siguiendo un flujo de Spec-Driven Development (propuesta → spec → tareas → implementación → verificación) apoyado en sub-agentes para algunas fases de implementación y testing. Todas las decisiones de arquitectura, los criterios de diseño y la revisión final fueron revisados por mí.
-
-### Puntos a explicar
-
-> Recordatorio personal: temas a desarrollar en la presentación o en la revisión del código.
-
-1. **UUID generado por el cliente.** Por qué el cliente aporta el id (identidad conocida antes de persistir, `Location` inmediato) y por qué un `POST` repetido con el mismo id devuelve `409 price_id_already_exists` en vez de ser idempotente.
-2. **`Identifier` e `InvalidUUID` en el kernel compartido.** La validación (UUID canónico de 36 caracteres) vive en `shared/domain` para reutilizarse; se eligió un error genérico (`invalid_uuid`) frente a uno por agregado, asumiendo que el `errorCode` no indica qué id falló.
-3. **`Persistable` e `isNew`: `persist` frente a `merge`.** Con ids asignados y sin `@Version`, `save()` de Spring Data siempre haría `merge` (`SELECT` + `INSERT`). `PriceJpaEntity` implementa `Persistable<UUID>` con un flag `@Transient` que fijan `forCreate`/`forUpdate`; no se usan callbacks `@PostLoad` porque el adaptador construye siempre una entidad nueva desde el dominio.
-4. **Por qué se mantiene `existsById` antes del alta.** La clave primaria es la red de seguridad, pero `DataIntegrityViolationException` no distingue qué restricción falló y acabaría en un `500`; la comprobación explícita expresa la regla de dominio y conserva el orden de validación.
-5. **Igualdad de `Identifier` con Lombok.** `@EqualsAndHashCode` usa `instanceof` + `canEqual`: dos subclases distintas con el mismo UUID serían iguales. Hoy solo existe `PriceId`; si aparece otra, hay que añadir `@EqualsAndHashCode(callSuper = true)` en las subclases o volver a un `equals` basado en `getClass()`.
+Parte del proyecto se construyó con Claude Code siguiendo un flujo de Spec-Driven Development (propuesta → spec → tareas → implementación → verificación). Las decisiones de arquitectura, los criterios de diseño y la revisión final son míos.
