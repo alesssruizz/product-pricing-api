@@ -1,10 +1,10 @@
 package com.inditex.pricing.prices.application.find;
 
 import com.inditex.pricing.prices.application.ApplicablePriceResponse;
-import com.inditex.pricing.prices.domain.PriceBrandId;
+import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.PriceDate;
-import com.inditex.pricing.prices.domain.PriceProductId;
 import com.inditex.pricing.prices.domain.PriceRepository;
+import com.inditex.pricing.prices.domain.ProductId;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.Service;
 
@@ -18,8 +18,8 @@ public final class PriceFinder {
   }
 
   public ApplicablePriceResponse find(FindApplicablePriceQuery query) {
-    var brandId = new PriceBrandId(query.brandId());
-    var productId = new PriceProductId(query.productId());
+    var brandId = new BrandId(query.brandId());
+    var productId = new ProductId(query.productId());
     var applicationDate = new PriceDate(query.applicationDate());
 
     return repository

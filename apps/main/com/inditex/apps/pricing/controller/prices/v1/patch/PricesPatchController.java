@@ -3,9 +3,9 @@ package com.inditex.apps.pricing.controller.prices.v1.patch;
 import java.util.Map;
 
 import com.inditex.pricing.prices.application.patch.PatchPriceCommand;
+import com.inditex.pricing.prices.domain.exceptions.InvalidPriceAmount;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceCurrency;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceQuantity;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceReference;
 import com.inditex.pricing.prices.domain.exceptions.PriceAlreadyExists;
 import com.inditex.pricing.prices.domain.exceptions.PriceFieldRequired;
@@ -78,7 +78,7 @@ public class PricesPatchController extends ApiController {
         PriceAlreadyExists.class, HttpStatus.CONFLICT,
         InvalidUUID.class, HttpStatus.BAD_REQUEST,
         InvalidPriceReference.class, HttpStatus.BAD_REQUEST,
-        InvalidPriceQuantity.class, HttpStatus.BAD_REQUEST,
+        InvalidPriceAmount.class, HttpStatus.BAD_REQUEST,
         InvalidPriceDateRange.class, HttpStatus.BAD_REQUEST,
         InvalidPriceCurrency.class, HttpStatus.BAD_REQUEST,
         PriceFieldRequired.class, HttpStatus.BAD_REQUEST,

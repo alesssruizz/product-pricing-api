@@ -1,8 +1,8 @@
 package com.inditex.pricing.prices.infrastructure.persistence.jpa;
 
-import com.inditex.pricing.prices.domain.PriceBrandId;
-import com.inditex.pricing.prices.domain.PriceProductId;
+import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.PriceReferences;
+import com.inditex.pricing.prices.domain.ProductId;
 import com.inditex.pricing.shared.domain.Service;
 
 import jakarta.persistence.EntityManager;
@@ -19,12 +19,12 @@ public class JpaPriceReferences implements PriceReferences {
   }
 
   @Override
-  public boolean brandExists(PriceBrandId id) {
+  public boolean brandExists(BrandId id) {
     return countById("brands", id.value()) > 0;
   }
 
   @Override
-  public boolean productExists(PriceProductId id) {
+  public boolean productExists(ProductId id) {
     return countById("products", id.value()) > 0;
   }
 

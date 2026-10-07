@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public interface PriceRepository {
   Optional<Price> findApplicablePrice(
-      PriceBrandId brandId, PriceProductId productId, PriceDate applicationDate);
+      BrandId brandId, ProductId productId, PriceDate applicationDate);
 
   Optional<Price> findById(PriceId id);
 

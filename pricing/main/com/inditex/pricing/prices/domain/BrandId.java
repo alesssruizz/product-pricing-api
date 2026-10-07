@@ -4,9 +4,9 @@ import java.util.Objects;
 
 import com.inditex.pricing.shared.domain.LongValueObject;
 
-public final class PriceBrandId extends LongValueObject {
+public final class BrandId extends LongValueObject {
 
-  public PriceBrandId(Long value) {
+  public BrandId(Long value) {
     super(Objects.requireNonNull(value));
   }
 }

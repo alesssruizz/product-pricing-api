@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceQuantity;
+import com.inditex.pricing.prices.domain.exceptions.InvalidPriceAmount;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,13 +21,12 @@ class PriceAmountTest {
   @Test
   void rejectsZero() {
     assertThatThrownBy(() -> new PriceAmount(BigDecimal.ZERO))
-        .isInstanceOf(InvalidPriceQuantity.class);
+        .isInstanceOf(InvalidPriceAmount.class);
   }
 
   @Test
   void rejectsNegativeValues() {
     var negativeValue = new BigDecimal("-1");
-    assertThatThrownBy(() -> new PriceAmount(negativeValue))
-        .isInstanceOf(InvalidPriceQuantity.class);
+    assertThatThrownBy(() -> new PriceAmount(negativeValue)).isInstanceOf(InvalidPriceAmount.class);
   }
 }

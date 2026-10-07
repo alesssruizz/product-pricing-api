@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.Price;
-import com.inditex.pricing.prices.domain.PriceBrandId;
 import com.inditex.pricing.prices.domain.PriceDate;
 import com.inditex.pricing.prices.domain.PriceId;
-import com.inditex.pricing.prices.domain.PriceProductId;
 import com.inditex.pricing.prices.domain.PriceRepository;
+import com.inditex.pricing.prices.domain.ProductId;
 import com.inditex.pricing.shared.domain.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +26,7 @@ public class PriceJpaAdapter implements PriceRepository {
 
   @Override
   public Optional<Price> findApplicablePrice(
-      PriceBrandId brandId, PriceProductId productId, PriceDate applicationDate) {
+      BrandId brandId, ProductId productId, PriceDate applicationDate) {
     return repository
         .findApplicablePrice(brandId.value(), productId.value(), applicationDate.value())
         .stream()
