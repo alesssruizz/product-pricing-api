@@ -55,7 +55,7 @@ public final class QueryHandlersInformation {
         (Class<? extends Query>)
             ResolvableType.forClass(handler.getClass()).as(QueryHandler.class).resolveGeneric(0);
 
-    if (null == queryClass) {
+    if (null == queryClass || queryClass.isInterface()) {
       throw new IllegalStateException(
           String.format("Cannot resolve Query generic type for handler <%s>", handler.getClass()));
     }
