@@ -13,12 +13,12 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Price extends AggregateRoot {
 
-  private final PriceId id;
+  @EqualsAndHashCode.Include private final PriceId id;
 
   private final BrandId brandId;
 

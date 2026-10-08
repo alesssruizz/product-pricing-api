@@ -1,16 +1,17 @@
 package com.inditex.pricing.prices.domain;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import java.math.BigDecimal;
 
 import com.inditex.pricing.prices.domain.exception.InvalidPriceReference;
 import com.inditex.pricing.prices.domain.exception.PriceAlreadyExists;
+import com.inditex.pricing.prices.domain.policy.PriceConflictPolicy;
+import com.inditex.pricing.prices.domain.policy.PriceReferencesPolicy;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,15 +24,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @DisplayName("PriceIntegrityChecker")
 class PriceIntegrityCheckerTest {
 
-  @Mock private PriceRepository repository;
+  @Mock private PriceReferencesPolicy referencesPolicy;
 
-  @Mock private PriceReferences references;
+  @Mock private PriceConflictPolicy conflictPolicy;
 
   private PriceIntegrityChecker checker;
 
   @BeforeEach
   void setUp() {
-    checker = new PriceIntegrityChecker(repository, references);
+    checker = new PriceIntegrityChecker(referencesPolicy, conflictPolicy);
   }
 
   private static Price price() {
@@ -48,38 +49,30 @@ class PriceIntegrityCheckerTest {
   }
 
   @Test
-  void allowsAPriceWhenReferencesExistAndNoConflict() {
-    when(references.brandExists(any())).thenReturn(true);
-    when(references.productExists(any())).thenReturn(true);
-    when(repository.existsConflict(any())).thenReturn(false);
+  void checksReferencesBeforeConflicts() {
+    var price = price();
 
-    assertThatCode(() -> checker.ensureCanBeSaved(price())).doesNotThrowAnyException();
+    checker.ensureCanBeSaved(price);
+
+    var order = inOrder(referencesPolicy, conflictPolicy);
+    order.verify(referencesPolicy).ensureReferencesExist(price);
+    order.verify(conflictPolicy).ensureNoConflict(price);
   }
 
   @Test
-  void rejectsAnUnknownBrandBeforeCheckingConflicts() {
-    when(references.brandExists(any())).thenReturn(false);
+  void doesNotCheckConflictsWhenReferencesAreInvalid() {
+    doThrow(new InvalidPriceReference("brand", 1L))
+        .when(referencesPolicy)
+        .ensureReferencesExist(any());
 
     assertThatThrownBy(() -> checker.ensureCanBeSaved(price()))
         .isInstanceOf(InvalidPriceReference.class);
-    verify(repository, never()).existsConflict(any());
+    verifyNoInteractions(conflictPolicy);
   }
 
   @Test
-  void rejectsAnUnknownProductBeforeCheckingConflicts() {
-    when(references.brandExists(any())).thenReturn(true);
-    when(references.productExists(any())).thenReturn(false);
-
-    assertThatThrownBy(() -> checker.ensureCanBeSaved(price()))
-        .isInstanceOf(InvalidPriceReference.class);
-    verify(repository, never()).existsConflict(any());
-  }
-
-  @Test
-  void rejectsAConflictingPrice() {
-    when(references.brandExists(any())).thenReturn(true);
-    when(references.productExists(any())).thenReturn(true);
-    when(repository.existsConflict(any())).thenReturn(true);
+  void propagatesAConflict() {
+    doThrow(new PriceAlreadyExists()).when(conflictPolicy).ensureNoConflict(any());
 
     assertThatThrownBy(() -> checker.ensureCanBeSaved(price()))
         .isInstanceOf(PriceAlreadyExists.class);
