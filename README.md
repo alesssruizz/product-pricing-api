@@ -5,10 +5,13 @@
 ![Gradle](https://img.shields.io/badge/Gradle-9.7.1-02303A?logo=gradle&logoColor=white)
 ![H2](https://img.shields.io/badge/DB-H2%20in--memory-1F5FA8)
 ![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen?logo=codecov&logoColor=white)
+[![Release](https://img.shields.io/github/v/release/alesssruizz/product-pricing-api)](https://github.com/alesssruizz/product-pricing-api/releases)
 
 Servicio REST que resuelve el precio aplicable a un producto de una cadena en una fecha determinada y permite gestionar las tarifas que lo determinan.
 
 Cuando varias tarifas se solapan en el tiempo, el servicio decide cuál aplica según su prioridad y fecha de inicio. Además de la consulta, expone un CRUD completo sobre las tarifas (`/prices`), con validación de dominio y errores homogéneos en formato [RFC 9457 Problem Details](https://www.rfc-editor.org/rfc/rfc9457).
+
+El historial de cambios de cada versión está en [Releases](https://github.com/alesssruizz/product-pricing-api/releases).
 
 ## Tabla de contenidos
 
