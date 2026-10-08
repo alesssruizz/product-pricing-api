@@ -1,6 +1,7 @@
 package com.inditex.pricing.prices.infrastructure.persistence.jpa;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -16,6 +17,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.domain.Persistable;
 
 @Entity
@@ -49,6 +52,14 @@ public class PriceJpaEntity implements Persistable<UUID> {
 
   @Column(name = "curr", columnDefinition = "CHAR(3)", nullable = false)
   private String currency;
+
+  @CreationTimestamp
+  @Column(name = "created_at", nullable = false, updatable = false)
+  private Instant createdAt;
+
+  @UpdateTimestamp
+  @Column(name = "updated_at", nullable = false)
+  private Instant updatedAt;
 
   @Transient private boolean newEntity;
 
@@ -139,6 +150,14 @@ public class PriceJpaEntity implements Persistable<UUID> {
 
   public String getCurrency() {
     return currency;
+  }
+
+  public Instant getCreatedAt() {
+    return createdAt;
+  }
+
+  public Instant getUpdatedAt() {
+    return updatedAt;
   }
 
   @Override
