@@ -4,7 +4,7 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.1.1-6DB33F?logo=springboot&logoColor=white)
 ![Gradle](https://img.shields.io/badge/Gradle-9.7.1-02303A?logo=gradle&logoColor=white)
 ![H2](https://img.shields.io/badge/DB-H2%20in--memory-1F5FA8)
-![Coverage](https://img.shields.io/badge/coverage-98%25-brightgreen?logo=codecov&logoColor=white)
+![Coverage](https://img.shields.io/badge/coverage-97%25-brightgreen?logo=codecov&logoColor=white)
 
 Servicio REST que resuelve el precio aplicable a un producto de una cadena en una fecha determinada y permite gestionar las tarifas que lo determinan.
 
@@ -28,15 +28,15 @@ Cuando varias tarifas se solapan en el tiempo, el servicio decide cuál aplica s
 
 ## Stack
 
-| Área | Tecnología |
-|---|---|
-| Lenguaje | Java 21 |
-| Framework | Spring Boot 4.1.1 (Web MVC, Data JPA) |
-| Base de datos | H2 en memoria |
-| Build | Gradle 9.7.1 (wrapper incluido) + `Makefile` |
-| Documentación | springdoc-openapi 3.1.1 (OpenAPI 3 + Swagger UI) |
-| Tests | JUnit 5, Mockito, AssertJ, Spring MockMvc, JaCoCo |
-| Calidad | Spotless (google-java-format), Checkstyle, SpotBugs + FindSecBugs |
+| Área          | Tecnología                                                        |
+|---------------|-------------------------------------------------------------------|
+| Lenguaje      | Java 21                                                           |
+| Framework     | Spring Boot 4.1.1 (Web MVC, Data JPA)                             |
+| Base de datos | H2 en memoria                                                     |
+| Build         | Gradle 9.7.1 (wrapper incluido) + `Makefile`                      |
+| Documentación | springdoc-openapi 3.1.1 (OpenAPI 3 + Swagger UI)                  |
+| Tests         | JUnit 5, Mockito, AssertJ, Spring MockMvc, JaCoCo                 |
+| Calidad       | Spotless (google-java-format), Checkstyle, SpotBugs + FindSecBugs |
 
 ## Arquitectura
 
@@ -83,36 +83,36 @@ make run          # ./gradlew bootRun
 
 La aplicación arranca en `http://localhost:8080/pricing-service` y carga los datos de ejemplo (`pricing/main/resources/database/data.sql`) en cada arranque.
 
-| Recurso | URL |
-|---|---|
-| API | `http://localhost:8080/pricing-service/api/v1` |
-| Swagger UI | `http://localhost:8080/pricing-service/swagger-ui/index.html` |
-| OpenAPI (JSON) | `http://localhost:8080/pricing-service/v3/api-docs` |
-| Health check | `http://localhost:8080/pricing-service/health-check` |
+| Recurso        | URL                                                           |
+|----------------|---------------------------------------------------------------|
+| API            | `http://localhost:8080/pricing-service/api/v1`                |
+| Swagger UI     | `http://localhost:8080/pricing-service/swagger-ui/index.html` |
+| OpenAPI (JSON) | `http://localhost:8080/pricing-service/v3/api-docs`           |
+| Health check   | `http://localhost:8080/pricing-service/health-check`          |
 
 Comandos disponibles:
 
-| Comando | Descripción |
-|---|---|
-| `make all` | Build completo con tests (`./gradlew clean build`) |
-| `make run` | Arranca la aplicación |
-| `make test` | Ejecuta los tests y genera el informe de cobertura |
-| `make lint` | Checkstyle y SpotBugs sobre código y tests |
-| `make fix-lint` | Aplica el formato automático (Spotless) |
+| Comando         | Descripción                                        |
+|-----------------|----------------------------------------------------|
+| `make all`      | Build completo con tests (`./gradlew clean build`) |
+| `make run`      | Arranca la aplicación                              |
+| `make test`     | Ejecuta los tests y genera el informe de cobertura |
+| `make lint`     | Checkstyle y SpotBugs sobre código y tests         |
+| `make fix-lint` | Aplica el formato automático (Spotless)            |
 
 ## API
 
 Todas las rutas cuelgan de `/pricing-service/api/v1`. La versión forma parte de la ruta (`/api/{version}`).
 
-| Método | Ruta | Descripción | Éxito |
-|---|---|---|---|
-| `GET` | `/prices/find` | Precio aplicable para una cadena, un producto y una fecha | `200` |
-| `GET` | `/prices` | Listado de tarifas (sin orden garantizado) | `200` |
-| `GET` | `/prices/{id}` | Tarifa por id | `200` |
-| `POST` | `/prices` | Crea una tarifa con id aportado por el cliente | `201` + `Location` |
-| `PUT` | `/prices/{id}` | Reemplaza una tarifa existente | `204` |
-| `PATCH` | `/prices/{id}` | Modifica parcialmente una tarifa existente | `204` |
-| `DELETE` | `/prices/{id}` | Elimina una tarifa | `204` |
+| Método   | Ruta           | Descripción                                               | Éxito              |
+|----------|----------------|-----------------------------------------------------------|--------------------|
+| `GET`    | `/prices/find` | Precio aplicable para una cadena, un producto y una fecha | `200`              |
+| `GET`    | `/prices`      | Listado de tarifas (sin orden garantizado)                | `200`              |
+| `GET`    | `/prices/{id}` | Tarifa por id                                             | `200`              |
+| `POST`   | `/prices`      | Crea una tarifa con id aportado por el cliente            | `201` + `Location` |
+| `PUT`    | `/prices/{id}` | Reemplaza una tarifa existente                            | `204`              |
+| `PATCH`  | `/prices/{id}` | Modifica parcialmente una tarifa existente                | `204`              |
+| `DELETE` | `/prices/{id}` | Elimina una tarifa                                        | `204`              |
 
 ### Consultar el precio aplicable
 
@@ -173,20 +173,20 @@ Los errores siguen el formato Problem Details (`application/problem+json`) e inc
 }
 ```
 
-| Status | `errorCode`                | Causa |
-|---|----------------------------|---|
-| `400` | `invalid_uuid`             | El id (body o path) no es un UUID válido |
-| `400` | `field_required`           | Falta un campo obligatorio o viene vacío |
-| `400` | `invalid_date_format`      | Fecha que no cumple ISO-8601 (`yyyy-MM-ddTHH:mm:ss`) |
-| `400` | `invalid_price_date_range` | `endDate` no es posterior a `startDate` |
-| `400` | `invalid_price_amount`     | Precio menor o igual que cero |
-| `400` | `invalid_price_currency`   | Moneda que no es un código ISO 4217 |
-| `400` | `invalid_reference`        | La cadena o el producto no existen |
-| `400` | —                          | Parámetro ausente o mal tipado, o JSON mal formado (validación de Spring) |
-| `404` | `price_not_found`          | No existe la tarifa o no hay ninguna aplicable |
-| `409` | `price_id_already_exists`  | `POST` con un id que ya existe |
-| `409` | `price_already_exists`     | Ya hay otra tarifa con la misma cadena, producto, prioridad y fecha de inicio |
-| `500` | —                          | Error inesperado (se registra en el log) |
+| Status | `errorCode`                | Causa                                                                         |
+|--------|----------------------------|-------------------------------------------------------------------------------|
+| `400`  | `invalid_uuid`             | El id (body o path) no es un UUID válido                                      |
+| `400`  | `field_required`           | Falta un campo obligatorio o viene vacío                                      |
+| `400`  | `invalid_date_format`      | Fecha que no cumple ISO-8601 (`yyyy-MM-ddTHH:mm:ss`)                          |
+| `400`  | `invalid_price_date_range` | `endDate` no es posterior a `startDate`                                       |
+| `400`  | `invalid_price_amount`     | Precio menor o igual que cero                                                 |
+| `400`  | `invalid_price_currency`   | Moneda que no es un código ISO 4217                                           |
+| `400`  | `invalid_reference`        | La cadena o el producto no existen                                            |
+| `400`  | —                          | Parámetro ausente o mal tipado, o JSON mal formado (validación de Spring)     |
+| `404`  | `price_not_found`          | No existe la tarifa o no hay ninguna aplicable                                |
+| `409`  | `price_id_already_exists`  | `POST` con un id que ya existe                                                |
+| `409`  | `price_already_exists`     | Ya hay otra tarifa con la misma cadena, producto, prioridad y fecha de inicio |
+| `500`  | —                          | Error inesperado (se registra en el log)                                      |
 
 La especificación completa, con todos los esquemas, está disponible en Swagger UI.
 
@@ -209,35 +209,35 @@ make test         # ./gradlew test
 
 La suite se organiza en tres niveles:
 
-| Nivel | Qué valida | Dónde |
-|---|---|---|
-| **Unitarios** | Dominio, casos de uso, buses, adaptador JPA (con el repositorio mockeado), manejo de errores y configuración. Sin contexto de Spring, con Mockito. | `pricing/test`, `ApiExceptionHandlerShould`, `apps/test/.../config` |
-| **Integración** | Componentes reales dentro del contexto de Spring: las consultas JPA del adaptador contra H2 (`PriceConflictQueryShould`) y la traducción a `500` de un fallo inesperado de infraestructura (`PricesUnexpectedErrorShould`). | `apps/test` |
-| **Aceptación** | Cada endpoint de extremo a extremo: petición HTTP con MockMvc → bus → dominio → H2, comprobando status, cuerpo y `errorCode`. | `apps/test/.../controller` (`*ControllerShould`) |
+| Nivel           | Qué valida                                                                                                                                                                                                                  | Dónde                                                               |
+|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------|
+| **Unitarios**   | Dominio, casos de uso, buses, adaptador JPA (con el repositorio mockeado), manejo de errores y configuración. Sin contexto de Spring, con Mockito.                                                                          | `pricing/test`, `ApiExceptionHandlerShould`, `apps/test/.../config` |
+| **Integración** | Componentes reales dentro del contexto de Spring: las consultas JPA del adaptador contra H2 (`PriceConflictQueryShould`) y la traducción a `500` de un fallo inesperado de infraestructura (`PricesUnexpectedErrorShould`). | `apps/test`                                                         |
+| **Aceptación**  | Cada endpoint de extremo a extremo: petición HTTP con MockMvc → bus → dominio → H2, comprobando status, cuerpo y `errorCode`.                                                                                               | `apps/test/.../controller` (`*ControllerShould`)                    |
 
 Los tests de integración y aceptación levantan el contexto completo de Spring y cada contexto usa su propia base de datos H2 en memoria; los que escriben datos son `@Transactional` y se revierten al terminar.
 
 Los escenarios del enunciado están cubiertos en `PricesGetApplicableControllerShould` (producto 35455, cadena 1):
 
-| Fecha de aplicación | Tarifa | Precio |
-|---|---|---|
-| 2020-06-14 10:00 | 1 | 35.50 EUR |
-| 2020-06-14 16:00 | 2 | 25.45 EUR |
-| 2020-06-14 21:00 | 1 | 35.50 EUR |
-| 2020-06-15 10:00 | 3 | 30.50 EUR |
-| 2020-06-16 21:00 | 4 | 38.95 EUR |
+| Fecha de aplicación | Tarifa | Precio    |
+|---------------------|--------|-----------|
+| 2020-06-14 10:00    | 1      | 35.50 EUR |
+| 2020-06-14 16:00    | 2      | 25.45 EUR |
+| 2020-06-14 21:00    | 1      | 35.50 EUR |
+| 2020-06-15 10:00    | 3      | 30.50 EUR |
+| 2020-06-16 21:00    | 4      | 38.95 EUR |
 
 ## Cobertura
 
-El proyecto tiene un **98 % de cobertura** de código según JaCoCo.
+El proyecto tiene un **97 % de cobertura** de código según JaCoCo.
 
-| Métrica | Cobertura | Cubierto / total |
-|---|---|---|
-| Instrucciones | 98 % | 2.287 / 2.327 |
-| Líneas | 97 % | 562 / 575 |
-| Ramas | 96 % | 81 / 84 |
-| Métodos | 96 % | 183 / 189 |
-| Clases | 100 % | 82 / 82 |
+| Métrica       | Cobertura | Cubierto / total |
+|---------------|-----------|------------------|
+| Instrucciones | 97 %      | 2.922 / 2.984    |
+| Líneas        | 97 %      | 693 / 713        |
+| Ramas         | 96 %      | 73 / 76          |
+| Métodos       | 95 %      | 223 / 234        |
+| Clases        | 100 %     | 102 / 102        |
 
 El informe se genera automáticamente al ejecutar `make test`, en `build/reports/jacoco/test/html/index.html`.
 
@@ -255,13 +255,13 @@ El informe se genera automáticamente al ejecutar `make test`, en `build/reports
 
 Configuración principal en `apps/main/resources/application.properties`.
 
-| Propiedad | Valor por defecto |
-|---|---|
-| `server.port` | `8080` |
-| `server.servlet.context-path` | `/pricing-service` |
-| `spring.datasource.url` | `jdbc:h2:mem:pricingdb` |
+| Propiedad                       | Valor por defecto                            |
+|---------------------------------|----------------------------------------------|
+| `server.port`                   | `8080`                                       |
+| `server.servlet.context-path`   | `/pricing-service`                           |
+| `spring.datasource.url`         | `jdbc:h2:mem:pricingdb`                      |
 | `spring.jpa.hibernate.ddl-auto` | `validate` (el esquema lo crea `schema.sql`) |
-| `spring.h2.console.enabled` | `false` |
+| `spring.h2.console.enabled`     | `false`                                      |
 
 **Perfil `dev`**: habilita la consola de H2.
 
