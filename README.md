@@ -294,10 +294,10 @@ El proyecto tiene un **97 % de cobertura** de código según JaCoCo.
 
 | Métrica       | Cobertura | Cubierto / total |
 |---------------|-----------|------------------|
-| Instrucciones | 97 %      | 2.922 / 2.984    |
-| Líneas        | 97 %      | 693 / 713        |
+| Instrucciones | 97 %      | 2.942 / 3.004    |
+| Líneas        | 97 %      | 697 / 717        |
 | Ramas         | 96 %      | 73 / 76          |
-| Métodos       | 95 %      | 223 / 234        |
+| Métodos       | 95 %      | 225 / 236        |
 | Clases        | 100 %     | 102 / 102        |
 
 El informe se genera automáticamente al ejecutar `make test`, en `build/reports/jacoco/test/html/index.html`.
@@ -340,6 +340,7 @@ Consola en `http://localhost:8080/pricing-service/h2-console` (JDBC URL `jdbc:h2
 - **Alta y modificación explícitas en el puerto.** `PriceRepository` expone `create` y `update` en lugar de un `save` genérico. La entidad JPA implementa `Persistable`, de forma que un alta se ejecuta como `persist` (solo `INSERT`) y una modificación como `merge`.
 - **Reglas de negocio como policies.** Las validaciones previas al guardado (referencias existentes, tarifas en conflicto) implementan `PricePolicy`, cada una con su orden de ejecución. `PriceIntegrityChecker` recibe todas las policies y las ejecuta en orden, así que añadir una regla es añadir una clase.
 - **Persistencia uniforme con JPA.** Cadenas y productos están mapeados como entidades JPA y `PriceJpaEntity` los referencia con relaciones `@ManyToOne` perezosas; no queda SQL nativo en el proyecto.
+- **Auditoría de tarifas.** La tabla `prices` registra `created_at` y `updated_at`, que Hibernate rellena automáticamente. Son metadatos de persistencia: no forman parte del dominio ni de la API.
 - **Eventos de dominio asíncronos.** Las escrituras publican eventos que procesan suscriptores asíncronos, desacoplando efectos secundarios como las métricas del caso de uso principal.
 - **Errores por caso de uso.** Cada controller decide qué status corresponde a cada error de dominio; el dominio no conoce HTTP.
 - **Versionado por ruta.** `/api/v1/...`, resuelto con el soporte nativo de versionado de API de Spring.
