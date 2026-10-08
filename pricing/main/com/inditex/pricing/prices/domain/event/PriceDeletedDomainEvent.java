@@ -1,7 +1,6 @@
 package com.inditex.pricing.prices.domain.event;
 
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Map;
 
 import com.inditex.pricing.shared.domain.bus.event.DomainEvent;

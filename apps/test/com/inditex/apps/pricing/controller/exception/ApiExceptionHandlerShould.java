@@ -6,13 +6,13 @@ import java.util.Map;
 
 import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
-import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.bus.command.Command;
 import com.inditex.pricing.shared.domain.bus.command.CommandHandlerExecutionError;
 import com.inditex.pricing.shared.domain.bus.command.DuplicateCommandHandlerError;
 import com.inditex.pricing.shared.domain.bus.query.DuplicateQueryHandlerError;
 import com.inditex.pricing.shared.domain.bus.query.Query;
 import com.inditex.pricing.shared.domain.bus.query.QueryHandlerExecutionError;
+import com.inditex.pricing.shared.domain.exception.DomainError;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
 import org.junit.jupiter.api.DisplayName;
@@ -24,8 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.method.HandlerMethod;
 
 class ApiExceptionHandlerShould {
-
-  private static final String UNEXPECTED_ERROR = "Unexpected error";
 
   private final ApiExceptionHandler handler = new ApiExceptionHandler();
 
@@ -108,24 +106,24 @@ class ApiExceptionHandlerShould {
   class StatusResolution {
 
     @Test
-    @DisplayName("Maps a non-ApiController bean to 500 with masked detail and snake_case code")
+    @DisplayName("Maps a non-ApiController bean to 500 and snake_case code")
     void nonApiControllerBeanMapsToInternalError() {
       ResponseEntity<ProblemDetail> response =
           handle(new IllegalStateException("boom"), handlerMethodFor(new Object()));
 
       assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-      assertThat(response.getBody().getDetail()).isEqualTo(UNEXPECTED_ERROR);
+      assertThat(response.getBody().getDetail()).isEqualTo("boom");
       assertThat(response.getBody().getProperties())
           .containsEntry("errorCode", "illegal_state_exception");
     }
 
     @Test
-    @DisplayName("Maps an unmapped DomainError to 500 with masked detail and its own errorCode")
+    @DisplayName("Maps an unmapped DomainError to 500 with its own errorCode")
     void unmappedDomainErrorMapsToInternalError() {
       ResponseEntity<ProblemDetail> response = handle(new TestError("secret"));
 
       assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-      assertThat(response.getBody().getDetail()).isEqualTo(UNEXPECTED_ERROR);
+      assertThat(response.getBody().getDetail()).isEqualTo("secret");
       assertThat(response.getBody().getProperties()).containsEntry("errorCode", "test_error");
     }
 
@@ -139,18 +137,6 @@ class ApiExceptionHandlerShould {
       assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
       assertThat(response.getBody().getDetail()).isEqualTo(error.getMessage());
       assertThat(response.getBody().getProperties()).containsEntry("errorCode", "price_not_found");
-    }
-
-    @Test
-    @DisplayName("Masks the message for a mapped 5xx status")
-    void mapped5xxMasksMessage() {
-      var mapping = handlerMethodMapping(Map.of(TestError.class, HttpStatus.INTERNAL_SERVER_ERROR));
-
-      ResponseEntity<ProblemDetail> response = handle(new TestError("secret"), mapping);
-
-      assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-      assertThat(response.getBody().getDetail()).isEqualTo(UNEXPECTED_ERROR);
-      assertThat(response.getBody().getDetail()).doesNotContain("secret");
     }
 
     @Test

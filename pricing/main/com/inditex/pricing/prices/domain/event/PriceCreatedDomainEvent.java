@@ -13,12 +13,19 @@ import lombok.Getter;
 @Getter
 public class PriceCreatedDomainEvent extends DomainEvent {
   private final Long productId;
+
   private final Long brandId;
+
   private final Integer priceList;
+
   private final Integer priority;
+
   private final String startDate;
+
   private final String endDate;
+
   private final BigDecimal price;
+
   private final String currency;
 
   public PriceCreatedDomainEvent(

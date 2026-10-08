@@ -21,6 +21,7 @@ public class CreatePriceCommandHandler implements CommandHandler<CreatePriceComm
 
   @Override
   public void handle(CreatePriceCommand command) {
+
     final var priceId = new PriceId(command.id());
     final var brandId = new BrandId(command.brandId());
     final var productId = new ProductId(command.productId());

@@ -44,7 +44,9 @@ class DomainEventTest {
   class GeneratingConstructor {
 
     private Instant before;
+
     private Instant after;
+
     private TestDomainEvent event;
 
     @BeforeEach

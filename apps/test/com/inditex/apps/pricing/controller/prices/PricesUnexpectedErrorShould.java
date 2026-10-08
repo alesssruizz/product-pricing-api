@@ -17,13 +17,13 @@ public class PricesUnexpectedErrorShould extends ProductPricingApiApplicationTes
   @MockitoBean private PriceRepository repository;
 
   @Test
-  @DisplayName("Returns 500 with detail Unexpected error and errorCode for unhandled exceptions")
+  @DisplayName("Returns 500 with errorCode for unhandled exceptions")
   public void returnUnexpectedErrorWhenRepositoryFails() throws Exception {
     when(repository.findAll()).thenThrow(new RuntimeException("connection lost"));
 
     perform(get("/api/v1/prices"))
         .andExpect(status().isInternalServerError())
-        .andExpect(jsonPath("$.detail").value("Unexpected error"))
+        .andExpect(jsonPath("$.detail").value("connection lost"))
         .andExpect(jsonPath("$.errorCode").value("runtime_exception"));
   }
 }

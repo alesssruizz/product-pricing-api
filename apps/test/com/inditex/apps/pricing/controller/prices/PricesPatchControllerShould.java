@@ -116,11 +116,11 @@ public class PricesPatchControllerShould extends ProductPricingApiApplicationTes
     }
 
     @Test
-    @DisplayName("Returns 400 with invalid_price_quantity when the merged price is zero")
+    @DisplayName("Returns 400 with invalid_price_amount when the merged price is minus than zero")
     void returns400OnZeroQuantity() throws Exception {
-      patchBody(ENDPOINT, "{\"price\": 0}")
+      patchBody(ENDPOINT, "{\"price\": -1}")
           .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.errorCode").value("invalid_price_quantity"));
+          .andExpect(jsonPath("$.errorCode").value("invalid_price_amount"));
     }
 
     @Test

@@ -4,6 +4,14 @@ import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
 
+import com.inditex.pricing.prices.domain.BrandId;
+import com.inditex.pricing.prices.domain.PriceAmount;
+import com.inditex.pricing.prices.domain.PriceCurrency;
+import com.inditex.pricing.prices.domain.PriceId;
+import com.inditex.pricing.prices.domain.PriceList;
+import com.inditex.pricing.prices.domain.PricePriority;
+import com.inditex.pricing.prices.domain.ProductId;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +44,16 @@ class CreatePriceCommandHandlerTest {
 
     handler.handle(command);
 
-    verify(creator).create(command);
+    verify(creator)
+        .create(
+            new PriceId(command.id()),
+            new BrandId(command.brandId()),
+            new ProductId(command.productId()),
+            new PriceList(command.priceList()),
+            new PricePriority(command.priority()),
+            command.startDate(),
+            command.endDate(),
+            new PriceAmount(command.price()),
+            new PriceCurrency(command.currency()));
   }
 }
