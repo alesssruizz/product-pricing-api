@@ -8,13 +8,13 @@ import com.inditex.pricing.prices.domain.exceptions.InvalidPriceCurrency;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceReference;
 import com.inditex.pricing.prices.domain.exceptions.PriceAlreadyExists;
-import com.inditex.pricing.prices.domain.exceptions.PriceFieldRequired;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
-import com.inditex.pricing.shared.domain.DomainError;
-import com.inditex.pricing.shared.domain.InvalidDateFormat;
-import com.inditex.pricing.shared.domain.InvalidUUID;
 import com.inditex.pricing.shared.domain.bus.command.CommandBus;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
+import com.inditex.pricing.shared.domain.exception.DomainError;
+import com.inditex.pricing.shared.domain.exception.FieldRequired;
+import com.inditex.pricing.shared.domain.exception.InvalidDateFormat;
+import com.inditex.pricing.shared.domain.exception.InvalidUUID;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +45,7 @@ public class PricesPutController extends ApiController {
       responseCode = "400",
       description =
           "invalid_uuid when the path id is not a UUID, or domain validation error with "
-              + "errorCode (price_field_required, invalid_reference, invalid_price_quantity, "
+              + "errorCode (field_required, invalid_reference, invalid_price_amount, "
               + "invalid_price_date_range, invalid_price_currency, invalid_date_format), "
               + "or malformed body (no errorCode)")
   @ApiResponse(responseCode = "404", description = "price_not_found")
@@ -81,7 +81,7 @@ public class PricesPutController extends ApiController {
         InvalidPriceAmount.class, HttpStatus.BAD_REQUEST,
         InvalidPriceDateRange.class, HttpStatus.BAD_REQUEST,
         InvalidPriceCurrency.class, HttpStatus.BAD_REQUEST,
-        PriceFieldRequired.class, HttpStatus.BAD_REQUEST,
+        FieldRequired.class, HttpStatus.BAD_REQUEST,
         InvalidDateFormat.class, HttpStatus.BAD_REQUEST);
   }
 }

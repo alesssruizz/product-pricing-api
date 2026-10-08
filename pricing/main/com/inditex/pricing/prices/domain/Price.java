@@ -6,8 +6,8 @@ import java.util.Objects;
 import com.inditex.pricing.prices.domain.event.PriceCreatedDomainEvent;
 import com.inditex.pricing.prices.domain.event.PriceDeletedDomainEvent;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
-import com.inditex.pricing.prices.domain.exceptions.PriceFieldRequired;
 import com.inditex.pricing.shared.domain.AggregateRoot;
+import com.inditex.pricing.shared.domain.exception.FieldRequired;
 
 import lombok.Getter;
 
@@ -54,6 +54,18 @@ public final class Price extends AggregateRoot {
     ensureValidDateRange();
   }
 
+  private Price(String id) {
+    this.id = new PriceId(id);
+    this.brandId = null;
+    this.startDate = null;
+    this.endDate = null;
+    this.priceList = null;
+    this.productId = null;
+    this.priority = null;
+    this.priceAmount = null;
+    this.currency = null;
+  }
+
   public static Price create(
       String id,
       Long brandId,
@@ -67,33 +79,21 @@ public final class Price extends AggregateRoot {
 
     var newPrice =
         new Price(
-            required(id, "id"),
+            id,
             required(brandId, "brandId"),
             required(productId, "productId"),
             required(priceList, "priceList"),
-            required(priority, "priority"),
+            priority,
             required(startDate, "startDate"),
             required(endDate, "endDate"),
             required(price, "price"),
-            required(currency, "currency"));
+            currency);
 
     newPrice.register(
         new PriceCreatedDomainEvent(
             id, brandId, productId, priceList, priority, startDate, endDate, price, currency));
 
     return newPrice;
-  }
-
-  private Price(String id) {
-    this.id = new PriceId(id);
-    this.brandId = null;
-    this.startDate = null;
-    this.endDate = null;
-    this.priceList = null;
-    this.productId = null;
-    this.priority = null;
-    this.priceAmount = null;
-    this.currency = null;
   }
 
   public static Price delete(String id) {
@@ -111,7 +111,7 @@ public final class Price extends AggregateRoot {
 
   private static <T> T required(T value, String field) {
     if (Objects.isNull(value) || (value instanceof String str && str.isBlank())) {
-      throw new PriceFieldRequired(field);
+      throw new FieldRequired(field);
     }
     return value;
   }

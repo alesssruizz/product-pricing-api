@@ -3,6 +3,8 @@ package com.inditex.pricing.shared.domain;
 import java.io.Serializable;
 import java.util.UUID;
 
+import com.inditex.pricing.shared.domain.exception.InvalidUUID;
+
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode

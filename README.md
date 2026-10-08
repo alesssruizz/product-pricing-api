@@ -173,20 +173,20 @@ Los errores siguen el formato Problem Details (`application/problem+json`) e inc
 }
 ```
 
-| Status | `errorCode` | Causa |
-|---|---|---|
-| `400` | `invalid_uuid` | El id (body o path) no es un UUID válido |
-| `400` | `price_field_required` | Falta un campo obligatorio o viene vacío |
-| `400` | `invalid_date_format` | Fecha que no cumple ISO-8601 (`yyyy-MM-ddTHH:mm:ss`) |
+| Status | `errorCode`                | Causa |
+|---|----------------------------|---|
+| `400` | `invalid_uuid`             | El id (body o path) no es un UUID válido |
+| `400` | `field_required`           | Falta un campo obligatorio o viene vacío |
+| `400` | `invalid_date_format`      | Fecha que no cumple ISO-8601 (`yyyy-MM-ddTHH:mm:ss`) |
 | `400` | `invalid_price_date_range` | `endDate` no es posterior a `startDate` |
-| `400` | `invalid_price_quantity` | Precio menor o igual que cero |
-| `400` | `invalid_price_currency` | Moneda que no es un código ISO 4217 |
-| `400` | `invalid_reference` | La cadena o el producto no existen |
-| `400` | — | Parámetro ausente o mal tipado, o JSON mal formado (validación de Spring) |
-| `404` | `price_not_found` | No existe la tarifa o no hay ninguna aplicable |
-| `409` | `price_id_already_exists` | `POST` con un id que ya existe |
-| `409` | `price_already_exists` | Ya hay otra tarifa con la misma cadena, producto, prioridad y fecha de inicio |
-| `500` | — | Error inesperado (se registra en el log) |
+| `400` | `invalid_price_amount`     | Precio menor o igual que cero |
+| `400` | `invalid_price_currency`   | Moneda que no es un código ISO 4217 |
+| `400` | `invalid_reference`        | La cadena o el producto no existen |
+| `400` | —                          | Parámetro ausente o mal tipado, o JSON mal formado (validación de Spring) |
+| `404` | `price_not_found`          | No existe la tarifa o no hay ninguna aplicable |
+| `409` | `price_id_already_exists`  | `POST` con un id que ya existe |
+| `409` | `price_already_exists`     | Ya hay otra tarifa con la misma cadena, producto, prioridad y fecha de inicio |
+| `500` | —                          | Error inesperado (se registra en el log) |
 
 La especificación completa, con todos los esquemas, está disponible en Swagger UI.
 

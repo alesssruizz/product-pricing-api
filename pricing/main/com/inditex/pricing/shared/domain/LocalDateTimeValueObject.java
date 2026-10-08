@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+import com.inditex.pricing.shared.domain.exception.InvalidDateFormat;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 

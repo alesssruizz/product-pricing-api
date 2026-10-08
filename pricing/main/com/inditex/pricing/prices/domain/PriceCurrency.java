@@ -1,10 +1,10 @@
 package com.inditex.pricing.prices.domain;
 
 import java.util.Currency;
-import java.util.Objects;
 
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceCurrency;
 import com.inditex.pricing.shared.domain.StringValueObject;
+import com.inditex.pricing.shared.domain.exception.FieldRequired;
 
 public final class PriceCurrency extends StringValueObject {
 
@@ -13,7 +13,9 @@ public final class PriceCurrency extends StringValueObject {
   }
 
   private static String ensureIsIso4217(String value) {
-    Objects.requireNonNull(value);
+    if (value == null || value.isBlank()) {
+      throw new FieldRequired("currency");
+    }
     try {
       Currency.getInstance(value);
     } catch (IllegalArgumentException ex) {

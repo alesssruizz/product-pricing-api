@@ -1,4 +1,4 @@
-package com.inditex.pricing.shared.domain;
+package com.inditex.pricing.shared.domain.exception;
 
 public class DomainError extends RuntimeException {
 

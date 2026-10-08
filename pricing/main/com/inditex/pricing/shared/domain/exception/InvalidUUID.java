@@ -1,4 +1,4 @@
-package com.inditex.pricing.shared.domain;
+package com.inditex.pricing.shared.domain.exception;
 
 public final class InvalidUUID extends DomainError {
 

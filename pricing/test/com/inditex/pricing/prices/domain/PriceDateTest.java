@@ -3,7 +3,7 @@ package com.inditex.pricing.prices.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.inditex.pricing.shared.domain.InvalidDateFormat;
+import com.inditex.pricing.shared.domain.exception.InvalidDateFormat;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

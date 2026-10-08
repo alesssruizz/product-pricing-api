@@ -2,11 +2,11 @@ package com.inditex.pricing.shared.infrastructure.spring;
 
 import java.util.Map;
 
-import com.inditex.pricing.shared.domain.DomainError;
 import com.inditex.pricing.shared.domain.bus.command.Command;
 import com.inditex.pricing.shared.domain.bus.command.CommandBus;
 import com.inditex.pricing.shared.domain.bus.query.Query;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
+import com.inditex.pricing.shared.domain.exception.DomainError;
 
 import org.springframework.http.HttpStatus;
 

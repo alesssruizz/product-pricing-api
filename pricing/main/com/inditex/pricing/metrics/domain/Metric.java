@@ -8,5 +8,6 @@ import lombok.Value;
 @Value
 public class Metric {
   String message;
+
   Map<String, Serializable> json;
 }

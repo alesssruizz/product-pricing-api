@@ -5,7 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.UUID;
 
-import com.inditex.pricing.shared.domain.InvalidUUID;
+import com.inditex.pricing.shared.domain.exception.FieldRequired;
+import com.inditex.pricing.shared.domain.exception.InvalidUUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,8 +26,17 @@ class PriceIdTest {
 
   @ParameterizedTest
   @NullAndEmptySource
-  @ValueSource(strings = {" ", "abc", "1-1-1-1-1", "00000000-0000-0000-0000-00000000000g"})
-  void rejectsNullBlankOrMalformedValues(String value) {
+  @ValueSource(strings = {" "})
+  void rejectsNullOrBlankValues(String value) {
+    assertThatThrownBy(() -> new PriceId(value))
+        .isInstanceOfSatisfying(
+            FieldRequired.class,
+            error -> assertThat(error.errorCode()).isEqualTo("field_required"));
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"abc", "1-1-1-1-1", "00000000-0000-0000-0000-00000000000g"})
+  void rejectsMalformedValues(String value) {
     assertThatThrownBy(() -> new PriceId(value))
         .isInstanceOfSatisfying(
             InvalidUUID.class, error -> assertThat(error.errorCode()).isEqualTo("invalid_uuid"));

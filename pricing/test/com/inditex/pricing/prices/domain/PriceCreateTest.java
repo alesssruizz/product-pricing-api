@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceCurrency;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
-import com.inditex.pricing.prices.domain.exceptions.PriceFieldRequired;
-import com.inditex.pricing.shared.domain.InvalidUUID;
+import com.inditex.pricing.shared.domain.exception.FieldRequired;
+import com.inditex.pricing.shared.domain.exception.InvalidUUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,13 +36,13 @@ class PriceCreateTest {
   @Test
   void rejectsANullId() {
     assertThatThrownBy(() -> create(null, "2020-06-14T00:00:00", "2020-12-31T23:59:59", "EUR"))
-        .isInstanceOf(PriceFieldRequired.class);
+        .isInstanceOf(FieldRequired.class);
   }
 
   @Test
   void rejectsABlankId() {
     assertThatThrownBy(() -> create("  ", "2020-06-14T00:00:00", "2020-12-31T23:59:59", "EUR"))
-        .isInstanceOf(PriceFieldRequired.class);
+        .isInstanceOf(FieldRequired.class);
   }
 
   @Test
@@ -55,7 +55,7 @@ class PriceCreateTest {
   @Test
   void rejectsABlankCurrency() {
     assertThatThrownBy(() -> create("2020-06-14T00:00:00", "2020-12-31T23:59:59", " "))
-        .isInstanceOf(PriceFieldRequired.class);
+        .isInstanceOf(FieldRequired.class);
   }
 
   @Test
@@ -72,7 +72,7 @@ class PriceCreateTest {
                     "2020-12-31T23:59:59",
                     BigDecimal.TEN,
                     null))
-        .isInstanceOf(PriceFieldRequired.class);
+        .isInstanceOf(FieldRequired.class);
   }
 
   @Test

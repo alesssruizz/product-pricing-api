@@ -4,7 +4,7 @@ import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.PriceDate;
 import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.ProductId;
-import com.inditex.pricing.shared.domain.DomainError;
+import com.inditex.pricing.shared.domain.exception.DomainError;
 
 public final class PriceNotFoundException extends DomainError {
 

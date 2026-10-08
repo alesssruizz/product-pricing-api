@@ -1,6 +1,6 @@
 package com.inditex.pricing.prices.domain.exceptions;
 
-import com.inditex.pricing.shared.domain.DomainError;
+import com.inditex.pricing.shared.domain.exception.DomainError;
 
 public final class InvalidPriceReference extends DomainError {
 

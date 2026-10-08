@@ -116,11 +116,11 @@ public class PricesPutControllerShould extends ProductPricingApiApplicationTests
     }
 
     @Test
-    @DisplayName("Returns 400 with price_field_required when priceList is missing")
+    @DisplayName("Returns 400 with field_required when priceList is missing")
     void returns400WhenPriceListIsMissing() throws Exception {
       putBody(ENDPOINT, VALID_BODY.replace("\"priceList\": 9,", ""))
           .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.errorCode").value("price_field_required"));
+          .andExpect(jsonPath("$.errorCode").value("field_required"));
     }
 
     @Test

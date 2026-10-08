@@ -97,19 +97,19 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
     }
 
     @Test
-    @DisplayName("Returns 400 with price_field_required when the id is missing")
+    @DisplayName("Returns 400 with field_required when the id is missing")
     void returns400WhenIdIsMissing() throws Exception {
       postBody(ENDPOINT, VALID_BODY.replace("\"id\": \"" + NEW_ID + "\",", ""))
           .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.errorCode").value("price_field_required"));
+          .andExpect(jsonPath("$.errorCode").value("field_required"));
     }
 
     @Test
-    @DisplayName("Returns 400 with price_field_required when the id is blank")
+    @DisplayName("Returns 400 with field_required when the id is blank")
     void returns400WhenIdIsBlank() throws Exception {
       postBody(ENDPOINT, VALID_BODY.replace(NEW_ID, " "))
           .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.errorCode").value("price_field_required"));
+          .andExpect(jsonPath("$.errorCode").value("field_required"));
     }
 
     @Test
@@ -118,6 +118,24 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
       postBody(ENDPOINT, VALID_BODY.replace(NEW_ID, "not-a-uuid"))
           .andExpect(status().isBadRequest())
           .andExpect(jsonPath("$.errorCode").value("invalid_uuid"));
+    }
+
+    @Test
+    @DisplayName("Returns 400 with null_pointer_exception when the priority is black")
+    void returns400WhenPriorityIsBlank() throws Exception {
+      postBody(ENDPOINT, VALID_BODY.replace("\"priority\": 5", "\"priority\": \" \""))
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.errorCode").value("field_required"));
+    }
+
+    @Test
+    @DisplayName("Returns 400 with invalid_date_format when the startDate/endate is blank")
+    void returns400WhenStartDateIsBlank() throws Exception {
+      postBody(
+              ENDPOINT,
+              VALID_BODY.replace("\"startDate\": \"2021-01-01T00:00:00\"", "\"startDate\": \" \""))
+          .andExpect(status().isBadRequest())
+          .andExpect(jsonPath("$.errorCode").value("field_required"));
     }
 
     @Test
@@ -172,19 +190,19 @@ public class PricesPostControllerShould extends ProductPricingApiApplicationTest
     }
 
     @Test
-    @DisplayName("Returns 400 with price_field_required when the currency is blank")
+    @DisplayName("Returns 400 with field_required when the currency is blank")
     void returns400OnBlankCurrency() throws Exception {
       postBody(ENDPOINT, VALID_BODY.replace("\"currency\": \"EUR\"", "\"currency\": \" \""))
           .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.errorCode").value("price_field_required"));
+          .andExpect(jsonPath("$.errorCode").value("field_required"));
     }
 
     @Test
-    @DisplayName("Returns 400 with invalid_price_quantity when price is zero")
+    @DisplayName("Returns 400 with invalid_price_amount when price is zero")
     void returns400OnZeroQuantity() throws Exception {
       postBody(ENDPOINT, VALID_BODY.replace("\"price\": 12.30", "\"price\": 0"))
           .andExpect(status().isBadRequest())
-          .andExpect(jsonPath("$.errorCode").value("invalid_price_quantity"));
+          .andExpect(jsonPath("$.errorCode").value("invalid_price_amount"));
     }
 
     @Test

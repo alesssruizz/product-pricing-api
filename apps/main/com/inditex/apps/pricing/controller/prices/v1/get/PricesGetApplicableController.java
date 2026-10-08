@@ -5,10 +5,10 @@ import java.util.Map;
 import com.inditex.pricing.prices.application.ApplicablePriceResponse;
 import com.inditex.pricing.prices.application.find.FindApplicablePriceQuery;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
-import com.inditex.pricing.shared.domain.DomainError;
-import com.inditex.pricing.shared.domain.InvalidDateFormat;
 import com.inditex.pricing.shared.domain.bus.command.CommandBus;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
+import com.inditex.pricing.shared.domain.exception.DomainError;
+import com.inditex.pricing.shared.domain.exception.InvalidDateFormat;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
 import io.swagger.v3.oas.annotations.Operation;

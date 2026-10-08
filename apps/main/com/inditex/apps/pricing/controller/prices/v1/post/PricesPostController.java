@@ -9,13 +9,13 @@ import com.inditex.pricing.prices.domain.exceptions.InvalidPriceCurrency;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceReference;
 import com.inditex.pricing.prices.domain.exceptions.PriceAlreadyExists;
-import com.inditex.pricing.prices.domain.exceptions.PriceFieldRequired;
 import com.inditex.pricing.prices.domain.exceptions.PriceIdAlreadyExists;
-import com.inditex.pricing.shared.domain.DomainError;
-import com.inditex.pricing.shared.domain.InvalidDateFormat;
-import com.inditex.pricing.shared.domain.InvalidUUID;
 import com.inditex.pricing.shared.domain.bus.command.CommandBus;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
+import com.inditex.pricing.shared.domain.exception.DomainError;
+import com.inditex.pricing.shared.domain.exception.FieldRequired;
+import com.inditex.pricing.shared.domain.exception.InvalidDateFormat;
+import com.inditex.pricing.shared.domain.exception.InvalidUUID;
 import com.inditex.pricing.shared.infrastructure.spring.ApiController;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,8 +55,8 @@ public class PricesPostController extends ApiController {
   @ApiResponse(
       responseCode = "400",
       description =
-          "Domain validation error with errorCode (invalid_uuid, price_field_required, "
-              + "invalid_reference, invalid_price_quantity, invalid_price_date_range, "
+          "Domain validation error with errorCode (invalid_uuid, field_required, "
+              + "invalid_reference, invalid_price_amount, invalid_price_date_range, "
               + "invalid_price_currency, invalid_date_format) or malformed body (no errorCode)")
   @ApiResponse(
       responseCode = "409",
@@ -100,7 +100,7 @@ public class PricesPostController extends ApiController {
         InvalidPriceAmount.class, HttpStatus.BAD_REQUEST,
         InvalidPriceDateRange.class, HttpStatus.BAD_REQUEST,
         InvalidPriceCurrency.class, HttpStatus.BAD_REQUEST,
-        PriceFieldRequired.class, HttpStatus.BAD_REQUEST,
+        FieldRequired.class, HttpStatus.BAD_REQUEST,
         InvalidDateFormat.class, HttpStatus.BAD_REQUEST);
   }
 }

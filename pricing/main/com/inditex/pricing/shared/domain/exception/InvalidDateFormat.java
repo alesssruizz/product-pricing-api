@@ -1,6 +1,6 @@
-package com.inditex.pricing.shared.domain;
+package com.inditex.pricing.shared.domain.exception;
 
-public class InvalidDateFormat extends DomainError {
+public final class InvalidDateFormat extends DomainError {
 
   public InvalidDateFormat(String value) {
     super(
