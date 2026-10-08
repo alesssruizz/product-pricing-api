@@ -13,7 +13,7 @@ import com.inditex.pricing.prices.domain.PriceList;
 import com.inditex.pricing.prices.domain.PricePriority;
 import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.prices.domain.ProductId;
-import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
+import com.inditex.pricing.prices.domain.exception.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.Service;
 import com.inditex.pricing.shared.domain.bus.event.EventBus;
 

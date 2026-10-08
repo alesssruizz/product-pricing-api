@@ -9,8 +9,8 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceReference;
-import com.inditex.pricing.prices.domain.exceptions.PriceAlreadyExists;
+import com.inditex.pricing.prices.domain.exception.InvalidPriceReference;
+import com.inditex.pricing.prices.domain.exception.PriceAlreadyExists;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -23,8 +23,8 @@ import com.inditex.pricing.prices.domain.PricePriority;
 import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.prices.domain.ProductId;
 import com.inditex.pricing.prices.domain.event.PriceUpdatedDomainEvent;
-import com.inditex.pricing.prices.domain.exceptions.PriceAlreadyExists;
-import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
+import com.inditex.pricing.prices.domain.exception.PriceAlreadyExists;
+import com.inditex.pricing.prices.domain.exception.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.bus.event.DomainEvent;
 import com.inditex.pricing.shared.domain.bus.event.EventBus;
 

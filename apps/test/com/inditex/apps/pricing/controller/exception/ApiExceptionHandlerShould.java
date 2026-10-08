@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Map;
 
 import com.inditex.pricing.prices.domain.PriceId;
-import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
+import com.inditex.pricing.prices.domain.exception.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.bus.command.Command;
 import com.inditex.pricing.shared.domain.bus.command.CommandHandlerExecutionError;
 import com.inditex.pricing.shared.domain.bus.command.DuplicateCommandHandlerError;

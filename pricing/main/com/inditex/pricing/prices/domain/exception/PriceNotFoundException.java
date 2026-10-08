@@ -1,4 +1,4 @@
-package com.inditex.pricing.prices.domain.exceptions;
+package com.inditex.pricing.prices.domain.exception;
 
 import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.PriceDate;

@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceAmount;
+import com.inditex.pricing.prices.domain.exception.InvalidPriceAmount;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

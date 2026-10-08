@@ -3,7 +3,7 @@ package com.inditex.apps.pricing.controller.prices.v1.delete;
 import java.util.Map;
 
 import com.inditex.pricing.prices.application.delete.DeletePriceCommand;
-import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
+import com.inditex.pricing.prices.domain.exception.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.bus.command.CommandBus;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.domain.exception.DomainError;

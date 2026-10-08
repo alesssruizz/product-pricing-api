@@ -4,7 +4,7 @@ import static com.inditex.pricing.shared.domain.Required.ensureProvided;
 
 import java.util.Currency;
 
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceCurrency;
+import com.inditex.pricing.prices.domain.exception.InvalidPriceCurrency;
 import com.inditex.pricing.shared.domain.StringValueObject;
 
 public final class PriceCurrency extends StringValueObject {

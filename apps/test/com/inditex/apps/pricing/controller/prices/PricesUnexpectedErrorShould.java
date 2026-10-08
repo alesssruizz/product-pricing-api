@@ -17,7 +17,7 @@ public class PricesUnexpectedErrorShould extends ProductPricingApiApplicationTes
   @MockitoBean private PriceRepository repository;
 
   @Test
-  @DisplayName("Returns 500 with errorCode for unhandled exceptions")
+  @DisplayName("Returns 500 with errorCode for unhandled exception")
   public void returnUnexpectedErrorWhenRepositoryFails() throws Exception {
     when(repository.findAll()).thenThrow(new RuntimeException("connection lost"));
 

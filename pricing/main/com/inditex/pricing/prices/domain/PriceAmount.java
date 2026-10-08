@@ -4,7 +4,7 @@ import static com.inditex.pricing.shared.domain.Required.ensureProvided;
 
 import java.math.BigDecimal;
 
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceAmount;
+import com.inditex.pricing.prices.domain.exception.InvalidPriceAmount;
 import com.inditex.pricing.shared.domain.BigDecimalValueObject;
 
 public final class PriceAmount extends BigDecimalValueObject {

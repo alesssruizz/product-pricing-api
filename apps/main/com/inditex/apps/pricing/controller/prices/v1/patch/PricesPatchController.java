@@ -3,12 +3,12 @@ package com.inditex.apps.pricing.controller.prices.v1.patch;
 import java.util.Map;
 
 import com.inditex.pricing.prices.application.patch.PatchPriceCommand;
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceAmount;
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceCurrency;
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceReference;
-import com.inditex.pricing.prices.domain.exceptions.PriceAlreadyExists;
-import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
+import com.inditex.pricing.prices.domain.exception.InvalidPriceAmount;
+import com.inditex.pricing.prices.domain.exception.InvalidPriceCurrency;
+import com.inditex.pricing.prices.domain.exception.InvalidPriceDateRange;
+import com.inditex.pricing.prices.domain.exception.InvalidPriceReference;
+import com.inditex.pricing.prices.domain.exception.PriceAlreadyExists;
+import com.inditex.pricing.prices.domain.exception.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.bus.command.CommandBus;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.domain.exception.DomainError;

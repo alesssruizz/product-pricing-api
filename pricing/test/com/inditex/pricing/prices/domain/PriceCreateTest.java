@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.math.BigDecimal;
 
 import com.inditex.pricing.prices.domain.event.PriceCreatedDomainEvent;
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
+import com.inditex.pricing.prices.domain.exception.InvalidPriceDateRange;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

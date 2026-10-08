@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 
 import com.inditex.pricing.prices.application.delete.DeletePriceCommand;
 import com.inditex.pricing.prices.domain.PriceId;
-import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
+import com.inditex.pricing.prices.domain.exception.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.bus.command.CommandHandler;
 import com.inditex.pricing.shared.domain.bus.command.CommandHandlerExecutionError;
 import com.inditex.pricing.shared.domain.bus.command.CommandNotRegisteredError;

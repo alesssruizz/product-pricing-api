@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.inditex.pricing.prices.application.PriceResponse;
 import com.inditex.pricing.prices.application.findbyid.FindPriceByIdQuery;
-import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
+import com.inditex.pricing.prices.domain.exception.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.bus.command.CommandBus;
 import com.inditex.pricing.shared.domain.bus.query.QueryBus;
 import com.inditex.pricing.shared.domain.exception.DomainError;

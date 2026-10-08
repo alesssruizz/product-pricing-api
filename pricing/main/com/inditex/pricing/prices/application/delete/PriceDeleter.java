@@ -3,7 +3,7 @@ package com.inditex.pricing.prices.application.delete;
 import com.inditex.pricing.prices.domain.Price;
 import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceRepository;
-import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
+import com.inditex.pricing.prices.domain.exception.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.Service;
 import com.inditex.pricing.shared.domain.bus.event.EventBus;
 

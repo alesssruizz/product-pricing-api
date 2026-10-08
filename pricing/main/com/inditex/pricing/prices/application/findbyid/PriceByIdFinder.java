@@ -3,7 +3,7 @@ package com.inditex.pricing.prices.application.findbyid;
 import com.inditex.pricing.prices.application.PriceResponse;
 import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceRepository;
-import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
+import com.inditex.pricing.prices.domain.exception.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.Service;
 
 @Service

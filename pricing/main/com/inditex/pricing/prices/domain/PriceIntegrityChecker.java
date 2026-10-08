@@ -1,7 +1,7 @@
 package com.inditex.pricing.prices.domain;
 
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceReference;
-import com.inditex.pricing.prices.domain.exceptions.PriceAlreadyExists;
+import com.inditex.pricing.prices.domain.exception.InvalidPriceReference;
+import com.inditex.pricing.prices.domain.exception.PriceAlreadyExists;
 import com.inditex.pricing.shared.domain.Service;
 
 @Service

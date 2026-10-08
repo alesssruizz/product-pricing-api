@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import com.inditex.pricing.prices.domain.event.PriceCreatedDomainEvent;
 import com.inditex.pricing.prices.domain.event.PriceDeletedDomainEvent;
 import com.inditex.pricing.prices.domain.event.PriceUpdatedDomainEvent;
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
+import com.inditex.pricing.prices.domain.exception.InvalidPriceDateRange;
 import com.inditex.pricing.shared.domain.AggregateRoot;
 
 import lombok.AccessLevel;
