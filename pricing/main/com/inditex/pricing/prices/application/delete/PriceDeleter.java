@@ -24,7 +24,7 @@ public final class PriceDeleter {
       throw new PriceNotFoundException(id);
     }
 
-    var price = Price.delete(id.value());
+    var price = Price.delete(id);
 
     repository.deleteById(id);
     eventBus.publish(price.pullDomainEvents());

@@ -15,6 +15,7 @@ import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.Price;
 import com.inditex.pricing.prices.domain.PriceAmount;
 import com.inditex.pricing.prices.domain.PriceCurrency;
+import com.inditex.pricing.prices.domain.PriceDate;
 import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceIntegrityChecker;
 import com.inditex.pricing.prices.domain.PriceList;
@@ -60,11 +61,11 @@ class PriceUpdaterTest {
     updater.update(
         new PriceId(ID),
         new BrandId(1L),
-        new ProductId(35455L),
+        new PriceDate("2020-06-14T00:00:00"),
+        new PriceDate("2020-12-31T23:59:59"),
         new PriceList(2),
+        new ProductId(35455L),
         new PricePriority(1),
-        "2020-06-14T00:00:00",
-        "2020-12-31T23:59:59",
         new PriceAmount(new BigDecimal("40.00")),
         new PriceCurrency("EUR"));
   }

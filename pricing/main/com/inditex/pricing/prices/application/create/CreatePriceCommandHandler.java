@@ -3,6 +3,7 @@ package com.inditex.pricing.prices.application.create;
 import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.PriceAmount;
 import com.inditex.pricing.prices.domain.PriceCurrency;
+import com.inditex.pricing.prices.domain.PriceDate;
 import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceList;
 import com.inditex.pricing.prices.domain.PricePriority;
@@ -27,19 +28,19 @@ public class CreatePriceCommandHandler implements CommandHandler<CreatePriceComm
     final var productId = new ProductId(command.productId());
     final var priceList = new PriceList(command.priceList());
     final var priority = new PricePriority(command.priority());
-    final String startDate = command.startDate();
-    final String endDate = command.endDate();
+    final var startDate = new PriceDate(command.startDate());
+    final var endDate = new PriceDate(command.endDate());
     final var priceAmount = new PriceAmount(command.price());
     final var priceCurrency = new PriceCurrency(command.currency());
 
     creator.create(
         priceId,
         brandId,
-        productId,
-        priceList,
-        priority,
         startDate,
         endDate,
+        priceList,
+        productId,
+        priority,
         priceAmount,
         priceCurrency);
   }

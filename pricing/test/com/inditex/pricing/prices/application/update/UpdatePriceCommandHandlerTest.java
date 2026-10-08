@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.PriceAmount;
 import com.inditex.pricing.prices.domain.PriceCurrency;
+import com.inditex.pricing.prices.domain.PriceDate;
 import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceList;
 import com.inditex.pricing.prices.domain.PricePriority;
@@ -48,11 +49,11 @@ class UpdatePriceCommandHandlerTest {
         .update(
             new PriceId(command.id()),
             new BrandId(command.brandId()),
-            new ProductId(command.productId()),
+            new PriceDate(command.startDate()),
+            new PriceDate(command.endDate()),
             new PriceList(command.priceList()),
+            new ProductId(command.productId()),
             new PricePriority(command.priority()),
-            command.startDate(),
-            command.endDate(),
             new PriceAmount(command.price()),
             new PriceCurrency(command.currency()));
   }

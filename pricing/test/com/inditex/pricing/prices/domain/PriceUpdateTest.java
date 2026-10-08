@@ -17,12 +17,17 @@ class PriceUpdateTest {
 
   private static final String ID = "00000000-0000-0000-0000-000000000001";
 
-  private static Price update(String id, String startDate, String endDate, String currency) {
-    return Price.update(id, 1L, startDate, endDate, 1, 35455L, 0, BigDecimal.TEN, currency);
-  }
-
-  private static Price update(String startDate, String endDate, String currency) {
-    return update(ID, startDate, endDate, currency);
+  private static Price update(String startDate, String endDate) {
+    return Price.update(
+        new PriceId(ID),
+        new BrandId(1L),
+        new PriceDate(startDate),
+        new PriceDate(endDate),
+        new PriceList(1),
+        new ProductId(35455L),
+        new PricePriority(0),
+        new PriceAmount(BigDecimal.TEN),
+        new PriceCurrency("EUR"));
   }
 
   @Nested
@@ -31,7 +36,7 @@ class PriceUpdateTest {
 
     @Test
     void registersExactlyOnePriceUpdatedDomainEvent() {
-      Price price = update("2020-06-14T00:00:00", "2020-12-31T23:59:59", "EUR");
+      Price price = update("2020-06-14T00:00:00", "2020-12-31T23:59:59");
 
       assertThat(price.pullDomainEvents())
           .singleElement()
@@ -43,8 +48,8 @@ class PriceUpdateTest {
                 assertThat(event.brandId()).isEqualTo(1L);
                 assertThat(event.productId()).isEqualTo(35455L);
                 assertThat(event.priceList()).isEqualTo(1);
-                assertThat(event.priority()).isEqualTo(0);
-                assertThat(event.startDate()).isEqualTo("2020-06-14T00:00:00");
+                assertThat(event.priority()).isZero();
+                assertThat(event.startDate()).isEqualTo("2020-06-14T00:00");
                 assertThat(event.endDate()).isEqualTo("2020-12-31T23:59:59");
                 assertThat(event.price()).isEqualByComparingTo(BigDecimal.TEN);
                 assertThat(event.currency()).isEqualTo("EUR");
@@ -58,7 +63,7 @@ class PriceUpdateTest {
 
     @Test
     void rejectsAnEndDateNotAfterStartDate() {
-      assertThatThrownBy(() -> update("2020-06-14T00:00:00", "2020-06-14T00:00:00", "EUR"))
+      assertThatThrownBy(() -> update("2020-06-14T00:00:00", "2020-06-14T00:00:00"))
           .isInstanceOf(InvalidPriceDateRange.class);
     }
   }

@@ -5,10 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 
-import com.inditex.pricing.prices.domain.exceptions.InvalidPriceCurrency;
+import com.inditex.pricing.prices.domain.event.PriceCreatedDomainEvent;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
-import com.inditex.pricing.shared.domain.exception.FieldRequired;
-import com.inditex.pricing.shared.domain.exception.InvalidUUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,72 +16,43 @@ class PriceCreateTest {
 
   private static final String ID = "00000000-0000-0000-0000-000000000001";
 
-  private static Price create(String id, String startDate, String endDate, String currency) {
-    return Price.create(id, 1L, startDate, endDate, 1, 35455L, 0, BigDecimal.TEN, currency);
-  }
-
-  private static Price create(String startDate, String endDate, String currency) {
-    return create(ID, startDate, endDate, currency);
+  private static Price create(String startDate, String endDate) {
+    return Price.create(
+        new PriceId(ID),
+        new BrandId(1L),
+        new PriceDate(startDate),
+        new PriceDate(endDate),
+        new PriceList(1),
+        new ProductId(35455L),
+        new PricePriority(0),
+        new PriceAmount(BigDecimal.TEN),
+        new PriceCurrency("EUR"));
   }
 
   @Test
   void createsAPriceWithTheGivenIdWhenAllFieldsAreValid() {
-    Price price = create("2020-06-14T00:00:00", "2020-12-31T23:59:59", "EUR");
+    Price price = create("2020-06-14T00:00:00", "2020-12-31T23:59:59");
 
     assertThat(price.id().value()).isEqualTo(ID);
   }
 
   @Test
-  void rejectsANullId() {
-    assertThatThrownBy(() -> create(null, "2020-06-14T00:00:00", "2020-12-31T23:59:59", "EUR"))
-        .isInstanceOf(FieldRequired.class);
-  }
+  void registersExactlyOnePriceCreatedDomainEvent() {
+    Price price = create("2020-06-14T00:00:00", "2020-12-31T23:59:59");
 
-  @Test
-  void rejectsABlankId() {
-    assertThatThrownBy(() -> create("  ", "2020-06-14T00:00:00", "2020-12-31T23:59:59", "EUR"))
-        .isInstanceOf(FieldRequired.class);
-  }
-
-  @Test
-  void rejectsAMalformedId() {
-    assertThatThrownBy(
-            () -> create("not-a-uuid", "2020-06-14T00:00:00", "2020-12-31T23:59:59", "EUR"))
-        .isInstanceOf(InvalidUUID.class);
-  }
-
-  @Test
-  void rejectsABlankCurrency() {
-    assertThatThrownBy(() -> create("2020-06-14T00:00:00", "2020-12-31T23:59:59", " "))
-        .isInstanceOf(FieldRequired.class);
-  }
-
-  @Test
-  void rejectsAMissingField() {
-    assertThatThrownBy(
-            () ->
-                Price.create(
-                    ID,
-                    1L,
-                    "2020-06-14T00:00:00",
-                    "2020-12-31T23:59:59",
-                    1,
-                    35455L,
-                    0,
-                    BigDecimal.TEN,
-                    null))
-        .isInstanceOf(FieldRequired.class);
+    assertThat(price.pullDomainEvents())
+        .singleElement()
+        .isInstanceOfSatisfying(
+            PriceCreatedDomainEvent.class,
+            event -> {
+              assertThat(event.eventName()).isEqualTo("price.created");
+              assertThat(event.aggregateId()).isEqualTo(ID);
+            });
   }
 
   @Test
   void rejectsAnEndDateNotAfterStartDate() {
-    assertThatThrownBy(() -> create("2020-06-14T00:00:00", "2020-06-14T00:00:00", "EUR"))
+    assertThatThrownBy(() -> create("2020-06-14T00:00:00", "2020-06-14T00:00:00"))
         .isInstanceOf(InvalidPriceDateRange.class);
-  }
-
-  @Test
-  void rejectsAnInvalidCurrency() {
-    assertThatThrownBy(() -> create("2020-06-14T00:00:00", "2020-12-31T23:59:59", "ABC"))
-        .isInstanceOf(InvalidPriceCurrency.class);
   }
 }

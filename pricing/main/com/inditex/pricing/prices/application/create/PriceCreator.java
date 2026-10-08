@@ -4,6 +4,7 @@ import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.Price;
 import com.inditex.pricing.prices.domain.PriceAmount;
 import com.inditex.pricing.prices.domain.PriceCurrency;
+import com.inditex.pricing.prices.domain.PriceDate;
 import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceIntegrityChecker;
 import com.inditex.pricing.prices.domain.PriceList;
@@ -29,25 +30,25 @@ public final class PriceCreator {
   public void create(
       PriceId priceId,
       BrandId brandId,
-      ProductId productId,
+      PriceDate startDate,
+      PriceDate endDate,
       PriceList priceList,
+      ProductId productId,
       PricePriority priority,
-      String startDate,
-      String endDate,
       PriceAmount priceAmount,
       PriceCurrency priceCurrency) {
 
     Price price =
         Price.create(
-            priceId.value(),
-            brandId.value(),
+            priceId,
+            brandId,
             startDate,
             endDate,
-            priceList.value(),
-            productId.value(),
-            priority.value(),
-            priceAmount.value(),
-            priceCurrency.value());
+            priceList,
+            productId,
+            priority,
+            priceAmount,
+            priceCurrency);
 
     if (repository.existsById(priceId)) {
       throw new PriceIdAlreadyExists(priceId);

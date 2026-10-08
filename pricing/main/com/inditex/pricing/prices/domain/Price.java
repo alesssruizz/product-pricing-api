@@ -8,11 +8,14 @@ import com.inditex.pricing.prices.domain.event.PriceUpdatedDomainEvent;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
 import com.inditex.pricing.shared.domain.AggregateRoot;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @EqualsAndHashCode(callSuper = false)
 @Getter
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Price extends AggregateRoot {
 
   private final PriceId id;
@@ -55,63 +58,69 @@ public final class Price extends AggregateRoot {
     ensureValidDateRange();
   }
 
-  private Price(String id) {
-    this.id = new PriceId(id);
-    this.brandId = null;
-    this.startDate = null;
-    this.endDate = null;
-    this.priceList = null;
-    this.productId = null;
-    this.priority = null;
-    this.priceAmount = null;
-    this.currency = null;
-  }
-
   public static Price create(
-      String id,
-      Long brandId,
-      String startDate,
-      String endDate,
-      Integer priceList,
-      Long productId,
-      Integer priority,
-      BigDecimal price,
-      String currency) {
+      PriceId id,
+      BrandId brandId,
+      PriceDate startDate,
+      PriceDate endDate,
+      PriceList priceList,
+      ProductId productId,
+      PricePriority priority,
+      PriceAmount price,
+      PriceCurrency currency) {
 
     var newPrice =
-        new Price(id, brandId, productId, priceList, priority, startDate, endDate, price, currency);
+        new Price(id, brandId, startDate, endDate, priceList, productId, priority, price, currency);
+    newPrice.ensureValidDateRange();
 
     newPrice.register(
         new PriceCreatedDomainEvent(
-            id, brandId, productId, priceList, priority, startDate, endDate, price, currency));
+            id.value(),
+            brandId.value(),
+            productId.value(),
+            priceList.value(),
+            priority.value(),
+            startDate.value().toString(),
+            endDate.value().toString(),
+            price.value(),
+            currency.value()));
 
     return newPrice;
   }
 
   public static Price update(
-      String id,
-      Long brandId,
-      String startDate,
-      String endDate,
-      Integer priceList,
-      Long productId,
-      Integer priority,
-      BigDecimal price,
-      String currency) {
+      PriceId id,
+      BrandId brandId,
+      PriceDate startDate,
+      PriceDate endDate,
+      PriceList priceList,
+      ProductId productId,
+      PricePriority priority,
+      PriceAmount price,
+      PriceCurrency currency) {
 
     var updatedPrice =
-        new Price(id, brandId, productId, priceList, priority, startDate, endDate, price, currency);
+        new Price(id, brandId, startDate, endDate, priceList, productId, priority, price, currency);
+    updatedPrice.ensureValidDateRange();
 
     updatedPrice.register(
         new PriceUpdatedDomainEvent(
-            id, brandId, productId, priceList, priority, startDate, endDate, price, currency));
+            id.value(),
+            brandId.value(),
+            productId.value(),
+            priceList.value(),
+            priority.value(),
+            startDate.value().toString(),
+            endDate.value().toString(),
+            price.value(),
+            currency.value()));
 
     return updatedPrice;
   }
 
-  public static Price delete(String id) {
-    var deletedPrice = new Price(id);
-    deletedPrice.register(new PriceDeletedDomainEvent(id));
+  public static Price delete(PriceId id) {
+    var deletedPrice = new Price(id, null, null, null, null, null, null, null, null);
+    deletedPrice.register(new PriceDeletedDomainEvent(id.value()));
 
     return deletedPrice;
   }

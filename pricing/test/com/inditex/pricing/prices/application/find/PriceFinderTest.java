@@ -11,7 +11,12 @@ import java.util.Optional;
 import com.inditex.pricing.prices.application.ApplicablePriceResponse;
 import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.Price;
+import com.inditex.pricing.prices.domain.PriceAmount;
+import com.inditex.pricing.prices.domain.PriceCurrency;
 import com.inditex.pricing.prices.domain.PriceDate;
+import com.inditex.pricing.prices.domain.PriceId;
+import com.inditex.pricing.prices.domain.PriceList;
+import com.inditex.pricing.prices.domain.PricePriority;
 import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.prices.domain.ProductId;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
@@ -39,15 +44,15 @@ class PriceFinderTest {
 
   private static Price buildPrice() {
     return Price.create(
-        "00000000-0000-0000-0000-000000000001",
-        1L,
-        "2020-06-14T00:00:00",
-        "2020-12-31T23:59:59",
-        1,
-        35455L,
-        0,
-        BigDecimal.TEN,
-        "EUR");
+        new PriceId("00000000-0000-0000-0000-000000000001"),
+        new BrandId(1L),
+        new PriceDate("2020-06-14T00:00:00"),
+        new PriceDate("2020-12-31T23:59:59"),
+        new PriceList(1),
+        new ProductId(35455L),
+        new PricePriority(0),
+        new PriceAmount(BigDecimal.TEN),
+        new PriceCurrency("EUR"));
   }
 
   @Nested

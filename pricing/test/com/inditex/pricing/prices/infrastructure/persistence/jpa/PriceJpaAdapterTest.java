@@ -7,7 +7,15 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.Price;
+import com.inditex.pricing.prices.domain.PriceAmount;
+import com.inditex.pricing.prices.domain.PriceCurrency;
+import com.inditex.pricing.prices.domain.PriceDate;
+import com.inditex.pricing.prices.domain.PriceId;
+import com.inditex.pricing.prices.domain.PriceList;
+import com.inditex.pricing.prices.domain.PricePriority;
+import com.inditex.pricing.prices.domain.ProductId;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,15 +43,15 @@ class PriceJpaAdapterTest {
 
   private static Price price() {
     return Price.create(
-        ID,
-        1L,
-        "2020-06-14T15:00:00",
-        "2020-06-14T18:30:00",
-        2,
-        35455L,
-        1,
-        new BigDecimal("25.45"),
-        "EUR");
+        new PriceId(ID),
+        new BrandId(1L),
+        new PriceDate("2020-06-14T15:00:00"),
+        new PriceDate("2020-06-14T18:30:00"),
+        new PriceList(2),
+        new ProductId(35455L),
+        new PricePriority(1),
+        new PriceAmount(new BigDecimal("25.45")),
+        new PriceCurrency("EUR"));
   }
 
   private static void assertMapsEveryField(PriceJpaEntity entity) {

@@ -57,15 +57,15 @@ public final class PricePatcher {
 
     Price merged =
         Price.update(
-            id.value(),
-            mergedBrandId.value(),
-            mergedStartDate.value().toString(),
-            mergedEndDate.value().toString(),
-            mergedPriceList.value(),
-            mergedProductId.value(),
-            mergedPriority.value(),
-            mergedPrice.value(),
-            mergedCurrency.value());
+            id,
+            mergedBrandId,
+            mergedStartDate,
+            mergedEndDate,
+            mergedPriceList,
+            mergedProductId,
+            mergedPriority,
+            mergedPrice,
+            mergedCurrency);
 
     integrityChecker.ensureCanBeSaved(merged);
 

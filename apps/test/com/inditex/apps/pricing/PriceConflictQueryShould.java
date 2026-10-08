@@ -4,7 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 
+import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.Price;
+import com.inditex.pricing.prices.domain.PriceAmount;
+import com.inditex.pricing.prices.domain.PriceCurrency;
+import com.inditex.pricing.prices.domain.PriceDate;
+import com.inditex.pricing.prices.domain.PriceId;
+import com.inditex.pricing.prices.domain.PriceList;
+import com.inditex.pricing.prices.domain.PricePriority;
+import com.inditex.pricing.prices.domain.ProductId;
 import com.inditex.pricing.prices.infrastructure.persistence.jpa.PriceJpaAdapter;
 
 import org.junit.jupiter.api.DisplayName;
@@ -55,14 +63,14 @@ public class PriceConflictQueryShould extends ProductPricingApiApplicationTests 
 
   private Price candidate(String id, int priority) {
     return Price.create(
-        id,
-        SEED_BRAND_ID,
-        SEED_START_DATE,
-        "2020-12-31T23:59:59",
-        1,
-        SEED_PRODUCT_ID,
-        priority,
-        new BigDecimal("35.50"),
-        "EUR");
+        new PriceId(id),
+        new BrandId(SEED_BRAND_ID),
+        new PriceDate(SEED_START_DATE),
+        new PriceDate("2020-12-31T23:59:59"),
+        new PriceList(1),
+        new ProductId(SEED_PRODUCT_ID),
+        new PricePriority(priority),
+        new PriceAmount(new BigDecimal("35.50")),
+        new PriceCurrency("EUR"));
   }
 }
