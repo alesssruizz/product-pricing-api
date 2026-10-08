@@ -2,6 +2,8 @@ package com.inditex.pricing.prices.application.delete;
 
 import static org.mockito.Mockito.verify;
 
+import com.inditex.pricing.prices.domain.PriceId;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,10 +22,10 @@ class DeletePriceCommandHandlerTest {
   @InjectMocks private DeletePriceCommandHandler handler;
 
   @Test
-  @DisplayName("Delegates the id to PriceDeleter")
+  @DisplayName("Converts the id to PriceId and delegates to PriceDeleter")
   void delegatesToDeleter() {
     handler.handle(new DeletePriceCommand(ID));
 
-    verify(deleter).delete(ID);
+    verify(deleter).delete(new PriceId(ID));
   }
 }

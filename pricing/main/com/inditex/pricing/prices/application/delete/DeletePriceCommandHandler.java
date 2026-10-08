@@ -1,5 +1,6 @@
 package com.inditex.pricing.prices.application.delete;
 
+import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.shared.domain.Service;
 import com.inditex.pricing.shared.domain.bus.command.CommandHandler;
 
@@ -14,6 +15,6 @@ public class DeletePriceCommandHandler implements CommandHandler<DeletePriceComm
 
   @Override
   public void handle(DeletePriceCommand command) {
-    deleter.delete(command.id());
+    deleter.delete(new PriceId(command.id()));
   }
 }

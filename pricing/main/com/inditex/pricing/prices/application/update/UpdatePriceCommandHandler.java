@@ -1,5 +1,12 @@
 package com.inditex.pricing.prices.application.update;
 
+import com.inditex.pricing.prices.domain.BrandId;
+import com.inditex.pricing.prices.domain.PriceAmount;
+import com.inditex.pricing.prices.domain.PriceCurrency;
+import com.inditex.pricing.prices.domain.PriceId;
+import com.inditex.pricing.prices.domain.PriceList;
+import com.inditex.pricing.prices.domain.PricePriority;
+import com.inditex.pricing.prices.domain.ProductId;
 import com.inditex.pricing.shared.domain.Service;
 import com.inditex.pricing.shared.domain.bus.command.CommandHandler;
 
@@ -14,6 +21,23 @@ public class UpdatePriceCommandHandler implements CommandHandler<UpdatePriceComm
 
   @Override
   public void handle(UpdatePriceCommand command) {
-    updater.update(command);
+    var id = new PriceId(command.id());
+    var brandId = new BrandId(command.brandId());
+    var productId = new ProductId(command.productId());
+    var priceList = new PriceList(command.priceList());
+    var priority = new PricePriority(command.priority());
+    var price = new PriceAmount(command.price());
+    var currency = new PriceCurrency(command.currency());
+
+    updater.update(
+        id,
+        brandId,
+        productId,
+        priceList,
+        priority,
+        command.startDate(),
+        command.endDate(),
+        price,
+        currency);
   }
 }

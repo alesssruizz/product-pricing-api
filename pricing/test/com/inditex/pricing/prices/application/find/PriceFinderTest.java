@@ -9,8 +9,11 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import com.inditex.pricing.prices.application.ApplicablePriceResponse;
+import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.Price;
+import com.inditex.pricing.prices.domain.PriceDate;
 import com.inditex.pricing.prices.domain.PriceRepository;
+import com.inditex.pricing.prices.domain.ProductId;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -57,7 +60,7 @@ class PriceFinderTest {
       when(repository.findApplicablePrice(any(), any(), any())).thenReturn(Optional.of(price));
 
       ApplicablePriceResponse response =
-          finder.find(new FindApplicablePriceQuery(1L, 35455L, "2020-06-14T10:00:00"));
+          finder.find(new BrandId(1L), new ProductId(35455L), new PriceDate("2020-06-14T10:00:00"));
 
       assertThat(response).isEqualTo(ApplicablePriceResponse.fromAggregate(price));
     }
@@ -72,7 +75,9 @@ class PriceFinderTest {
       when(repository.findApplicablePrice(any(), any(), any())).thenReturn(Optional.empty());
 
       assertThatThrownBy(
-              () -> finder.find(new FindApplicablePriceQuery(1L, 35455L, "2020-06-14T10:00:00")))
+              () ->
+                  finder.find(
+                      new BrandId(1L), new ProductId(35455L), new PriceDate("2020-06-14T10:00:00")))
           .isInstanceOf(PriceNotFoundException.class);
     }
   }

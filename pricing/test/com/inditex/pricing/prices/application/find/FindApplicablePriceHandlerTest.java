@@ -5,6 +5,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.inditex.pricing.prices.application.ApplicablePriceResponse;
+import com.inditex.pricing.prices.domain.BrandId;
+import com.inditex.pricing.prices.domain.PriceDate;
+import com.inditex.pricing.prices.domain.ProductId;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,15 +37,18 @@ class FindApplicablePriceHandlerTest {
   class DelegationScenarios {
 
     @Test
-    @DisplayName("Delegates the query to PriceFinder and returns its response")
+    @DisplayName("Converts the query to value objects and delegates to PriceFinder")
     void delegatesToFinder() {
       var query = new FindApplicablePriceQuery(1L, 35455L, "2020-06-14T10:00:00");
-      when(finder.find(query)).thenReturn(response);
+      when(finder.find(
+              new BrandId(1L), new ProductId(35455L), new PriceDate("2020-06-14T10:00:00")))
+          .thenReturn(response);
 
       var result = handler.handle(query);
 
       assertThat(result).isSameAs(response);
-      verify(finder).find(query);
+      verify(finder)
+          .find(new BrandId(1L), new ProductId(35455L), new PriceDate("2020-06-14T10:00:00"));
     }
   }
 }

@@ -10,9 +10,16 @@ import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 
+import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.Price;
+import com.inditex.pricing.prices.domain.PriceAmount;
+import com.inditex.pricing.prices.domain.PriceCurrency;
+import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceIntegrityChecker;
+import com.inditex.pricing.prices.domain.PriceList;
+import com.inditex.pricing.prices.domain.PricePriority;
 import com.inditex.pricing.prices.domain.PriceRepository;
+import com.inditex.pricing.prices.domain.ProductId;
 import com.inditex.pricing.prices.domain.exceptions.PriceAlreadyExists;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 
@@ -42,17 +49,17 @@ class PriceUpdaterTest {
     updater = new PriceUpdater(repository, integrityChecker);
   }
 
-  private static UpdatePriceCommand command() {
-    return new UpdatePriceCommand(
-        ID,
-        1L,
-        35455L,
-        2,
-        1,
+  private void update() {
+    updater.update(
+        new PriceId(ID),
+        new BrandId(1L),
+        new ProductId(35455L),
+        new PriceList(2),
+        new PricePriority(1),
         "2020-06-14T00:00:00",
         "2020-12-31T23:59:59",
-        new BigDecimal("40.00"),
-        "EUR");
+        new PriceAmount(new BigDecimal("40.00")),
+        new PriceCurrency("EUR"));
   }
 
   @Nested
@@ -63,8 +70,7 @@ class PriceUpdaterTest {
     void throwsNotFoundWithoutCheckingIntegrityNorUpdating() {
       when(repository.existsById(any())).thenReturn(false);
 
-      assertThatThrownBy(() -> updater.update(command()))
-          .isInstanceOf(PriceNotFoundException.class);
+      assertThatThrownBy(PriceUpdaterTest.this::update).isInstanceOf(PriceNotFoundException.class);
       verify(integrityChecker, never()).ensureCanBeSaved(any());
       verify(repository, never()).update(any());
     }
@@ -75,11 +81,11 @@ class PriceUpdaterTest {
   class WhenIdExists {
 
     @Test
-    void updatesThePriceWithTheCommandValues() {
+    void updatesThePriceWithTheGivenValues() {
       when(repository.existsById(any())).thenReturn(true);
       ArgumentCaptor<Price> saved = ArgumentCaptor.forClass(Price.class);
 
-      updater.update(command());
+      update();
 
       verify(integrityChecker).ensureCanBeSaved(any(Price.class));
       verify(repository).update(saved.capture());
@@ -101,7 +107,7 @@ class PriceUpdaterTest {
       when(repository.existsById(any())).thenReturn(true);
       doThrow(new PriceAlreadyExists()).when(integrityChecker).ensureCanBeSaved(any());
 
-      assertThatThrownBy(() -> updater.update(command())).isInstanceOf(PriceAlreadyExists.class);
+      assertThatThrownBy(PriceUpdaterTest.this::update).isInstanceOf(PriceAlreadyExists.class);
       verify(repository, never()).update(any());
     }
   }

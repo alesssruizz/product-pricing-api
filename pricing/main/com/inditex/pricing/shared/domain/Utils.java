@@ -2,6 +2,7 @@ package com.inditex.pricing.shared.domain;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +13,10 @@ public final class Utils {
 
   public static String toSnake(String text) {
     return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, text);
+  }
+
+  public static <T, R> R convertIfPresent(T raw, Function<T, R> constructor) {
+    return raw == null ? null : constructor.apply(raw);
   }
 
   public static String toParsedJson(Map<String, Serializable> map) {

@@ -36,6 +36,7 @@ public final class PriceCreator {
       String endDate,
       PriceAmount priceAmount,
       PriceCurrency priceCurrency) {
+
     Price price =
         Price.create(
             priceId.value(),
@@ -48,9 +49,8 @@ public final class PriceCreator {
             priceAmount.value(),
             priceCurrency.value());
 
-    PriceId id = price.id();
-    if (repository.existsById(id)) {
-      throw new PriceIdAlreadyExists(id);
+    if (repository.existsById(priceId)) {
+      throw new PriceIdAlreadyExists(priceId);
     }
     integrityChecker.ensureCanBeSaved(price);
 

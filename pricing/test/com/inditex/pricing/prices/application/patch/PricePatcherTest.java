@@ -12,6 +12,9 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import com.inditex.pricing.prices.domain.Price;
+import com.inditex.pricing.prices.domain.PriceAmount;
+import com.inditex.pricing.prices.domain.PriceDate;
+import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceIntegrityChecker;
 import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
@@ -56,9 +59,8 @@ class PricePatcherTest {
         "EUR");
   }
 
-  private static PatchPriceCommand command(
-      BigDecimal price, String startDate, String endDate, String currency) {
-    return new PatchPriceCommand(ID, null, null, null, null, startDate, endDate, price, currency);
+  private void patch(PriceAmount price, PriceDate startDate, PriceDate endDate) {
+    patcher.patch(new PriceId(ID), null, null, null, null, startDate, endDate, price, null);
   }
 
   @Test
@@ -67,7 +69,7 @@ class PricePatcherTest {
     when(repository.findById(any())).thenReturn(Optional.of(existing()));
     ArgumentCaptor<Price> saved = ArgumentCaptor.forClass(Price.class);
 
-    patcher.patch(command(new BigDecimal("40.00"), null, null, null));
+    patch(new PriceAmount(new BigDecimal("40.00")), null, null);
 
     verify(repository).update(saved.capture());
     verify(repository, never()).create(any());
@@ -84,7 +86,7 @@ class PricePatcherTest {
   void validatesTheMergedFinalState() {
     when(repository.findById(any())).thenReturn(Optional.of(existing()));
 
-    assertThatThrownBy(() -> patcher.patch(command(null, null, "2020-06-13T00:00:00", null)))
+    assertThatThrownBy(() -> patch(null, null, new PriceDate("2020-06-13T00:00:00")))
         .isInstanceOf(InvalidPriceDateRange.class);
     verify(repository, never()).update(any());
   }
@@ -94,7 +96,7 @@ class PricePatcherTest {
   void throwsNotFoundWhenMissing() {
     when(repository.findById(any())).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> patcher.patch(command(new BigDecimal("40.00"), null, null, null)))
+    assertThatThrownBy(() -> patch(new PriceAmount(new BigDecimal("40.00")), null, null))
         .isInstanceOf(PriceNotFoundException.class);
     verify(integrityChecker, never()).ensureCanBeSaved(any());
     verify(repository, never()).update(any());
@@ -106,7 +108,7 @@ class PricePatcherTest {
     when(repository.findById(any())).thenReturn(Optional.of(existing()));
     doThrow(new PriceAlreadyExists()).when(integrityChecker).ensureCanBeSaved(any());
 
-    assertThatThrownBy(() -> patcher.patch(command(new BigDecimal("40.00"), null, null, null)))
+    assertThatThrownBy(() -> patch(new PriceAmount(new BigDecimal("40.00")), null, null))
         .isInstanceOf(PriceAlreadyExists.class);
     verify(repository, never()).update(any());
   }

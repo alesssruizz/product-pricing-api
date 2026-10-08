@@ -2,10 +2,17 @@ package com.inditex.pricing.prices.application.patch;
 
 import java.util.Objects;
 
+import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.Price;
+import com.inditex.pricing.prices.domain.PriceAmount;
+import com.inditex.pricing.prices.domain.PriceCurrency;
+import com.inditex.pricing.prices.domain.PriceDate;
 import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceIntegrityChecker;
+import com.inditex.pricing.prices.domain.PriceList;
+import com.inditex.pricing.prices.domain.PricePriority;
 import com.inditex.pricing.prices.domain.PriceRepository;
+import com.inditex.pricing.prices.domain.ProductId;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.Service;
 
@@ -21,25 +28,42 @@ public final class PricePatcher {
     this.integrityChecker = integrityChecker;
   }
 
-  public void patch(PatchPriceCommand command) {
-    var id = new PriceId(command.id());
+  public void patch(
+      PriceId id,
+      BrandId brandId,
+      ProductId productId,
+      PriceList priceList,
+      PricePriority priority,
+      PriceDate startDate,
+      PriceDate endDate,
+      PriceAmount price,
+      PriceCurrency currency) {
 
     Price current = repository.findById(id).orElseThrow(() -> new PriceNotFoundException(id));
 
-    Price price =
+    var mergedBrandId = Objects.requireNonNullElse(brandId, current.brandId());
+    var mergedProductId = Objects.requireNonNullElse(productId, current.productId());
+    var mergedPriceList = Objects.requireNonNullElse(priceList, current.priceList());
+    var mergedPriority = Objects.requireNonNullElse(priority, current.priority());
+    var mergedStartDate = Objects.requireNonNullElse(startDate, current.startDate());
+    var mergedEndDate = Objects.requireNonNullElse(endDate, current.endDate());
+    var mergedPrice = Objects.requireNonNullElse(price, current.priceAmount());
+    var mergedCurrency = Objects.requireNonNullElse(currency, current.currency());
+
+    Price merged =
         Price.create(
-            command.id(),
-            Objects.requireNonNullElse(command.brandId(), current.brandId().value()),
-            Objects.requireNonNullElse(command.productId(), current.productId().value()),
-            Objects.requireNonNullElse(command.priceList(), current.priceList().value()),
-            Objects.requireNonNullElse(command.priority(), current.priority().value()),
-            Objects.requireNonNullElse(command.startDate(), current.startDate().value().toString()),
-            Objects.requireNonNullElse(command.endDate(), current.endDate().value().toString()),
-            Objects.requireNonNullElse(command.price(), current.priceAmount().value()),
-            Objects.requireNonNullElse(command.currency(), current.currency().value()));
+            id.value(),
+            mergedBrandId.value(),
+            mergedProductId.value(),
+            mergedPriceList.value(),
+            mergedPriority.value(),
+            mergedStartDate.value().toString(),
+            mergedEndDate.value().toString(),
+            mergedPrice.value(),
+            mergedCurrency.value());
 
-    integrityChecker.ensureCanBeSaved(price);
+    integrityChecker.ensureCanBeSaved(merged);
 
-    repository.update(price);
+    repository.update(merged);
   }
 }

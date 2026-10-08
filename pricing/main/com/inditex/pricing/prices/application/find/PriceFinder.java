@@ -17,10 +17,8 @@ public final class PriceFinder {
     this.repository = repository;
   }
 
-  public ApplicablePriceResponse find(FindApplicablePriceQuery query) {
-    var brandId = new BrandId(query.brandId());
-    var productId = new ProductId(query.productId());
-    var applicationDate = new PriceDate(query.applicationDate());
+  public ApplicablePriceResponse find(
+      BrandId brandId, ProductId productId, PriceDate applicationDate) {
 
     return repository
         .findApplicablePrice(brandId, productId, applicationDate)

@@ -1,6 +1,7 @@
 package com.inditex.pricing.prices.application.delete;
 
 import com.inditex.pricing.prices.domain.Price;
+import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.Service;
@@ -18,14 +19,14 @@ public final class PriceDeleter {
     this.eventBus = eventBus;
   }
 
-  public void delete(String id) {
-    var price = Price.delete(id);
-
-    if (!repository.existsById(price.id())) {
-      throw new PriceNotFoundException(price.id());
+  public void delete(PriceId id) {
+    if (!repository.existsById(id)) {
+      throw new PriceNotFoundException(id);
     }
 
-    repository.deleteById(price.id());
+    var price = Price.delete(id.value());
+
+    repository.deleteById(id);
     eventBus.publish(price.pullDomainEvents());
   }
 }
