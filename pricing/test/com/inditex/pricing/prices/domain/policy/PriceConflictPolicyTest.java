@@ -62,7 +62,7 @@ class PriceConflictPolicyTest {
     void rejectsWithPriceAlreadyExists() {
       when(repository.existsConflict(any())).thenReturn(true);
 
-      assertThatThrownBy(() -> policy.ensureNoConflict(price()))
+      assertThatThrownBy(() -> policy.ensure(price()))
           .isInstanceOfSatisfying(
               PriceAlreadyExists.class,
               error -> assertThat(error.errorCode()).isEqualTo("price_already_exists"));
@@ -77,7 +77,7 @@ class PriceConflictPolicyTest {
     void allowsThePrice() {
       when(repository.existsConflict(any())).thenReturn(false);
 
-      assertThatCode(() -> policy.ensureNoConflict(price())).doesNotThrowAnyException();
+      assertThatCode(() -> policy.ensure(price())).doesNotThrowAnyException();
     }
   }
 }

@@ -6,7 +6,9 @@ import com.inditex.pricing.prices.domain.exception.PriceAlreadyExists;
 import com.inditex.pricing.shared.domain.Service;
 
 @Service
-public class PriceConflictPolicy {
+public class PriceConflictPolicy implements PricePolicy {
+
+  private static final int ORDER = 20;
 
   private final PriceRepository repository;
 
@@ -14,9 +16,15 @@ public class PriceConflictPolicy {
     this.repository = repository;
   }
 
-  public void ensureNoConflict(Price price) {
+  @Override
+  public void ensure(Price price) {
     if (repository.existsConflict(price)) {
       throw new PriceAlreadyExists();
     }
+  }
+
+  @Override
+  public int order() {
+    return ORDER;
   }
 }

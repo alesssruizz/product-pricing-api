@@ -64,7 +64,7 @@ class PriceReferencesPolicyTest {
     void rejectsWithInvalidReferenceAndNeverAsksForTheProduct() {
       when(references.brandExists(any())).thenReturn(false);
 
-      assertThatThrownBy(() -> policy.ensureReferencesExist(price()))
+      assertThatThrownBy(() -> policy.ensure(price()))
           .isInstanceOfSatisfying(
               InvalidPriceReference.class,
               error -> assertThat(error.errorCode()).isEqualTo("invalid_reference"));
@@ -81,7 +81,7 @@ class PriceReferencesPolicyTest {
       when(references.brandExists(any())).thenReturn(true);
       when(references.productExists(any())).thenReturn(false);
 
-      assertThatThrownBy(() -> policy.ensureReferencesExist(price()))
+      assertThatThrownBy(() -> policy.ensure(price()))
           .isInstanceOfSatisfying(
               InvalidPriceReference.class,
               error -> assertThat(error.errorCode()).isEqualTo("invalid_reference"));
@@ -97,7 +97,7 @@ class PriceReferencesPolicyTest {
       when(references.brandExists(any())).thenReturn(true);
       when(references.productExists(any())).thenReturn(true);
 
-      assertThatCode(() -> policy.ensureReferencesExist(price())).doesNotThrowAnyException();
+      assertThatCode(() -> policy.ensure(price())).doesNotThrowAnyException();
     }
   }
 }

@@ -1,24 +1,21 @@
 package com.inditex.pricing.prices.domain;
 
-import com.inditex.pricing.prices.domain.policy.PriceConflictPolicy;
-import com.inditex.pricing.prices.domain.policy.PriceReferencesPolicy;
+import java.util.Comparator;
+import java.util.List;
+
+import com.inditex.pricing.prices.domain.policy.PricePolicy;
 import com.inditex.pricing.shared.domain.Service;
 
 @Service
 public class PriceIntegrityChecker {
 
-  private final PriceReferencesPolicy referencesPolicy;
+  private final List<PricePolicy> policies;
 
-  private final PriceConflictPolicy conflictPolicy;
-
-  public PriceIntegrityChecker(
-      PriceReferencesPolicy referencesPolicy, PriceConflictPolicy conflictPolicy) {
-    this.referencesPolicy = referencesPolicy;
-    this.conflictPolicy = conflictPolicy;
+  public PriceIntegrityChecker(List<PricePolicy> policies) {
+    this.policies = policies.stream().sorted(Comparator.comparingInt(PricePolicy::order)).toList();
   }
 
   public void ensureCanBeSaved(Price price) {
-    referencesPolicy.ensureReferencesExist(price);
-    conflictPolicy.ensureNoConflict(price);
+    policies.forEach(policy -> policy.ensure(price));
   }
 }
