@@ -350,6 +350,7 @@ Consola en `http://localhost:8080/pricing-service/h2-console` (JDBC URL `jdbc:h2
 
 ### Decisiones a destacar
 
+- **Select en vez de jpa.** Para comprobar que una tarifa existe, ya que la prioridad es la eficiencia en la extracción de datos, se opta por una SQL nativa en vez de hacerlo en un caso de uso.
 - **El cliente genera el id.** Así la identidad se conoce antes de persistir y el `201` devuelve el `Location` sin esperar a la base de datos. Como contrapartida, repetir un `POST` con el mismo id devuelve `409 price_id_already_exists`.
 - **Validación de UUID compartida.** `Identifier` vive en el kernel compartido para que cualquier identificador la reutilice, y lanza un error genérico (`invalid_uuid`) en lugar de uno por agregado.
 - **`persist` en vez de `merge` en las altas.** Con ids asignados, Spring Data trataría todo `save()` como una actualización (`SELECT` + `INSERT`). La entidad JPA implementa `Persistable` y el adaptador indica explícitamente si es un alta o una modificación.
