@@ -57,11 +57,11 @@ public class PriceConflictQueryShould extends ProductPricingApiApplicationTests 
     return Price.create(
         id,
         SEED_BRAND_ID,
-        SEED_PRODUCT_ID,
-        1,
-        priority,
         SEED_START_DATE,
         "2020-12-31T23:59:59",
+        1,
+        SEED_PRODUCT_ID,
+        priority,
         new BigDecimal("35.50"),
         "EUR");
   }

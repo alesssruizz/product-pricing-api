@@ -59,11 +59,11 @@ public final class PricePatcher {
         Price.update(
             id.value(),
             mergedBrandId.value(),
-            mergedProductId.value(),
-            mergedPriceList.value(),
-            mergedPriority.value(),
             mergedStartDate.value().toString(),
             mergedEndDate.value().toString(),
+            mergedPriceList.value(),
+            mergedProductId.value(),
+            mergedPriority.value(),
             mergedPrice.value(),
             mergedCurrency.value());
 

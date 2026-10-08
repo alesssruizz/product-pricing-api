@@ -70,11 +70,11 @@ public final class Price extends AggregateRoot {
   public static Price create(
       String id,
       Long brandId,
-      Long productId,
-      Integer priceList,
-      Integer priority,
       String startDate,
       String endDate,
+      Integer priceList,
+      Long productId,
+      Integer priority,
       BigDecimal price,
       String currency) {
 
@@ -91,11 +91,11 @@ public final class Price extends AggregateRoot {
   public static Price update(
       String id,
       Long brandId,
-      Long productId,
-      Integer priceList,
-      Integer priority,
       String startDate,
       String endDate,
+      Integer priceList,
+      Long productId,
+      Integer priority,
       BigDecimal price,
       String currency) {
 

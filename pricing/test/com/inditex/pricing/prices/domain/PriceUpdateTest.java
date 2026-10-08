@@ -18,7 +18,7 @@ class PriceUpdateTest {
   private static final String ID = "00000000-0000-0000-0000-000000000001";
 
   private static Price update(String id, String startDate, String endDate, String currency) {
-    return Price.update(id, 1L, 35455L, 1, 0, startDate, endDate, BigDecimal.TEN, currency);
+    return Price.update(id, 1L, startDate, endDate, 1, 35455L, 0, BigDecimal.TEN, currency);
   }
 
   private static Price update(String startDate, String endDate, String currency) {

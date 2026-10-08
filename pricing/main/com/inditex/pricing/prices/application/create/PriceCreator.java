@@ -41,11 +41,11 @@ public final class PriceCreator {
         Price.create(
             priceId.value(),
             brandId.value(),
-            productId.value(),
-            priceList.value(),
-            priority.value(),
             startDate,
             endDate,
+            priceList.value(),
+            productId.value(),
+            priority.value(),
             priceAmount.value(),
             priceCurrency.value());
 

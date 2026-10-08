@@ -48,11 +48,11 @@ public final class PriceUpdater {
         Price.update(
             id.value(),
             brandId.value(),
-            productId.value(),
-            priceList.value(),
-            priority.value(),
             startDate,
             endDate,
+            priceList.value(),
+            productId.value(),
+            priority.value(),
             price.value(),
             currency.value());
 

@@ -37,11 +37,11 @@ class PriceJpaAdapterTest {
     return Price.create(
         ID,
         1L,
-        35455L,
-        2,
-        1,
         "2020-06-14T15:00:00",
         "2020-06-14T18:30:00",
+        2,
+        35455L,
+        1,
         new BigDecimal("25.45"),
         "EUR");
   }
