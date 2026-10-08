@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.Price;
@@ -20,8 +21,11 @@ import com.inditex.pricing.prices.domain.PriceList;
 import com.inditex.pricing.prices.domain.PricePriority;
 import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.prices.domain.ProductId;
+import com.inditex.pricing.prices.domain.event.PriceUpdatedDomainEvent;
 import com.inditex.pricing.prices.domain.exceptions.PriceAlreadyExists;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
+import com.inditex.pricing.shared.domain.bus.event.DomainEvent;
+import com.inditex.pricing.shared.domain.bus.event.EventBus;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,6 +38,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PriceUpdater")
+@SuppressWarnings("unchecked")
 class PriceUpdaterTest {
 
   private static final String ID = "00000000-0000-0000-0000-000000000001";
@@ -42,11 +47,13 @@ class PriceUpdaterTest {
 
   @Mock private PriceIntegrityChecker integrityChecker;
 
+  @Mock private EventBus eventBus;
+
   private PriceUpdater updater;
 
   @BeforeEach
   void setUp() {
-    updater = new PriceUpdater(repository, integrityChecker);
+    updater = new PriceUpdater(repository, integrityChecker, eventBus);
   }
 
   private void update() {
@@ -73,6 +80,7 @@ class PriceUpdaterTest {
       assertThatThrownBy(PriceUpdaterTest.this::update).isInstanceOf(PriceNotFoundException.class);
       verify(integrityChecker, never()).ensureCanBeSaved(any());
       verify(repository, never()).update(any());
+      verify(eventBus, never()).publish(any());
     }
   }
 
@@ -100,6 +108,11 @@ class PriceUpdaterTest {
       assertThat(price.endDate().value().toString()).isEqualTo("2020-12-31T23:59:59");
       assertThat(price.priceAmount().value()).isEqualByComparingTo("40.00");
       assertThat(price.currency().value()).isEqualTo("EUR");
+      ArgumentCaptor<List<DomainEvent>> publishedEvents = ArgumentCaptor.forClass(List.class);
+      verify(eventBus).publish(publishedEvents.capture());
+      assertThat(publishedEvents.getValue())
+          .singleElement()
+          .isInstanceOf(PriceUpdatedDomainEvent.class);
     }
 
     @Test
@@ -109,6 +122,7 @@ class PriceUpdaterTest {
 
       assertThatThrownBy(PriceUpdaterTest.this::update).isInstanceOf(PriceAlreadyExists.class);
       verify(repository, never()).update(any());
+      verify(eventBus, never()).publish(any());
     }
   }
 }

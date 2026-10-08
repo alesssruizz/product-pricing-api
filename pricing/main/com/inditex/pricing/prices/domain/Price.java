@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import com.inditex.pricing.prices.domain.event.PriceCreatedDomainEvent;
 import com.inditex.pricing.prices.domain.event.PriceDeletedDomainEvent;
+import com.inditex.pricing.prices.domain.event.PriceUpdatedDomainEvent;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
 import com.inditex.pricing.shared.domain.AggregateRoot;
 
@@ -85,6 +86,27 @@ public final class Price extends AggregateRoot {
             id, brandId, productId, priceList, priority, startDate, endDate, price, currency));
 
     return newPrice;
+  }
+
+  public static Price update(
+      String id,
+      Long brandId,
+      Long productId,
+      Integer priceList,
+      Integer priority,
+      String startDate,
+      String endDate,
+      BigDecimal price,
+      String currency) {
+
+    var updatedPrice =
+        new Price(id, brandId, productId, priceList, priority, startDate, endDate, price, currency);
+
+    updatedPrice.register(
+        new PriceUpdatedDomainEvent(
+            id, brandId, productId, priceList, priority, startDate, endDate, price, currency));
+
+    return updatedPrice;
   }
 
   public static Price delete(String id) {

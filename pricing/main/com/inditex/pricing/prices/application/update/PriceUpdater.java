@@ -12,6 +12,7 @@ import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.prices.domain.ProductId;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.Service;
+import com.inditex.pricing.shared.domain.bus.event.EventBus;
 
 @Service
 public final class PriceUpdater {
@@ -20,9 +21,13 @@ public final class PriceUpdater {
 
   private final PriceIntegrityChecker integrityChecker;
 
-  public PriceUpdater(PriceRepository repository, PriceIntegrityChecker integrityChecker) {
+  private final EventBus eventBus;
+
+  public PriceUpdater(
+      PriceRepository repository, PriceIntegrityChecker integrityChecker, EventBus eventBus) {
     this.repository = repository;
     this.integrityChecker = integrityChecker;
+    this.eventBus = eventBus;
   }
 
   public void update(
@@ -40,7 +45,7 @@ public final class PriceUpdater {
     }
 
     Price updated =
-        Price.create(
+        Price.update(
             id.value(),
             brandId.value(),
             productId.value(),
@@ -54,5 +59,6 @@ public final class PriceUpdater {
     integrityChecker.ensureCanBeSaved(updated);
 
     repository.update(updated);
+    eventBus.publish(updated.pullDomainEvents());
   }
 }

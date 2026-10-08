@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import com.inditex.pricing.prices.domain.Price;
@@ -17,9 +18,12 @@ import com.inditex.pricing.prices.domain.PriceDate;
 import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceIntegrityChecker;
 import com.inditex.pricing.prices.domain.PriceRepository;
+import com.inditex.pricing.prices.domain.event.PriceUpdatedDomainEvent;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
 import com.inditex.pricing.prices.domain.exceptions.PriceAlreadyExists;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
+import com.inditex.pricing.shared.domain.bus.event.DomainEvent;
+import com.inditex.pricing.shared.domain.bus.event.EventBus;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +35,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("PricePatcher")
+@SuppressWarnings("unchecked")
 class PricePatcherTest {
 
   private static final String ID = "00000000-0000-0000-0000-000000000001";
@@ -39,11 +44,13 @@ class PricePatcherTest {
 
   @Mock private PriceIntegrityChecker integrityChecker;
 
+  @Mock private EventBus eventBus;
+
   private PricePatcher patcher;
 
   @BeforeEach
   void setUp() {
-    patcher = new PricePatcher(repository, integrityChecker);
+    patcher = new PricePatcher(repository, integrityChecker, eventBus);
   }
 
   private static Price existing() {
@@ -79,6 +86,11 @@ class PricePatcherTest {
     assertThat(price.priceList().value()).isEqualTo(1);
     assertThat(price.currency().value()).isEqualTo("EUR");
     assertThat(price.startDate().value().toString()).isEqualTo("2020-06-14T00:00");
+    ArgumentCaptor<List<DomainEvent>> publishedEvents = ArgumentCaptor.forClass(List.class);
+    verify(eventBus).publish(publishedEvents.capture());
+    assertThat(publishedEvents.getValue())
+        .singleElement()
+        .isInstanceOf(PriceUpdatedDomainEvent.class);
   }
 
   @Test
@@ -89,6 +101,7 @@ class PricePatcherTest {
     assertThatThrownBy(() -> patch(null, null, new PriceDate("2020-06-13T00:00:00")))
         .isInstanceOf(InvalidPriceDateRange.class);
     verify(repository, never()).update(any());
+    verify(eventBus, never()).publish(any());
   }
 
   @Test
@@ -100,6 +113,7 @@ class PricePatcherTest {
         .isInstanceOf(PriceNotFoundException.class);
     verify(integrityChecker, never()).ensureCanBeSaved(any());
     verify(repository, never()).update(any());
+    verify(eventBus, never()).publish(any());
   }
 
   @Test
@@ -111,5 +125,6 @@ class PricePatcherTest {
     assertThatThrownBy(() -> patch(new PriceAmount(new BigDecimal("40.00")), null, null))
         .isInstanceOf(PriceAlreadyExists.class);
     verify(repository, never()).update(any());
+    verify(eventBus, never()).publish(any());
   }
 }

@@ -15,6 +15,7 @@ import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.prices.domain.ProductId;
 import com.inditex.pricing.prices.domain.exceptions.PriceNotFoundException;
 import com.inditex.pricing.shared.domain.Service;
+import com.inditex.pricing.shared.domain.bus.event.EventBus;
 
 @Service
 public final class PricePatcher {
@@ -23,9 +24,13 @@ public final class PricePatcher {
 
   private final PriceIntegrityChecker integrityChecker;
 
-  public PricePatcher(PriceRepository repository, PriceIntegrityChecker integrityChecker) {
+  private final EventBus eventBus;
+
+  public PricePatcher(
+      PriceRepository repository, PriceIntegrityChecker integrityChecker, EventBus eventBus) {
     this.repository = repository;
     this.integrityChecker = integrityChecker;
+    this.eventBus = eventBus;
   }
 
   public void patch(
@@ -51,7 +56,7 @@ public final class PricePatcher {
     var mergedCurrency = Objects.requireNonNullElse(currency, current.currency());
 
     Price merged =
-        Price.create(
+        Price.update(
             id.value(),
             mergedBrandId.value(),
             mergedProductId.value(),
@@ -65,5 +70,6 @@ public final class PricePatcher {
     integrityChecker.ensureCanBeSaved(merged);
 
     repository.update(merged);
+    eventBus.publish(merged.pullDomainEvents());
   }
 }
