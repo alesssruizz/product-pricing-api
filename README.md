@@ -17,13 +17,13 @@ Cuando varias tarifas se solapan en el tiempo, el servicio decide cuál aplica s
 - [Requisitos](#requisitos)
 - [Puesta en marcha](#puesta-en-marcha)
 - [API](#api)
+- [Eventos de dominio](#eventos-de-dominio)
 - [Datos de ejemplo](#datos-de-ejemplo)
 - [Tests](#tests)
 - [Cobertura](#cobertura)
 - [Calidad de código](#calidad-de-código)
 - [Configuración](#configuración)
 - [Decisiones de diseño](#decisiones-de-diseño)
-- [Contribuir](#contribuir)
 - [Notas del autor](#notas-del-autor)
 
 ## Stack
@@ -37,34 +37,50 @@ Cuando varias tarifas se solapan en el tiempo, el servicio decide cuál aplica s
 | Documentación | springdoc-openapi 3.1.1 (OpenAPI 3 + Swagger UI)                  |
 | Tests         | JUnit 5, Mockito, AssertJ, Spring MockMvc, JaCoCo                 |
 | Calidad       | Spotless (google-java-format), Checkstyle, SpotBugs + FindSecBugs |
+| Utilidades    | Lombok                                                            |
 
 ## Arquitectura
 
 Arquitectura hexagonal (Ports & Adapters) con CQRS ligero mediante buses de comandos y queries en memoria. El código se organiza en dos raíces de código fuente dentro de un único módulo Gradle:
 
 ```
-apps/main/com/inditex/apps/pricing      # Adaptadores de entrada y arranque de Spring
-├── config                              # Versionado de API, OpenAPI
-└── controller                          # Controllers REST (uno por caso de uso) y manejo de errores
+apps/main/com/inditex/apps/pricing          # Adaptadores de entrada y arranque de Spring
+├── config                                  # Versionado de API, OpenAPI
+└── controller                              # Controllers REST (uno por caso de uso) y manejo de errores
     └── prices/v1/{get,post,put,patch,delete}
 
-pricing/main/com/inditex/pricing        # Núcleo de negocio, sin dependencias de framework en el dominio
-├── prices                              # Bounded context de precios
-│   ├── domain                          # Agregado Price, value objects, puertos, excepciones de dominio
-│   ├── application                     # Casos de uso: create, update, patch, delete, find, findbyid, searchall
-│   └── infrastructure/persistence/jpa  # Adaptador JPA del puerto PriceRepository
-└── shared                              # Kernel compartido: Identifier, value objects base, buses
+pricing/main/com/inditex/pricing            # Núcleo de negocio, sin dependencias de framework en el dominio
+├── prices                                  # Bounded context de precios
+│   ├── domain                              # Agregado Price, value objects y puertos
+│   │   ├── policy                          # Reglas de negocio que se validan antes de guardar
+│   │   ├── event                           # Eventos de dominio: creado, actualizado, eliminado
+│   │   └── exception                       # Errores de dominio con errorCode
+│   ├── application                         # Casos de uso: create, update, patch, delete, find, findbyid, searchall
+│   └── infrastructure/persistence/jpa      # Adaptadores JPA de los puertos
+├── brands                                  # Cadenas: modelo de dominio y entidad JPA (solo lectura)
+│   ├── domain
+│   └── infrastructure/persistence/jpa
+├── products                                # Productos: modelo de dominio y entidad JPA (solo lectura)
+│   ├── domain
+│   └── infrastructure/persistence/jpa
+├── metrics                                 # Métricas a partir de eventos de dominio
+│   ├── domain                              # Metric y el puerto MetricSender
+│   ├── application                         # Suscriptores asíncronos de los eventos de precios
+│   └── infrastructure                      # LogMetricSender: escribe la métrica en el log
+└── shared                                  # Kernel compartido: Identifier, value objects base, buses de comandos, queries y eventos
 ```
 
-Flujo de una petición:
+Flujo de una petición de escritura:
 
 ```
-Controller ──► CommandBus / QueryBus ──► Handler ──► Caso de uso ──► PriceRepository (puerto)
-                                                                          │
-                                                                PriceJpaAdapter (adaptador) ──► H2
+Controller ──► CommandBus ──► Handler ──► Caso de uso ──► PriceRepository (puerto) ──► PriceJpaAdapter ──► H2
+                                              │
+                                              └──► EventBus ──► suscriptores asíncronos (metrics) ──► log
 ```
 
 Cada controller declara su propio `errorMapping` (excepción de dominio → status HTTP); `ApiExceptionHandler` lo aplica y construye la respuesta `ProblemDetail` con un `errorCode` estable.
+
+Los contextos se comunican solo por identificador: el dominio de `prices` no importa nada de `brands` ni de `products`, y la única dependencia entre contextos está en infraestructura (las relaciones JPA de `PriceJpaEntity`).
 
 ## Requisitos
 
@@ -190,6 +206,51 @@ Los errores siguen el formato Problem Details (`application/problem+json`) e inc
 
 La especificación completa, con todos los esquemas, está disponible en Swagger UI.
 
+## Eventos de dominio
+
+Cada operación de escritura sobre una tarifa registra un evento de dominio en el agregado `Price`:
+
+| Operación | Evento | Nombre |
+|---|---|---|
+| `POST` | `PriceCreatedDomainEvent` | `price.created` |
+| `PUT` / `PATCH` | `PriceUpdatedDomainEvent` | `price.updated` |
+| `DELETE` | `PriceDeletedDomainEvent` | `price.deleted` |
+
+Tras persistir el cambio, el caso de uso publica los eventos en el `EventBus` (implementado sobre los eventos de aplicación de Spring). Los suscriptores del contexto `metrics` los reciben de forma **asíncrona** (`@Async`, en un hilo `task-N`), así que no añaden latencia a la petición HTTP. Hoy su única acción es enviar una métrica a través del puerto `MetricSender`, cuya implementación (`LogMetricSender`) la escribe en el log. Todas las métricas incluyen el `priceId` de la tarifa afectada.
+
+Ejemplo real de los tres eventos al crear, modificar y eliminar una tarifa:
+
+```
+18:45:58.246 [task-1] INFO  c.i.p.m.i.LogMetricSender - price.created ->
+ {
+  "priceId" : "3f2b8c1e-7d4a-4b9e-9c51-2a6f0e8d7b13",
+  "productId" : 35455,
+  "endDate" : "2021-01-31T23:59:59",
+  "price" : 12.30,
+  "priceList" : 5,
+  "startDate" : "2021-01-01T00:00",
+  "currency" : "EUR",
+  "brandId" : 1
+}
+18:45:58.276 [task-2] INFO  c.i.p.m.i.LogMetricSender - price.updated ->
+ {
+  "priceId" : "3f2b8c1e-7d4a-4b9e-9c51-2a6f0e8d7b13",
+  "productId" : 35455,
+  "endDate" : "2021-02-28T23:59:59",
+  "price" : 15.00,
+  "priceList" : 5,
+  "startDate" : "2021-01-01T00:00",
+  "currency" : "EUR",
+  "brandId" : 1
+}
+18:45:58.296 [task-3] INFO  c.i.p.m.i.LogMetricSender - price.deleted ->
+ {
+  "priceId" : "3f2b8c1e-7d4a-4b9e-9c51-2a6f0e8d7b13"
+}
+```
+
+Para enviar las métricas a otro destino (Prometheus, una cola, etc.) basta con una nueva implementación de `MetricSender`; ni los eventos ni los casos de uso cambian.
+
 ## Datos de ejemplo
 
 | ID | BRAND_ID | START_DATE | END_DATE | PRICE_LIST | PRODUCT_ID | PRIORITY | PRICE | CURR |
@@ -271,12 +332,15 @@ Configuración principal en `apps/main/resources/application.properties`.
 
 Consola en `http://localhost:8080/pricing-service/h2-console` (JDBC URL `jdbc:h2:mem:pricingdb`, usuario `sa`, sin contraseña).
 
-**Logs**: consola y fichero `var/logs/product-pricing-api.log` (configuración en `apps/main/resources/logback.xml`).
+**Logs**: consola y fichero `var/logs/product-pricing-api.log` (configuración en `apps/main/resources/logback.xml`). Ahí se registran los errores inesperados y las métricas de los [eventos de dominio](#eventos-de-dominio).
 
 ## Decisiones de diseño
 
 - **Ids generados por el cliente.** El id de una tarifa es un UUID que envía el cliente en el `POST`. La validación vive en `Identifier` (`shared/domain`), reutilizable por cualquier identificador, y lanza el error genérico `InvalidUUID`.
 - **Alta y modificación explícitas en el puerto.** `PriceRepository` expone `create` y `update` en lugar de un `save` genérico. La entidad JPA implementa `Persistable`, de forma que un alta se ejecuta como `persist` (solo `INSERT`) y una modificación como `merge`.
+- **Reglas de negocio como policies.** Las validaciones previas al guardado (referencias existentes, tarifas en conflicto) implementan `PricePolicy`, cada una con su orden de ejecución. `PriceIntegrityChecker` recibe todas las policies y las ejecuta en orden, así que añadir una regla es añadir una clase.
+- **Persistencia uniforme con JPA.** Cadenas y productos están mapeados como entidades JPA y `PriceJpaEntity` los referencia con relaciones `@ManyToOne` perezosas; no queda SQL nativo en el proyecto.
+- **Eventos de dominio asíncronos.** Las escrituras publican eventos que procesan suscriptores asíncronos, desacoplando efectos secundarios como las métricas del caso de uso principal.
 - **Errores por caso de uso.** Cada controller decide qué status corresponde a cada error de dominio; el dominio no conoce HTTP.
 - **Versionado por ruta.** `/api/v1/...`, resuelto con el soporte nativo de versionado de API de Spring.
 
