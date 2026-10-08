@@ -1,16 +1,16 @@
 package com.inditex.pricing.prices.domain;
 
 import java.math.BigDecimal;
-import java.util.Objects;
 
 import com.inditex.pricing.prices.domain.event.PriceCreatedDomainEvent;
 import com.inditex.pricing.prices.domain.event.PriceDeletedDomainEvent;
 import com.inditex.pricing.prices.domain.exceptions.InvalidPriceDateRange;
 import com.inditex.pricing.shared.domain.AggregateRoot;
-import com.inditex.pricing.shared.domain.exception.FieldRequired;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
+@EqualsAndHashCode(callSuper = false)
 @Getter
 public final class Price extends AggregateRoot {
 
@@ -78,16 +78,7 @@ public final class Price extends AggregateRoot {
       String currency) {
 
     var newPrice =
-        new Price(
-            id,
-            required(brandId, "brandId"),
-            required(productId, "productId"),
-            required(priceList, "priceList"),
-            priority,
-            required(startDate, "startDate"),
-            required(endDate, "endDate"),
-            required(price, "price"),
-            currency);
+        new Price(id, brandId, productId, priceList, priority, startDate, endDate, price, currency);
 
     newPrice.register(
         new PriceCreatedDomainEvent(
@@ -107,12 +98,5 @@ public final class Price extends AggregateRoot {
     if (!endDate.value().isAfter(startDate.value())) {
       throw new InvalidPriceDateRange();
     }
-  }
-
-  private static <T> T required(T value, String field) {
-    if (Objects.isNull(value) || (value instanceof String str && str.isBlank())) {
-      throw new FieldRequired(field);
-    }
-    return value;
   }
 }
