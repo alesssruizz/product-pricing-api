@@ -63,9 +63,9 @@ class SpringApplicationEventBusTest {
       bus.publish(List.of(eventA, eventB, eventC));
 
       var order = inOrder(publisher);
-      order.verify(publisher).publishEvent((Object) eventA);
-      order.verify(publisher).publishEvent((Object) eventB);
-      order.verify(publisher).publishEvent((Object) eventC);
+      order.verify(publisher).publishEvent(eventA);
+      order.verify(publisher).publishEvent(eventB);
+      order.verify(publisher).publishEvent(eventC);
     }
 
     @Test
