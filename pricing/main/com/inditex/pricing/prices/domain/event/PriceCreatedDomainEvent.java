@@ -58,6 +58,7 @@ public class PriceCreatedDomainEvent extends DomainEvent {
   @Override
   public Map<String, Serializable> toPrimitives() {
     return Map.ofEntries(
+        Map.entry("priceId", aggregateId()),
         Map.entry("productId", productId),
         Map.entry("brandId", brandId),
         Map.entry("priceList", priceList),

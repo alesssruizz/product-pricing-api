@@ -53,6 +53,7 @@ class PriceCreateTest {
             event -> {
               assertThat(event.eventName()).isEqualTo("price.created");
               assertThat(event.aggregateId()).isEqualTo(ID);
+              assertThat(event.toPrimitives()).containsEntry("priceId", ID);
             });
   }
 

@@ -45,6 +45,7 @@ class PriceUpdateTest {
               event -> {
                 assertThat(event.eventName()).isEqualTo("price.updated");
                 assertThat(event.aggregateId()).isEqualTo(ID);
+                assertThat(event.toPrimitives()).containsEntry("priceId", ID);
                 assertThat(event.brandId()).isEqualTo(1L);
                 assertThat(event.productId()).isEqualTo(35455L);
                 assertThat(event.priceList()).isEqualTo(1);
