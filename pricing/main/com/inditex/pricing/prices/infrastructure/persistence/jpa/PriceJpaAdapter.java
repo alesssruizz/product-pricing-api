@@ -4,12 +4,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.inditex.pricing.brands.infrastructure.persistence.jpa.BrandJpaRepository;
 import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.Price;
 import com.inditex.pricing.prices.domain.PriceDate;
 import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceRepository;
 import com.inditex.pricing.prices.domain.ProductId;
+import com.inditex.pricing.products.infrastructure.persistence.jpa.ProductJpaRepository;
 import com.inditex.pricing.shared.domain.Service;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -20,8 +22,15 @@ public class PriceJpaAdapter implements PriceRepository {
 
   private final PriceJpaRepository repository;
 
-  public PriceJpaAdapter(PriceJpaRepository repository) {
+  private final BrandJpaRepository brands;
+
+  private final ProductJpaRepository products;
+
+  public PriceJpaAdapter(
+      PriceJpaRepository repository, BrandJpaRepository brands, ProductJpaRepository products) {
     this.repository = repository;
+    this.brands = brands;
+    this.products = products;
   }
 
   @Override
@@ -47,13 +56,21 @@ public class PriceJpaAdapter implements PriceRepository {
   @Override
   @Transactional
   public void create(Price price) {
-    repository.save(PriceJpaEntity.forCreate(price));
+    repository.save(
+        PriceJpaEntity.forCreate(
+            price,
+            brands.getReferenceById(price.brandId().value()),
+            products.getReferenceById(price.productId().value())));
   }
 
   @Override
   @Transactional
   public void update(Price price) {
-    repository.save(PriceJpaEntity.forUpdate(price));
+    repository.save(
+        PriceJpaEntity.forUpdate(
+            price,
+            brands.getReferenceById(price.brandId().value()),
+            products.getReferenceById(price.productId().value())));
   }
 
   @Override
@@ -64,13 +81,12 @@ public class PriceJpaAdapter implements PriceRepository {
 
   @Override
   public boolean existsConflict(Price price) {
-    return repository.countConflicts(
-            price.brandId().value(),
-            price.productId().value(),
-            price.priority().value(),
-            price.startDate().value(),
-            price.id().toUuid())
-        > 0;
+    return repository.existsByBrand_IdAndProduct_IdAndPriorityAndStartDateAndIdNot(
+        price.brandId().value(),
+        price.productId().value(),
+        price.priority().value(),
+        price.startDate().value(),
+        price.id().toUuid());
   }
 
   @Override

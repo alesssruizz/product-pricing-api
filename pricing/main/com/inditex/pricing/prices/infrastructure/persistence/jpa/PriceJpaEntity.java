@@ -4,11 +4,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.inditex.pricing.brands.infrastructure.persistence.jpa.BrandJpaEntity;
 import com.inditex.pricing.prices.domain.Price;
+import com.inditex.pricing.products.infrastructure.persistence.jpa.ProductJpaEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import org.springframework.data.domain.Persistable;
@@ -19,8 +24,9 @@ public class PriceJpaEntity implements Persistable<UUID> {
 
   @Id private UUID id;
 
-  @Column(name = "brand_id", nullable = false)
-  private Long brandId;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "brand_id", nullable = false)
+  private BrandJpaEntity brand;
 
   @Column(name = "start_date", nullable = false)
   private LocalDateTime startDate;
@@ -31,8 +37,9 @@ public class PriceJpaEntity implements Persistable<UUID> {
   @Column(name = "price_list", nullable = false)
   private Integer priceList;
 
-  @Column(name = "product_id", nullable = false)
-  private Long productId;
+  @ManyToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "product_id", nullable = false)
+  private ProductJpaEntity product;
 
   @Column(nullable = false)
   private Integer priority;
@@ -51,43 +58,46 @@ public class PriceJpaEntity implements Persistable<UUID> {
 
   private PriceJpaEntity(
       UUID id,
-      Long brandId,
+      BrandJpaEntity brand,
       LocalDateTime startDate,
       LocalDateTime endDate,
       Integer priceList,
-      Long productId,
+      ProductJpaEntity product,
       Integer priority,
       BigDecimal price,
       String currency,
       boolean newEntity) {
     this.id = id;
-    this.brandId = brandId;
+    this.brand = brand;
     this.startDate = startDate;
     this.endDate = endDate;
     this.priceList = priceList;
-    this.productId = productId;
+    this.product = product;
     this.priority = priority;
     this.price = price;
     this.currency = currency;
     this.newEntity = newEntity;
   }
 
-  public static PriceJpaEntity forCreate(Price price) {
-    return fromDomain(price, true);
+  public static PriceJpaEntity forCreate(
+      Price price, BrandJpaEntity brand, ProductJpaEntity product) {
+    return fromDomain(price, brand, product, true);
   }
 
-  public static PriceJpaEntity forUpdate(Price price) {
-    return fromDomain(price, false);
+  public static PriceJpaEntity forUpdate(
+      Price price, BrandJpaEntity brand, ProductJpaEntity product) {
+    return fromDomain(price, brand, product, false);
   }
 
-  private static PriceJpaEntity fromDomain(Price price, boolean newEntity) {
+  private static PriceJpaEntity fromDomain(
+      Price price, BrandJpaEntity brand, ProductJpaEntity product, boolean newEntity) {
     return new PriceJpaEntity(
         price.id().toUuid(),
-        price.brandId().value(),
+        brand,
         price.startDate().value(),
         price.endDate().value(),
         price.priceList().value(),
-        price.productId().value(),
+        product,
         price.priority().value(),
         price.priceAmount().value(),
         price.currency().value(),
@@ -100,7 +110,7 @@ public class PriceJpaEntity implements Persistable<UUID> {
   }
 
   public Long getBrandId() {
-    return brandId;
+    return brand.getId();
   }
 
   public LocalDateTime getStartDate() {
@@ -116,7 +126,7 @@ public class PriceJpaEntity implements Persistable<UUID> {
   }
 
   public Long getProductId() {
-    return productId;
+    return product.getId();
   }
 
   public Integer getPriority() {

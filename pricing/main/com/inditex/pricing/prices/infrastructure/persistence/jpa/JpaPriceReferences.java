@@ -1,40 +1,34 @@
 package com.inditex.pricing.prices.infrastructure.persistence.jpa;
 
+import com.inditex.pricing.brands.infrastructure.persistence.jpa.BrandJpaRepository;
 import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.PriceReferences;
 import com.inditex.pricing.prices.domain.ProductId;
+import com.inditex.pricing.products.infrastructure.persistence.jpa.ProductJpaRepository;
 import com.inditex.pricing.shared.domain.Service;
 
-import jakarta.persistence.EntityManager;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 public class JpaPriceReferences implements PriceReferences {
 
-  private final EntityManager entityManager;
+  private final BrandJpaRepository brands;
 
-  public JpaPriceReferences(EntityManager entityManager) {
-    this.entityManager = entityManager;
+  private final ProductJpaRepository products;
+
+  public JpaPriceReferences(BrandJpaRepository brands, ProductJpaRepository products) {
+    this.brands = brands;
+    this.products = products;
   }
 
   @Override
   public boolean brandExists(BrandId id) {
-    return countById("brands", id.value()) > 0;
+    return brands.existsById(id.value());
   }
 
   @Override
   public boolean productExists(ProductId id) {
-    return countById("products", id.value()) > 0;
-  }
-
-  private long countById(String table, Long id) {
-    Number count =
-        (Number)
-            entityManager
-                .createNativeQuery("SELECT COUNT(*) FROM " + table + " WHERE id = ?1")
-                .setParameter(1, id)
-                .getSingleResult();
-    return count.longValue();
+    return products.existsById(id.value());
   }
 }

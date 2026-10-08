@@ -2,11 +2,14 @@ package com.inditex.pricing.prices.infrastructure.persistence.jpa;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.inditex.pricing.brands.infrastructure.persistence.jpa.BrandJpaEntity;
+import com.inditex.pricing.brands.infrastructure.persistence.jpa.BrandJpaRepository;
 import com.inditex.pricing.prices.domain.BrandId;
 import com.inditex.pricing.prices.domain.Price;
 import com.inditex.pricing.prices.domain.PriceAmount;
@@ -16,6 +19,8 @@ import com.inditex.pricing.prices.domain.PriceId;
 import com.inditex.pricing.prices.domain.PriceList;
 import com.inditex.pricing.prices.domain.PricePriority;
 import com.inditex.pricing.prices.domain.ProductId;
+import com.inditex.pricing.products.infrastructure.persistence.jpa.ProductJpaEntity;
+import com.inditex.pricing.products.infrastructure.persistence.jpa.ProductJpaRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,11 +39,19 @@ class PriceJpaAdapterTest {
 
   @Mock private PriceJpaRepository repository;
 
+  @Mock private BrandJpaRepository brands;
+
+  @Mock private ProductJpaRepository products;
+
+  @Mock private BrandJpaEntity brand;
+
+  @Mock private ProductJpaEntity product;
+
   private PriceJpaAdapter adapter;
 
   @BeforeEach
   void setUp() {
-    adapter = new PriceJpaAdapter(repository);
+    adapter = new PriceJpaAdapter(repository, brands, products);
   }
 
   private static Price price() {
@@ -52,6 +65,13 @@ class PriceJpaAdapterTest {
         new PricePriority(1),
         new PriceAmount(new BigDecimal("25.45")),
         new PriceCurrency("EUR"));
+  }
+
+  private void stubReferences() {
+    when(brand.getId()).thenReturn(1L);
+    when(product.getId()).thenReturn(35455L);
+    when(brands.getReferenceById(1L)).thenReturn(brand);
+    when(products.getReferenceById(35455L)).thenReturn(product);
   }
 
   private static void assertMapsEveryField(PriceJpaEntity entity) {
@@ -72,6 +92,7 @@ class PriceJpaAdapterTest {
 
     @Test
     void savesAnEntityFlaggedAsNew() {
+      stubReferences();
       ArgumentCaptor<PriceJpaEntity> saved = ArgumentCaptor.forClass(PriceJpaEntity.class);
 
       adapter.create(price());
@@ -80,6 +101,8 @@ class PriceJpaAdapterTest {
       PriceJpaEntity entity = saved.getValue();
       assertThat(entity.isNew()).isTrue();
       assertMapsEveryField(entity);
+      verify(brands).getReferenceById(1L);
+      verify(products).getReferenceById(35455L);
     }
   }
 
@@ -89,6 +112,7 @@ class PriceJpaAdapterTest {
 
     @Test
     void savesAnEntityNotFlaggedAsNew() {
+      stubReferences();
       ArgumentCaptor<PriceJpaEntity> saved = ArgumentCaptor.forClass(PriceJpaEntity.class);
 
       adapter.update(price());
@@ -97,6 +121,23 @@ class PriceJpaAdapterTest {
       PriceJpaEntity entity = saved.getValue();
       assertThat(entity.isNew()).isFalse();
       assertMapsEveryField(entity);
+      verify(brands).getReferenceById(1L);
+      verify(products).getReferenceById(35455L);
+    }
+  }
+
+  @Nested
+  @DisplayName("when checking conflicts")
+  class WhenCheckingConflicts {
+
+    @Test
+    void delegatesToTheDerivedExistsQuery() {
+      var price = price();
+      when(repository.existsByBrand_IdAndProduct_IdAndPriorityAndStartDateAndIdNot(
+              1L, 35455L, 1, LocalDateTime.of(2020, 6, 14, 15, 0, 0), UUID.fromString(ID)))
+          .thenReturn(true);
+
+      assertThat(adapter.existsConflict(price)).isTrue();
     }
   }
 }

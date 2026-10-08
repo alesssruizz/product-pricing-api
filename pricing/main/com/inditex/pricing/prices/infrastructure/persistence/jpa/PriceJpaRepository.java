@@ -13,8 +13,8 @@ public interface PriceJpaRepository extends ListCrudRepository<PriceJpaEntity, U
       """
       SELECT p
       FROM PriceJpaEntity p
-      WHERE p.brandId = :brandId
-          AND p.productId = :productId
+      WHERE p.brand.id = :brandId
+          AND p.product.id = :productId
           AND :applicationDate BETWEEN p.startDate AND p.endDate
       ORDER BY p.priority DESC, p.startDate DESC
       LIMIT 1
@@ -22,16 +22,6 @@ public interface PriceJpaRepository extends ListCrudRepository<PriceJpaEntity, U
   List<PriceJpaEntity> findApplicablePrice(
       Long brandId, Long productId, LocalDateTime applicationDate);
 
-  @Query(
-      """
-      SELECT COUNT(p)
-      FROM PriceJpaEntity p
-      WHERE p.brandId = :brandId
-          AND p.productId = :productId
-          AND p.priority = :priority
-          AND p.startDate = :startDate
-          AND p.id <> :id
-      """)
-  long countConflicts(
+  boolean existsByBrand_IdAndProduct_IdAndPriorityAndStartDateAndIdNot(
       Long brandId, Long productId, Integer priority, LocalDateTime startDate, UUID id);
 }
