@@ -4,8 +4,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.Immutable;
 
+@Accessors(fluent = false)
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Immutable
 @Table(name = "products")
@@ -15,16 +22,4 @@ public class ProductJpaEntity {
 
   @Column(nullable = false, length = 100)
   private String name;
-
-  protected ProductJpaEntity() {
-    // Required by JPA
-  }
-
-  public Long getId() {
-    return id;
-  }
-
-  public String getName() {
-    return name;
-  }
 }

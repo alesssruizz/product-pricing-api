@@ -17,16 +17,24 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.domain.Persistable;
 
+@Accessors(fluent = false)
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "prices")
 public class PriceJpaEntity implements Persistable<UUID> {
 
   @Id private UUID id;
 
+  @Getter(AccessLevel.NONE)
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "brand_id", nullable = false)
   private BrandJpaEntity brand;
@@ -40,6 +48,7 @@ public class PriceJpaEntity implements Persistable<UUID> {
   @Column(name = "price_list", nullable = false)
   private Integer priceList;
 
+  @Getter(AccessLevel.NONE)
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "product_id", nullable = false)
   private ProductJpaEntity product;
@@ -61,11 +70,9 @@ public class PriceJpaEntity implements Persistable<UUID> {
   @Column(name = "updated_at", nullable = false)
   private Instant updatedAt;
 
-  @Transient private boolean newEntity;
-
-  protected PriceJpaEntity() {
-    // Required by JPA
-  }
+  @Getter(AccessLevel.NONE)
+  @Transient
+  private boolean newEntity;
 
   private PriceJpaEntity(
       UUID id,
@@ -115,49 +122,12 @@ public class PriceJpaEntity implements Persistable<UUID> {
         newEntity);
   }
 
-  @Override
-  public UUID getId() {
-    return id;
-  }
-
   public Long getBrandId() {
     return brand.getId();
   }
 
-  public LocalDateTime getStartDate() {
-    return startDate;
-  }
-
-  public LocalDateTime getEndDate() {
-    return endDate;
-  }
-
-  public Integer getPriceList() {
-    return priceList;
-  }
-
   public Long getProductId() {
     return product.getId();
-  }
-
-  public Integer getPriority() {
-    return priority;
-  }
-
-  public BigDecimal getPrice() {
-    return price;
-  }
-
-  public String getCurrency() {
-    return currency;
-  }
-
-  public Instant getCreatedAt() {
-    return createdAt;
-  }
-
-  public Instant getUpdatedAt() {
-    return updatedAt;
   }
 
   @Override
