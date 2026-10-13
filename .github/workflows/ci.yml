@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build, lint and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # Caches Gradle dependencies and validates the wrapper jar checksum.
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      # make all = gradle clean build: spotlessCheck, checkstyle, spotbugs, test and jacocoTestReport.
+      - name: Build
+        run: make all
+
+      - name: Upload test and coverage reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: reports
+          path: |
+            build/reports/tests/test
+            build/reports/jacoco/test/html
+          if-no-files-found: ignore
+          retention-days: 14
