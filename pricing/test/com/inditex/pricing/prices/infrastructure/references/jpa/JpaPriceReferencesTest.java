@@ -1,4 +1,4 @@
-package com.inditex.pricing.prices.infrastructure.persistence.jpa;
+package com.inditex.pricing.prices.infrastructure.references.jpa;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;

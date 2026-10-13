@@ -1,4 +1,4 @@
-package com.inditex.pricing.prices.infrastructure.persistence.jpa;
+package com.inditex.pricing.prices.infrastructure.references.jpa;
 
 import com.inditex.pricing.brands.infrastructure.persistence.jpa.BrandJpaRepository;
 import com.inditex.pricing.prices.domain.BrandId;
