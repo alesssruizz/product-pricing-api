@@ -23,29 +23,35 @@ Always run `make fix-lint` before `make lint`: formatting is owned by Spotless, 
 
 ## Build layout
 
-There is a **single Gradle module** with custom source sets (no `src/main`):
+There is a **single Gradle module** (Java 21 toolchain) with custom source sets (no `src/main`):
 
 - `apps/main` + `pricing/main` → main source set; `apps/main/resources` + `pricing/main/resources` share one classpath root.
-- `apps/test` + `pricing/test` → test source set.
+- `apps/test` + `pricing/test` → test source set; `apps/test/resources` + `pricing/test/resources` likewise share one root.
 
-Consequences: a resource can exist only once across both trees (e.g. there is one `logback.xml`, in `apps/main/resources`; a second one breaks `processResources`), and `pricing` code can see `apps` classes at compile time — keep the dependency direction `apps → pricing` by convention.
+Consequences: within each source set, a resource can exist only once across both trees (e.g. there is one `logback.xml`, in `apps/main/resources`; a second one breaks `processResources`), and `pricing` code can see `apps` classes at compile time — keep the dependency direction `apps → pricing` by convention.
 
 ## Architecture
 
 Hexagonal architecture with lightweight CQRS over in-memory buses.
 
-- `pricing/main/com/inditex/pricing/prices` — the `prices` bounded context: `domain` (aggregate `Price`, value objects, `PriceRepository`/`PriceReferences` ports, `policy/`, `exception/`), `application` (one package per use case), `infrastructure/persistence/jpa` (adapters).
+- `pricing/main/com/inditex/pricing/prices` — the `prices` bounded context: `domain` (aggregate `Price`, value objects, `PriceRepository`/`PriceReferences` ports, `policy/`, `exception/`), `application` (one package per use case), `infrastructure/persistence/jpa` (own persistence adapters), `infrastructure/references/jpa` (`JpaPriceReferences`, the adapter that checks brands/products exist — the boundary with those contexts).
 - `pricing/main/com/inditex/pricing/{brands,products}` — read-only contexts: domain model (`Brand`/`Product`, own `BrandId`/`ProductId`) and JPA entities. No use cases and no repository ports yet; brands and products cannot be created through the API.
-- `pricing/main/com/inditex/pricing/shared` — shared kernel: base value objects, `Identifier`, `DomainError`, bus interfaces and their in-memory implementations. **Must not import from any context.**
+- `pricing/main/com/inditex/pricing/shared` — shared kernel: base value objects, `Identifier`, `DomainError`, bus interfaces and their implementations (in-memory command/query buses, Spring-backed event bus). **Must not import from any context.**
+- `pricing/main/com/inditex/pricing/metrics` — event-driven context: subscribers in `application` react to price domain events and send a `Metric` through the `MetricSender` port (`LogMetricSender` writes it to the log).
 - `apps/main/com/inditex/apps/pricing` — Spring Boot entry point, config (API versioning, OpenAPI), REST controllers and error handling.
 
-Context boundaries: the `prices` domain and application reference brands and products **only by id**, using their own `BrandId`/`ProductId` value objects, and never import `brands`/`products`. The only allowed cross-context imports are infrastructure → infrastructure (`PriceJpaEntity` relations, `JpaPriceReferences`). Packages are singular (`exception`, `policy`).
+Context boundaries: the `prices` domain and application reference brands and products **only by id**, using their own `BrandId`/`ProductId` value objects, and never import `brands`/`products`. The only allowed cross-context imports are infrastructure → infrastructure (`PriceJpaEntity` relations, `references/jpa/JpaPriceReferences`) and subscribers importing the domain events they listen to (`metrics` → `prices.domain.event`). Packages are singular (`exception`, `policy`).
 
 ### Wiring
 
 - Beans are not registered with Spring stereotypes in the core: classes use the project's own `com.inditex.pricing.shared.domain.Service` annotation, picked up by an `includeFilters` `@ComponentScan` in `ProductPricingApiApplication`.
 - Command/query handlers are indexed automatically by the generic type they implement (`QueryHandlersInformation` / `CommandHandlersInformation`); two handlers for the same type fail at startup.
 - A use case package contains the `Command`/`Query` record, its `*Handler`, and the application service that does the work (e.g. `create/`: `CreatePriceCommand`, `CreatePriceCommandHandler`, `PriceCreator`).
+
+### Domain events
+
+- Write use cases (`PriceCreator`, `PriceUpdater`, `PricePatcher`, `PriceDeleter`) persist first, then call `eventBus.publish(price.pullDomainEvents())`. Events: `price.created`, `price.updated` (PUT and PATCH), `price.deleted`.
+- `SpringApplicationEventBus` republishes them as Spring application events. Subscribers are `@Service` + `@DomainEventSuscriber({...})` classes with an `@EventListener` method, marked `@Async` (`@EnableAsync` on `ProductPricingApiApplication`), so they run on a `task-N` thread and never add latency or errors to the HTTP request.
 
 ### HTTP layer
 
